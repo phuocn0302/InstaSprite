@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -55,4 +56,20 @@ fun InstaSpriteTheme(
         typography = Typography,
         content = content
     )
+}
+
+object DrawingScreenColor {
+    // UI Colors
+    val BackgroundColor = Color(0xFF1A1A2E)
+    val PaletteBarColor = Color(0xFF262B44)
+    val PaletteBackgroundColor = Color(0xFF5A6988)
+    val CanvasBorderColor = Color(0xFF2D3250)
+    val SelectedToolColor = Color(0xFF4D5881)
+    val ColorItemBorder = Color(0xFF262B44)
+    val ColorItemBorderOverlay = Color.White.copy(alpha = 0.3f)
+
+    // Canvas Colors
+    val DefaultCanvasColor = Color(0xFF9BAFD9)
+    val CheckerColor1 = Color(0xFF8B9BB4)
+    val CheckerColor2 = Color(0xFF5A6988)
 }

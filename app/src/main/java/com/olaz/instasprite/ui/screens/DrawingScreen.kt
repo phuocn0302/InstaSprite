@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
@@ -55,16 +56,8 @@ fun DrawingScreen() {
 
     var scale by remember { mutableFloatStateOf(1f) }
 
-    // For canvas section, somehow make the top and bottom bar always on top when zooming
-    val scrollState = rememberScrollState()
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DrawingScreenColor.BackgroundColor)
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Top palette bar
+    Scaffold(
+        topBar = {
             ColorPalette(
                 onColorSelected = {
                     selectedColor = it
@@ -72,68 +65,73 @@ fun DrawingScreen() {
                 },
                 selectedColor = selectedColor,
                 modifier = Modifier
-                    .weight(0.3f)
                     .background(DrawingScreenColor.PaletteBarColor)
                     .padding(horizontal = 8.dp, vertical = 12.dp)
             )
+        },
 
-            // Canvas section
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-            ) {
-                PixelCanvas(
-                    pixels = canvasPixels,
-                    onPixelClick = { row, col ->
-                        val newCanvas = canvasPixels.toMutableList().apply {
-                            val newRow = this[row].toMutableList().apply {
-                                this[col] = selectedColor
-                            }
-                            this[row] = newRow
-                        }
-                        canvasPixels = newCanvas
-                    },
+        bottomBar = {
+            Column() {
+                Slider(
+                    value = scale,
+                    onValueChange = { newValue -> scale = newValue },
+                    valueRange = 0.5f..5f,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.White,
+                        activeTrackColor = DrawingScreenColor.SelectedToolColor,
+                        inactiveTrackColor = DrawingScreenColor.SelectedToolColor
+
+                    ),
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(32.dp)
-                        .aspectRatio(1f)
-                        .fillMaxHeight(0.7f)
-                        .graphicsLayer(
-                            scaleX = scale,
-                            scaleY = scale,
-                        )
+                        .fillMaxWidth()
+                        .background(DrawingScreenColor.PaletteBarColor)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                ToolSelector(
+                    selectedTool = selectedTool,
+                    onToolSelected = { selectedTool = it },
+                    modifier = Modifier
+                        .background(DrawingScreenColor.PaletteBarColor)
+                        .padding(horizontal = 5.dp, vertical = 8.dp)
                 )
             }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(DrawingScreenColor.BackgroundColor)
+        ) {
 
-            Slider(
-                value = scale,
-                onValueChange = { newValue -> scale = newValue },
-                valueRange = 0.5f..5f,
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = DrawingScreenColor.SelectedToolColor,
-                    inactiveTrackColor = DrawingScreenColor.SelectedToolColor
-
-                ),
+            // Canvas section
+            PixelCanvas(
+                pixels = canvasPixels,
+                onPixelClick = { row, col ->
+                    val newCanvas = canvasPixels.toMutableList().apply {
+                        val newRow = this[row].toMutableList().apply {
+                            this[col] = selectedColor
+                        }
+                        this[row] = newRow
+                    }
+                    canvasPixels = newCanvas
+                },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(DrawingScreenColor.PaletteBarColor)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-
-            // Bottom tool bar
-            ToolSelector(
-                selectedTool = selectedTool,
-                onToolSelected = { selectedTool = it },
-                modifier = Modifier
-                    .background(DrawingScreenColor.PaletteBarColor)
-                    .padding(horizontal = 5.dp, vertical = 8.dp)
+                    .align(Alignment.Center)
+                    .padding(32.dp)
+                    .aspectRatio(1f)
+                    .fillMaxSize()
+                    .fillMaxHeight(0.7f)
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                    )
             )
         }
     }
 }
+
 
 @Composable
 fun ColorPalette(
@@ -154,7 +152,7 @@ fun ColorPalette(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                var borderColor : Color = DrawingScreenColor.ColorItemBorder
+                var borderColor: Color = DrawingScreenColor.ColorItemBorder
 
                 // Top row
                 Row(
@@ -162,7 +160,7 @@ fun ColorPalette(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     for (i in 0 until 8) {
-                        val color : Color = ColorPalette.ColorsList[i]
+                        val color: Color = ColorPalette.ColorsList[i]
 
                         borderColor = if (color == selectedColor) {
                             Color.White
@@ -170,7 +168,8 @@ fun ColorPalette(
                             DrawingScreenColor.ColorItemBorder
                         }
 
-                        ColorItem(color = color,
+                        ColorItem(
+                            color = color,
                             onColorSelected = onColorSelected,
                             modifier = Modifier
                                 .size(36.dp)
@@ -187,7 +186,7 @@ fun ColorPalette(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     for (i in 8 until 16) {
-                        val color : Color = ColorPalette.ColorsList[i]
+                        val color: Color = ColorPalette.ColorsList[i]
 
                         borderColor = if (color == selectedColor) {
                             Color.White
@@ -195,7 +194,8 @@ fun ColorPalette(
                             DrawingScreenColor.ColorItemBorder
                         }
 
-                        ColorItem(color = color,
+                        ColorItem(
+                            color = color,
                             onColorSelected = onColorSelected,
                             modifier = Modifier
                                 .size(36.dp)
@@ -240,8 +240,9 @@ fun PixelCanvas(
             .border(10.dp, DrawingScreenColor.CanvasBorderColor)
             .padding(10.dp)
     ) {
-        Column(modifier = Modifier
-            .fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             for (row in 0 until rows) {
                 Row(modifier = Modifier.weight(1f)) {
@@ -249,17 +250,19 @@ fun PixelCanvas(
                         val checkerBlockRow = row / checkerSize
                         val checkerBlockCol = col / checkerSize
 
-                        val checkerBlockColor = if ((checkerBlockRow + checkerBlockCol) % 2 == 0) {
-                            DrawingScreenColor.CheckerColor1
-                        } else {
-                            DrawingScreenColor.CheckerColor2
-                        }
+                        val checkerBlockColor =
+                            if ((checkerBlockRow + checkerBlockCol) % 2 == 0) {
+                                DrawingScreenColor.CheckerColor1
+                            } else {
+                                DrawingScreenColor.CheckerColor2
+                            }
 
-                        val displayColor = if (pixels[row][col] != DrawingScreenColor.DefaultCanvasColor) {
-                            pixels[row][col]
-                        } else {
-                            checkerBlockColor
-                        }
+                        val displayColor =
+                            if (pixels[row][col] != DrawingScreenColor.DefaultCanvasColor) {
+                                pixels[row][col]
+                            } else {
+                                checkerBlockColor
+                            }
 
                         Box(
                             modifier = Modifier

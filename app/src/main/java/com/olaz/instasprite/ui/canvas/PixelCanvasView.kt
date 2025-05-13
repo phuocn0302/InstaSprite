@@ -11,17 +11,21 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
 @Composable
 fun PixelCanvas(
-    pixels: List<List<Color>>,
-    onPixelClick: (Int, Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: PixelCanvasViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val pixels = uiState.canvasPixels
+
     val rows = pixels.size
     val cols = if (rows > 0) pixels[0].size else 0
     val checkerSize = 8
@@ -61,7 +65,7 @@ fun PixelCanvas(
                                 .weight(1f)
                                 .fillMaxHeight()
                                 .background(displayColor)
-                                .clickable { onPixelClick(row, col) }
+                                .clickable { viewModel.drawPixel(row, col)}
                         )
                     }
                 }

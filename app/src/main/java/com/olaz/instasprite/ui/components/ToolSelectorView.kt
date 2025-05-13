@@ -11,51 +11,45 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.R
+import com.olaz.instasprite.domain.tool.EraserTool
+import com.olaz.instasprite.domain.tool.EyedropperTool
+import com.olaz.instasprite.domain.tool.FillTool
+import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
 @Composable
 fun ToolSelector(
-    selectedTool: String,
-    onToolSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ToolSelectorViewModel = ToolSelectorViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val tools = listOf(
+        PencilTool,
+        EraserTool,
+        FillTool,
+        EyedropperTool
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        ToolItem(
-            iconResourceId = R.drawable.ic_pencil_tool,
-            contentDescription = "Pencil Tool",
-            selected = selectedTool == "pencil",
-            onClick = { onToolSelected("pencil") }
-        )
-
-        ToolItem(
-            iconResourceId = R.drawable.ic_eraser_tool,
-            contentDescription = "Eraser Tool",
-            selected = selectedTool == "eraser",
-            onClick = { onToolSelected("eraser") }
-        )
-
-        ToolItem(
-            iconResourceId = R.drawable.ic_fill_tool,
-            contentDescription = "Fill Tool",
-            selected = selectedTool == "fill",
-            onClick = { onToolSelected("fill") }
-        )
-
-        ToolItem(
-            iconResourceId = R.drawable.ic_eyedropper_tool,
-            contentDescription = "Eyedropper Tool",
-            selected = selectedTool == "eyedropper",
-            onClick = { onToolSelected("eyedropper") }
-        )
+        tools.forEach { tool ->
+            ToolItem(
+                iconResourceId = tool.icon,
+                contentDescription = tool.name,
+                selected = tool == uiState.selectedTool,
+                onClick = { viewModel.selectTool(tool) }
+            )
+        }
     }
 }
 

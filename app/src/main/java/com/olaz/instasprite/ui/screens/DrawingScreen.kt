@@ -12,8 +12,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,45 +23,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.canvas.PixelCanvas
+import com.olaz.instasprite.ui.canvas.PixelCanvasViewModel
 import com.olaz.instasprite.ui.components.ColorPalette
+import com.olaz.instasprite.ui.components.ColorPaletteViewModel
 import com.olaz.instasprite.ui.components.ToolSelector
+import com.olaz.instasprite.ui.components.ToolSelectorViewModel
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
-import com.olaz.instasprite.utils.ColorPalette
 import com.olaz.instasprite.utils.UiUtils
 
 @Composable
-fun DrawingScreen() {
+fun DrawingScreen(viewModel: DrawingScreenViewModel = DrawingScreenViewModel()) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
-
-    var selectedColor by remember { mutableStateOf(ColorPalette.Color1) }
-    var selectedTool by remember { mutableStateOf("pencil") }
+    val uiState by viewModel.uiState.collectAsState()
 
     val canvasSize = 16
     var canvasPixels by remember {
         mutableStateOf(List(canvasSize) { List(canvasSize) { DrawingScreenColor.DefaultCanvasColor } })
     }
 
-    var scale by remember { mutableFloatStateOf(1f) }
+    val pixelCanvasViewModel =
+        PixelCanvasViewModel(canvasSize, canvasPixels)
+    val colorPaletteViewModel = ColorPaletteViewModel()
+    val toolSelectorViewModel = ToolSelectorViewModel()
+
+    val pixelCanvasState = pixelCanvasViewModel.uiState.collectAsState()
+    val colorPaletteState = colorPaletteViewModel.uiState.collectAsState()
+    val toolSelectorState = toolSelectorViewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
             ColorPalette(
-                onColorSelected = {
-                    selectedColor = it
-                    ColorPalette.activeColor = it
-                },
-                selectedColor = selectedColor,
                 modifier = Modifier
                     .background(DrawingScreenColor.PaletteBarColor)
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                viewModel = colorPaletteViewModel
             )
         },
 
         bottomBar = {
             Column {
                 Slider(
-                    value = scale,
-                    onValueChange = { newValue -> scale = newValue },
+                    value = uiState.canvasScale,
+                    onValueChange = { viewModel.setCanvasScale(it) },
                     valueRange = 0.5f..5f,
                     colors = SliderDefaults.colors(
                         thumbColor = Color.White,
@@ -76,11 +79,10 @@ fun DrawingScreen() {
                 )
 
                 ToolSelector(
-                    selectedTool = selectedTool,
-                    onToolSelected = { selectedTool = it },
                     modifier = Modifier
                         .background(DrawingScreenColor.PaletteBarColor)
-                        .padding(horizontal = 5.dp, vertical = 8.dp)
+                        .padding(horizontal = 5.dp, vertical = 8.dp),
+                    viewModel = toolSelectorViewModel
                 )
             }
         }
@@ -94,16 +96,6 @@ fun DrawingScreen() {
 
             // Canvas section
             PixelCanvas(
-                pixels = canvasPixels,
-                onPixelClick = { row, col ->
-                    val newCanvas = canvasPixels.toMutableList().apply {
-                        val newRow = this[row].toMutableList().apply {
-                            this[col] = selectedColor
-                        }
-                        this[row] = newRow
-                    }
-                    canvasPixels = newCanvas
-                },
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(32.dp)
@@ -111,9 +103,10 @@ fun DrawingScreen() {
                     .fillMaxSize()
                     .fillMaxHeight(0.7f)
                     .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                    )
+                        scaleX = uiState.canvasScale,
+                        scaleY = uiState.canvasScale,
+                    ),
+                viewModel = pixelCanvasViewModel
             )
         }
     }

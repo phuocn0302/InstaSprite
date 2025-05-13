@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,10 +26,11 @@ import com.olaz.instasprite.utils.ColorPalette
 
 @Composable
 fun ColorPalette(
-    selectedColor: Color,
-    onColorSelected: (Color) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ColorPaletteViewModel = ColorPaletteViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -51,7 +54,7 @@ fun ColorPalette(
                     for (i in 0 until 8) {
                         val color: Color = ColorPalette.ColorsList[i]
 
-                        borderColor = if (color == selectedColor) {
+                        borderColor = if (color == uiState.selectedColor) {
                             Color.White
                         } else {
                             DrawingScreenColor.ColorItemBorder
@@ -59,7 +62,7 @@ fun ColorPalette(
 
                         ColorItem(
                             color = color,
-                            onColorSelected = onColorSelected,
+                            onColorSelected = viewModel::selectColor,
                             modifier = Modifier
                                 .size(36.dp)
                                 .border(5.dp, borderColor, RoundedCornerShape(4.dp))
@@ -77,7 +80,7 @@ fun ColorPalette(
                     for (i in 8 until 16) {
                         val color: Color = ColorPalette.ColorsList[i]
 
-                        borderColor = if (color == selectedColor) {
+                        borderColor = if (color == uiState.selectedColor) {
                             Color.White
                         } else {
                             DrawingScreenColor.ColorItemBorder
@@ -85,7 +88,7 @@ fun ColorPalette(
 
                         ColorItem(
                             color = color,
-                            onColorSelected = onColorSelected,
+                            onColorSelected = viewModel::selectColor,
                             modifier = Modifier
                                 .size(36.dp)
                                 .border(5.dp, borderColor, RoundedCornerShape(4.dp))

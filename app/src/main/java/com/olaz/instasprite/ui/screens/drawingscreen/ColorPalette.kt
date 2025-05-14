@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.components
+package com.olaz.instasprite.ui.screens.drawingscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,7 +27,7 @@ import com.olaz.instasprite.utils.ColorPalette
 @Composable
 fun ColorPalette(
     modifier: Modifier = Modifier,
-    viewModel: ColorPaletteViewModel = ColorPaletteViewModel()
+    viewModel: DrawingScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

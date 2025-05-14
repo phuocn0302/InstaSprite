@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.canvas
+package com.olaz.instasprite.ui.screens.drawingscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,7 +20,7 @@ import com.olaz.instasprite.ui.theme.DrawingScreenColor
 @Composable
 fun PixelCanvas(
     modifier: Modifier = Modifier,
-    viewModel: PixelCanvasViewModel
+    viewModel: DrawingScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

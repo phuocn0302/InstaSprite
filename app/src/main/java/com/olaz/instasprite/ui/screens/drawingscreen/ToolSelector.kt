@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.components
+package com.olaz.instasprite.ui.screens.drawingscreen
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -27,7 +27,7 @@ import com.olaz.instasprite.ui.theme.DrawingScreenColor
 @Composable
 fun ToolSelector(
     modifier: Modifier = Modifier,
-    viewModel: ToolSelectorViewModel = ToolSelectorViewModel()
+    viewModel: DrawingScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

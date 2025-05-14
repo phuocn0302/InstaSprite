@@ -14,16 +14,14 @@ data class DrawingScreenState(
     val selectedColor: Color,
     val selectedTool: Tool,
 
-    val canvasSize: Int = 16,
-    val canvasPixels: List<List<Color>>,
+    val canvasSize: Pair<Int, Int> = Pair(16,16), // Height, Width ,
 
     val canvasOffset: Offset,
     val canvasScale: Float,
 )
 
 class DrawingScreenViewModel(
-    canvasSize: Int,
-    canvasPixels: List<List<Color>>
+    canvasSize: Pair<Int, Int>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
@@ -31,7 +29,6 @@ class DrawingScreenViewModel(
             selectedTool = PencilTool,
 
             canvasSize = canvasSize,
-            canvasPixels = canvasPixels,
 
             canvasScale = 1f,
             canvasOffset = Offset.Zero

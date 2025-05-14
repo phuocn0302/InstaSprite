@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.data.model.PixelCanvas
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
@@ -30,12 +31,9 @@ fun DrawingScreen() {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
 
 
-    val canvasSize = 16
-    var canvasPixels by remember {
-        mutableStateOf(List(canvasSize) { List(canvasSize) { DrawingScreenColor.DefaultCanvasColor } })
-    }
+    val canvasSize = Pair(16, 16)
 
-    val viewModel = DrawingScreenViewModel(canvasSize, canvasPixels)
+    val viewModel = DrawingScreenViewModel(canvasSize)
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -84,6 +82,7 @@ fun DrawingScreen() {
 
             // Canvas section
             PixelCanvas(
+                canvas = PixelCanvas(canvasSize.first, canvasSize.second),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(32.dp)

@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -16,16 +17,18 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
 @Composable
 fun PixelCanvas(
-    model: PixelCanvasModel,
     modifier: Modifier = Modifier,
     viewModel: DrawingScreenViewModel
 ) {
+    val model = viewModel.canvasModel
     val uiState by viewModel.uiState.collectAsState()
+    val pixelChangeTrigger by viewModel.pixelChangeTrigger.collectAsState()
+
+    Log.d("RecomposeCheck", "PixelCanvas recomposed")
 
     Box(
         modifier = modifier
@@ -55,6 +58,9 @@ fun PixelCanvas(
             val cellWidth = canvasWidth / uiState.canvasSize.second
             val cellHeight = canvasHeight / uiState.canvasSize.first
 
+            // To recompose when pixelChangeTrigger changes
+            pixelChangeTrigger.hashCode()
+
             // Draw grid
             for (row in 0 until uiState.canvasSize.first) {
                 for (col in 0 until uiState.canvasSize.second) {
@@ -70,14 +76,14 @@ fun PixelCanvas(
 
                     // Pixel
                     drawRect(
-                        color = model.getPixel(col, row),
+                        color = model.getPixel(row, col),
                         topLeft = topLeft,
                         size = cellSize
                     )
 
                     // Grid
                     drawRect(
-                        color = Color.LightGray.copy(alpha = 0.1f),
+                        color = Color.LightGray.copy(alpha = 0.2f),
                         topLeft = topLeft,
                         size = cellSize,
                         style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)

@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
@@ -81,7 +80,6 @@ fun DrawingScreen() {
 
             // Canvas section
             PixelCanvas(
-                model = PixelCanvasModel(canvasSize.first, canvasSize.second),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(10.dp)

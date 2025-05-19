@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,18 +15,16 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.data.model.PixelCanvas
+import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun DrawingScreen() {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
@@ -51,7 +50,7 @@ fun DrawingScreen() {
                 Slider(
                     value = uiState.canvasScale,
                     onValueChange = { viewModel.setCanvasScale(it) },
-                    valueRange = 0.5f..5f,
+                    valueRange = 0.5f..10f,
                     colors = SliderDefaults.colors(
                         thumbColor = Color.White,
                         activeTrackColor = DrawingScreenColor.SelectedToolColor,
@@ -82,10 +81,10 @@ fun DrawingScreen() {
 
             // Canvas section
             PixelCanvas(
-                canvas = PixelCanvas(canvasSize.first, canvasSize.second),
+                model = PixelCanvasModel(canvasSize.first, canvasSize.second),
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .padding(32.dp)
+                    .padding(10.dp)
                     .aspectRatio(1f)
                     .fillMaxSize()
                     .fillMaxHeight(0.7f)

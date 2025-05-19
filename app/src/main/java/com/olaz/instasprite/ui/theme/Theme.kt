@@ -1,6 +1,5 @@
 package com.olaz.instasprite.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +69,6 @@ object DrawingScreenColor {
 
     // Canvas Colors
     val DefaultCanvasColor = Color(0xFF9BAFD9)
-    val CheckerColor1 = Color(0xFF8B9BB4)
-    val CheckerColor2 = Color(0xFF5A6988)
+    val CheckerColor1 = Color(0xFF808080)
+    val CheckerColor2 = Color(0xFFC0C0C0)
 }

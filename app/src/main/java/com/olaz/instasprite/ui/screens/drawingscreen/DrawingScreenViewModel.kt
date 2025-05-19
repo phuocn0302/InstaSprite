@@ -1,8 +1,10 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.utils.ColorPalette
@@ -55,11 +57,8 @@ class DrawingScreenViewModel(
         _uiState.value = _uiState.value.copy(selectedTool = tool)
     }
 
-    fun drawPixel(x: Int, y: Int, color: Color = ColorPalette.activeColor) {
-
-    }
-
-    fun applyTool(tool: Tool, x: Int, y: Int, color: Color = ColorPalette.activeColor) {
+    fun applyTool(canvas: PixelCanvasModel ,tool: Tool, x: Int, y: Int, color: Color = ColorPalette.activeColor) {
+        Log.d("DrawingScreenViewModel", "Applying tool: ${tool.name} at x=$x, y=$y with color=$color")
         tool.apply(x, y)
     }
 }

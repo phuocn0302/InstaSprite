@@ -1,8 +1,11 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,17 +18,22 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.domain.tool.EraserTool
+import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
 @Composable
 fun PixelCanvas(
-    model: PixelCanvasModel,
     modifier: Modifier = Modifier,
     viewModel: DrawingScreenViewModel
 ) {
+    val model = viewModel.canvasModel
     val uiState by viewModel.uiState.collectAsState()
+    val pixelChangeTrigger by viewModel.pixelChangeTrigger.collectAsState()
+
+    Log.d("RecomposeCheck", "PixelCanvas recomposed")
 
     Box(
         modifier = modifier
@@ -36,17 +44,38 @@ fun PixelCanvas(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        val canvasWidth = size.width.toFloat()
-                        val canvasHeight = size.height.toFloat()
-                        val cellWidth = canvasWidth / uiState.canvasSize.second
-                        val cellHeight = canvasHeight / uiState.canvasSize.first
+                .pointerInput(uiState.selectedTool) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        val startCell = down.position.toGridCell(
+                            size.width, size.height,
+                            uiState.canvasSize.first, uiState.canvasSize.second
+                        )
 
-                        val gridX = (offset.x / cellWidth).toInt().coerceIn(0, uiState.canvasSize.second - 1)
-                        val gridY = (offset.y / cellHeight).toInt().coerceIn(0, uiState.canvasSize.first - 1)
+                        viewModel.applyTool(
+                            model,
+                            uiState.selectedTool,
+                            startCell.y,
+                            startCell.x,
+                            uiState.selectedColor
+                        )
 
-                        viewModel.applyTool(model, uiState.selectedTool, gridY, gridX, uiState.selectedColor)
+                        if (uiState.selectedTool is PencilTool || uiState.selectedTool is EraserTool) {
+                            drag(down.id) { change ->
+                                change.consume()
+                                val dragCell = change.position.toGridCell(
+                                    size.width, size.height,
+                                    uiState.canvasSize.first, uiState.canvasSize.second
+                                )
+                                viewModel.applyTool(
+                                    model,
+                                    uiState.selectedTool,
+                                    dragCell.y,
+                                    dragCell.x,
+                                    uiState.selectedColor
+                                )
+                            }
+                        }
                     }
                 }
         ) {
@@ -54,6 +83,9 @@ fun PixelCanvas(
             val canvasHeight = size.height
             val cellWidth = canvasWidth / uiState.canvasSize.second
             val cellHeight = canvasHeight / uiState.canvasSize.first
+
+            // To recompose when pixelChangeTrigger changes
+            pixelChangeTrigger.hashCode()
 
             // Draw grid
             for (row in 0 until uiState.canvasSize.first) {
@@ -70,14 +102,14 @@ fun PixelCanvas(
 
                     // Pixel
                     drawRect(
-                        color = model.getPixel(col, row),
+                        color = model.getPixel(row, col),
                         topLeft = topLeft,
                         size = cellSize
                     )
 
                     // Grid
                     drawRect(
-                        color = Color.LightGray.copy(alpha = 0.1f),
+                        color = Color.LightGray.copy(alpha = 0.2f),
                         topLeft = topLeft,
                         size = cellSize,
                         style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)
@@ -86,4 +118,13 @@ fun PixelCanvas(
             }
         }
     }
+}
+
+fun Offset.toGridCell(canvasWidth: Int, canvasHeight: Int, rows: Int, cols: Int): IntOffset {
+    val cellWidth = canvasWidth / cols
+    val cellHeight = canvasHeight / rows
+
+    val gridX = (x / cellWidth).toInt().coerceIn(0, cols - 1)
+    val gridY = (y / cellHeight).toInt().coerceIn(0, rows - 1)
+    return IntOffset(gridX, gridY)
 }

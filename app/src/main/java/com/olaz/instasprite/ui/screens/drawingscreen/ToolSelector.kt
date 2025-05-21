@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.FillTool
+import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
@@ -35,7 +36,8 @@ fun ToolSelector(
         PencilTool,
         EraserTool,
         FillTool,
-        EyedropperTool
+        EyedropperTool,
+        MoveTool
     )
 
     Row(

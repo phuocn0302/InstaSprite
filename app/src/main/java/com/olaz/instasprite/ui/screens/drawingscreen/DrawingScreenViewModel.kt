@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.utils.ColorPalette
@@ -17,6 +18,7 @@ data class DrawingScreenState(
     val selectedTool: Tool,
 
     val canvasSize: Pair<Int, Int> = Pair(16,16), // Height, Width ,
+//    val canvasPixels: List<Color>,
 
     val canvasOffset: Offset,
     val canvasScale: Float,
@@ -31,6 +33,7 @@ class DrawingScreenViewModel(
             selectedTool = PencilTool,
 
             canvasSize = canvasSize,
+//            canvasPixels = List(canvasSize.first * canvasSize.second) { Color.Transparent },
 
             canvasScale = 1f,
             canvasOffset = Offset.Zero
@@ -38,6 +41,10 @@ class DrawingScreenViewModel(
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
 
+    private val _pixelChangeTrigger = MutableStateFlow(0)
+    val pixelChangeTrigger: StateFlow<Int> = _pixelChangeTrigger
+
+    val canvasModel = PixelCanvasModel(canvasSize.first, canvasSize.second)
 
     // Just for scaling and offsetting the canvas
     fun setCanvasScale(scale: Float) {
@@ -57,8 +64,14 @@ class DrawingScreenViewModel(
         _uiState.value = _uiState.value.copy(selectedTool = tool)
     }
 
-    fun applyTool(canvas: PixelCanvasModel ,tool: Tool, x: Int, y: Int, color: Color = ColorPalette.activeColor) {
+    fun applyTool(canvasModel: PixelCanvasModel ,tool: Tool, x: Int, y: Int, color: Color = ColorPalette.activeColor) {
         Log.d("DrawingScreenViewModel", "Applying tool: ${tool.name} at x=$x, y=$y with color=$color")
-        tool.apply(x, y)
+
+        tool.apply(canvasModel, x, y, color)
+
+        if (tool is EyedropperTool) {
+            selectColor(ColorPalette.activeColor)
+        }
+        _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
     }
 }

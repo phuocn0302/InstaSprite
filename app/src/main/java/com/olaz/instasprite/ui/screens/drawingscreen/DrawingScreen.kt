@@ -2,7 +2,7 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
 import kotlin.math.roundToInt
@@ -87,12 +86,12 @@ fun DrawingScreen() {
                     scaleY = uiState.canvasScale,
                 )
                 .pointerInput(uiState.selectedTool) {
-                    if (uiState.selectedTool == MoveTool) {
-                        detectDragGestures { change, dragAmount ->
-                            change.consume()
-                            viewModel.setCanvasOffset((uiState.canvasOffset + dragAmount))
+                    detectTransformGestures(
+                        onGesture = { _, pan, zoom, _ ->
+                            viewModel.setCanvasScale(uiState.canvasScale * zoom)
+                            viewModel.setCanvasOffset(uiState.canvasOffset + pan)
                         }
-                    }
+                    )
                 }
         ) {
 

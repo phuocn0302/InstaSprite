@@ -2,12 +2,14 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -19,9 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
+import kotlin.math.roundToInt
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -76,6 +82,18 @@ fun DrawingScreen() {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(DrawingScreenColor.BackgroundColor)
+                .graphicsLayer(
+                    scaleX = uiState.canvasScale,
+                    scaleY = uiState.canvasScale,
+                )
+                .pointerInput(uiState.selectedTool) {
+                    if (uiState.selectedTool == MoveTool) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            viewModel.setCanvasOffset((uiState.canvasOffset + dragAmount))
+                        }
+                    }
+                }
         ) {
 
             // Canvas section
@@ -83,13 +101,12 @@ fun DrawingScreen() {
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(10.dp)
+                    .offset {
+                        IntOffset(uiState.canvasOffset.x.roundToInt(), uiState.canvasOffset.y.roundToInt())
+                    }
                     .aspectRatio(1f)
                     .fillMaxSize()
-                    .fillMaxHeight(0.7f)
-                    .graphicsLayer(
-                        scaleX = uiState.canvasScale,
-                        scaleY = uiState.canvasScale,
-                    ),
+                    .fillMaxHeight(0.7f),
                 viewModel = viewModel
             )
         }

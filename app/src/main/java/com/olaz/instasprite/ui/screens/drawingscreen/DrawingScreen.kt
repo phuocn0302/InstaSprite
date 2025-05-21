@@ -26,11 +26,11 @@ import com.olaz.instasprite.utils.UiUtils
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun DrawingScreen() {
+fun DrawingScreen(width: Int, height: Int) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
 
 
-    val canvasSize = Pair(16, 16)
+    val canvasSize = Pair(width, height)
 
     val viewModel = DrawingScreenViewModel(canvasSize)
     val uiState by viewModel.uiState.collectAsState()

@@ -72,3 +72,11 @@ object DrawingScreenColor {
     val CheckerColor1 = Color(0xFF808080)
     val CheckerColor2 = Color(0xFFC0C0C0)
 }
+
+object HomeScreenColor {
+    val BackgroundColor = Color(0xFF1A1A2E)
+    val TopbarColor = Color(0xFF262B44)
+    val BottombarColor = Color(0xFF262B44)
+    val SelectedColor = Color(0xFF4D5881)
+    val ButtonColor = Color(0xFF5A6988)
+}

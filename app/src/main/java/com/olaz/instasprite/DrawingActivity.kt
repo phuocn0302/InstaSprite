@@ -8,24 +8,31 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreen
-import com.olaz.instasprite.ui.screens.homescreen.HomeScreen
 import com.olaz.instasprite.ui.theme.Typography
 
-class MainActivity : ComponentActivity() {
+class DrawingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val canvasWith = intent.getIntExtra(EXTRA_CANVAS_WIDTH, 16)
+        val canvasHeight = intent.getIntExtra(EXTRA_CANVAS_HEIGHT, 16)
+
         setContent {
             MaterialTheme(
                 typography = Typography
             ) {
                 Surface(
-
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    DrawingScreen(canvasWith, canvasHeight)
                 }
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_CANVAS_WIDTH = "com.olaz.instasprite.CANVAS_WIDTH"
+        const val EXTRA_CANVAS_HEIGHT = "com.olaz.instasprite.CANVAS_HEIGHT"
     }
 }

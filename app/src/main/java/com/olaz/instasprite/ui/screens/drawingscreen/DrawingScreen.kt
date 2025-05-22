@@ -25,16 +25,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
 import kotlin.math.roundToInt
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun DrawingScreen() {
+fun DrawingScreen(width: Int, height: Int) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
+    UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
 
-
-    val canvasSize = Pair(16, 16)
+    val canvasSize = Pair(width, height)
 
     val viewModel = DrawingScreenViewModel(canvasSize)
     val uiState by viewModel.uiState.collectAsState()

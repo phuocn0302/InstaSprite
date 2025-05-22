@@ -17,4 +17,14 @@ object UiUtils {
             )
         }
     }
+    @Composable
+    fun SetNavigationBarColor(statusBarColor: Color) {
+        val systemUiController = rememberSystemUiController()
+        LaunchedEffect(statusBarColor) {
+            systemUiController.setNavigationBarColor(
+                color = statusBarColor,
+                darkIcons = statusBarColor.luminance() > 0.5f
+            )
+        }
+    }
 }

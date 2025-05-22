@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.screens.homescreen
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -33,16 +36,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.olaz.instasprite.DrawingActivity
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 
 
 @Composable
 fun CreateCanvasDialog(
     onDismiss: () -> Unit,
-    onCreateCanvas: (width: Int, height: Int) -> Unit
 ) {
     var heightVal by remember { mutableStateOf(TextFieldValue(text = "")) }
     var widthVal by remember { mutableStateOf(TextFieldValue(text = "")) }
+    val context = LocalContext.current
+
     Dialog(
         onDismissRequest = {
             onDismiss()
@@ -149,13 +154,24 @@ fun CreateCanvasDialog(
                 ) {
                     Button(
                         onClick = {
-                            try {
-                                val width = widthVal.text.toIntOrNull() ?: 16
-                                val height = heightVal.text.toIntOrNull() ?: 16
-                                onCreateCanvas(width, height)
-                            } catch (e: Exception) {
-                                onCreateCanvas(16, 16)
+                            val width = widthVal.text.toIntOrNull() ?: 16
+                            val height = heightVal.text.toIntOrNull() ?: 16
+
+                            if (width == 0 || height == 0) {
+                                Toast.makeText(
+                                    context,
+                                    "Canvas size cannot be 0",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@Button
                             }
+
+                            val intent = Intent(context, DrawingActivity::class.java).apply {
+                                putExtra(DrawingActivity.EXTRA_CANVAS_WIDTH, width)
+                                putExtra(DrawingActivity.EXTRA_CANVAS_HEIGHT, height)
+                            }
+                            onDismiss()
+                            context.startActivity(intent)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = HomeScreenColor.ButtonColor,

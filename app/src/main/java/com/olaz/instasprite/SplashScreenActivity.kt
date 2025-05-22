@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.screens
+package com.olaz.instasprite
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -18,13 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.olaz.instasprite.MainActivity
-import com.olaz.instasprite.R
 
 @SuppressLint("RestrictedApi", "CustomSplashScreen")
-class CustomSplashScreenActivity : ComponentActivity() {
+class SplashScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_InstaSprite)
         super.onCreate(savedInstanceState)
@@ -34,7 +34,7 @@ class CustomSplashScreenActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             delay(1000L)
-            startActivity(Intent(this@CustomSplashScreenActivity, MainActivity::class.java))
+            startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
             finish()
         }
     }
@@ -43,6 +43,8 @@ class CustomSplashScreenActivity : ComponentActivity() {
 @Composable
 @Preview
 fun SplashScreen() {
+    UiUtils.SetStatusBarColor(HomeScreenColor.BackgroundColor)
+    UiUtils.SetNavigationBarColor(HomeScreenColor.BackgroundColor)
     Box(
         modifier = Modifier
             .fillMaxSize()

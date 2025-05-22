@@ -23,7 +23,7 @@
             android:theme="@style/Theme.InstaSprite">
         </activity>
         <activity
-            android:name=".ui.screens.CustomSplashScreenActivity"
+            android:name=".SplashScreenActivity"
             android:exported="true"
             android:theme="@style/Theme.InstaSprite.SplashScreen">
             <intent-filter>

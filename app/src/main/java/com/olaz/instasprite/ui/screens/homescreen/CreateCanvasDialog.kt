@@ -26,11 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -39,7 +37,7 @@ import com.olaz.instasprite.ui.theme.HomeScreenColor
 
 
 @Composable
-fun CreateCanvasScreen(
+fun CreateCanvasDialog(
     onDismiss: () -> Unit,
     onCreateCanvas: (width: Int, height: Int) -> Unit
 ) {
@@ -56,17 +54,17 @@ fun CreateCanvasScreen(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .width(400.dp)
-                .height(300.dp)
+                .fillMaxWidth(0.9f)
                 .clip(RoundedCornerShape(10.dp))
                 .background(HomeScreenColor.BackgroundColor)
+                .padding(20.dp)
         ) {
             Column {
                 Text(
                     text = "New Canvas",
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    fontSize = 20.sp,
+                    fontSize = 16.sp,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
@@ -75,7 +73,9 @@ fun CreateCanvasScreen(
                         .height(25.dp)
                 )
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 5.dp)
                 ) {
                     Text(
                         text = "Height",
@@ -104,17 +104,13 @@ fun CreateCanvasScreen(
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp)
-                            .padding(0.dp, 0.dp, 40.dp, 0.dp)
                     )
                 }
 
-                Spacer(
-                    modifier = Modifier
-                        .height(10.dp)
-                )
-
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 5.dp)
                 ) {
                     Text(
                         text = "Width",
@@ -142,21 +138,14 @@ fun CreateCanvasScreen(
                         ),
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp)
-                            .padding(0.dp, 0.dp, 40.dp, 0.dp)
-
                     )
                 }
-
-                Spacer(
-                    modifier = Modifier
-                        .height(25.dp)
-                )
 
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(vertical = 10.dp)
                 ) {
                     Button(
                         onClick = {
@@ -178,7 +167,6 @@ fun CreateCanvasScreen(
                     ) {
                         Text(
                             text = "Create",
-                            fontSize = 16.sp
                         )
                     }
                     Spacer(
@@ -196,10 +184,8 @@ fun CreateCanvasScreen(
                     ) {
                         Text(
                             text = "Cancel",
-                            fontSize = 16.sp
                         )
                     }
-
                 }
             }
         }

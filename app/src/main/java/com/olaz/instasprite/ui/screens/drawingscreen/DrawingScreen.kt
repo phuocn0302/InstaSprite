@@ -22,13 +22,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun DrawingScreen(width: Int, height: Int) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
-
+    UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
 
     val canvasSize = Pair(width, height)
 

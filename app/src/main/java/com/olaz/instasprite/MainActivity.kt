@@ -9,12 +9,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreen
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreen
+import com.olaz.instasprite.ui.theme.Typography
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            MaterialTheme(
+                typography = Typography
+            ) {
                 Surface(
 
                     modifier = Modifier.fillMaxSize(),

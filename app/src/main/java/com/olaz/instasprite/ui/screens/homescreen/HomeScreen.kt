@@ -2,7 +2,11 @@ package com.olaz.instasprite.ui.screens.homescreen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,6 +25,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,11 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreen
 import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.utils.UiUtils
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @Preview
 fun HomeScreen() {
+    UiUtils.SetStatusBarColor(HomeScreenColor.TopbarColor)
+    UiUtils.SetNavigationBarColor(HomeScreenColor.BottombarColor)
+
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Create", "Search")
 
@@ -45,7 +54,7 @@ fun HomeScreen() {
 
 
     if (selectedItem == 1) {
-        CreateCanvasScreen(
+        CreateCanvasDialog(
             onDismiss = { selectedItem = 0 },
             onCreateCanvas = { width, height ->
                 canvasWidth = width
@@ -61,14 +70,18 @@ fun HomeScreen() {
     } else {
         Scaffold(
             topBar = {
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(HomeScreenColor.TopbarColor)
+                        .height(50.dp)
+                ) {
                     Text(
                         text = "Home",
                         color = Color.White,
                         textAlign = TextAlign.Center,
                         fontSize = 14.sp,
                         modifier = Modifier
-                            .background(HomeScreenColor.BackgroundColor)
                             .weight(1f)
                             .padding(10.dp)
                     )
@@ -78,7 +91,6 @@ fun HomeScreen() {
                         textAlign = TextAlign.Center,
                         fontSize = 14.sp,
                         modifier = Modifier
-                            .background(HomeScreenColor.BackgroundColor)
                             .weight(1f)
                             .padding(10.dp)
                     )
@@ -86,7 +98,7 @@ fun HomeScreen() {
             },
             bottomBar = {
                 NavigationBar(
-                    containerColor = (HomeScreenColor.BackgroundColor),
+                    containerColor = (HomeScreenColor.BottombarColor),
                     modifier = Modifier
                 ) {
                     items.forEachIndexed { index, item ->
@@ -118,6 +130,15 @@ fun HomeScreen() {
 
                 }
             }
-        ) {}
+        ) {
+            // WIP
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(HomeScreenColor.BackgroundColor)
+            )
+
+        }
     }
 }

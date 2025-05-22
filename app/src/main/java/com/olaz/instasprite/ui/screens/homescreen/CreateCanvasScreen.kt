@@ -24,10 +24,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -55,9 +58,22 @@ fun CreateCanvasScreen(
             modifier = Modifier
                 .width(400.dp)
                 .height(300.dp)
+                .clip(RoundedCornerShape(10.dp))
                 .background(HomeScreenColor.BackgroundColor)
         ) {
             Column {
+                Text(
+                    text = "New Canvas",
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(25.dp)
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -91,6 +107,12 @@ fun CreateCanvasScreen(
                             .padding(0.dp, 0.dp, 40.dp, 0.dp)
                     )
                 }
+
+                Spacer(
+                    modifier = Modifier
+                        .height(10.dp)
+                )
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -125,10 +147,15 @@ fun CreateCanvasScreen(
 
                     )
                 }
+
+                Spacer(
+                    modifier = Modifier
+                        .height(25.dp)
+                )
+
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .padding(0.dp, 50.dp, 0.dp, 0.dp)
                         .fillMaxWidth()
                 ) {
                     Button(
@@ -142,7 +169,7 @@ fun CreateCanvasScreen(
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF262B44),
+                            containerColor = HomeScreenColor.ButtonColor,
                         ),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
@@ -160,7 +187,7 @@ fun CreateCanvasScreen(
                     Button(
                         onClick = { onDismiss() },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF262B44),
+                            containerColor = HomeScreenColor.ButtonColor,
                         ),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier

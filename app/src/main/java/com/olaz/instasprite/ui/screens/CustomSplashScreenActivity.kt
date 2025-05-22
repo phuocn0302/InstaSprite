@@ -24,41 +24,38 @@ import com.olaz.instasprite.MainActivity
 import com.olaz.instasprite.R
 
 @SuppressLint("RestrictedApi", "CustomSplashScreen")
-class CustomSplashScreenActivity: ComponentActivity() {
-
+class CustomSplashScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_InstaSprite) // No semicolon needed in Kotlin
+        setTheme(R.style.Theme_InstaSprite)
         super.onCreate(savedInstanceState)
-        setContent{
+        setContent {
             SplashScreen()
         }
 
-        // Optionally delay or animate
-        // Note: Using Handler().postDelayed is a legacy way.
-        // Consider using coroutines for more modern Android development.
         lifecycleScope.launch {
             delay(1000L)
             startActivity(Intent(this@CustomSplashScreenActivity, MainActivity::class.java))
             finish()
-        }// Delay in ms
+        }
     }
 }
 
-@Composable @Preview
-fun SplashScreen(){
-     Box(
-         modifier = Modifier
-             .fillMaxSize()
-             .background(Color(0xFF112118)),
-         contentAlignment = Alignment.Center
-     )
-     {
-         Image(
-             painter = painterResource(R.drawable.ic_launcher),
-             modifier = Modifier
-                 .fillMaxWidth(0.3f)
-                 .fillMaxHeight(0.3f),
-             contentDescription = "Splash Screen",
-         )
-     }
+@Composable
+@Preview
+fun SplashScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF1A1A2E)),
+        contentAlignment = Alignment.Center
+    )
+    {
+        Image(
+            painter = painterResource(R.drawable.splash),
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .fillMaxHeight(0.7f),
+            contentDescription = "Splash Screen",
+        )
+    }
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -20,6 +24,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +34,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.FillTool
@@ -40,7 +48,8 @@ fun ToolSelector(
     viewModel: DrawingScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val expanded by viewModel.isToolListExpanded.collectAsState()
+    var toolListVisible by remember { mutableStateOf(false) }
+    var menuListVisible by remember { mutableStateOf(false) }
 
     val tools = listOf(
         PencilTool,
@@ -52,53 +61,126 @@ fun ToolSelector(
 
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.TopStart)
-            .padding(horizontal = 20.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        Box(
-            modifier = modifier
-                .size(64.dp)
-                .background(
-                    DrawingScreenColor.SelectedToolColor,
-                    CircleShape
-                )
-                .clickable { viewModel.toggleToolList() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = uiState.selectedTool.icon),
+        Box {
+            ToolItem(
+                iconResourceId = uiState.selectedTool.icon,
                 contentDescription = uiState.selectedTool.name,
-                tint = Color.Unspecified,
-                modifier = Modifier.size(32.dp)
+                selected = true,
+                onClick = { toolListVisible = true }
             )
+
+            DropdownMenu(
+                expanded = toolListVisible,
+                containerColor = DrawingScreenColor.PaletteBarColor,
+                onDismissRequest = { toolListVisible = false }
+            ) {
+
+                tools.reversed().forEach { tool ->
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(tool.icon),
+                                contentDescription = tool.description,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        },
+                        text = { Text(tool.name, color = Color.White) },
+                        onClick = {
+                            viewModel.selectTool(tool)
+                            toolListVisible = false
+                        }
+                    )
+                }
+            }
+
         }
 
-        DropdownMenu(
-            expanded = expanded,
-            containerColor = DrawingScreenColor.PaletteBarColor,
-            onDismissRequest = { viewModel.toggleToolList() }
-        ) {
+        ToolItem(
+            iconResourceId = R.drawable.ic_undo,
+            contentDescription = "Undo last change",
+            selected = false,
+            onClick = {
+                // TODO: Handle undo
+            }
+        )
 
-            tools.reversed().forEach { tool ->
+        ToolItem(
+            iconResourceId = R.drawable.ic_redo,
+            contentDescription = "Redo last change",
+            selected = false,
+            onClick = {
+                // TODO: Handle redo
+            }
+        )
+
+        Box {
+            ToolItem(
+                iconResourceId = R.drawable.ic_menu,
+                contentDescription = "Menu",
+                selected = false,
+                onClick = {
+                    menuListVisible = true
+                }
+            )
+
+            DropdownMenu(
+                expanded = menuListVisible,
+                containerColor = DrawingScreenColor.PaletteBarColor,
+                onDismissRequest = { menuListVisible = false }
+            ) {
                 DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(tool.icon),
-                            contentDescription = tool.description,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    },
-                    text = { Text(tool.name, color = Color.White) },
+                    text = { Text(text = "Save", color = Color.White) },
                     onClick = {
-                        viewModel.selectTool(tool)
-                        viewModel.toggleToolList()
+                        // TODO: Handle save
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(text = "Load", color = Color.White) },
+                    onClick = {
+                        // TODO: Handle load
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(text = "Settings", color = Color.White) },
+                    onClick = {
+                        // TODO: Handle settings
                     }
                 )
             }
         }
+    }
+}
+
+
+@Composable
+fun ToolItem(
+    @DrawableRes iconResourceId: Int,
+    contentDescription: String?,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected) DrawingScreenColor.SelectedToolColor else Color.Transparent
+        ),
+        shape = CircleShape,
+        contentPadding = PaddingValues(0.dp),
+        modifier = modifier.size(64.dp),
+        onClick = onClick,
+    ) {
+        Icon(
+            painter = painterResource(id = iconResourceId),
+            contentDescription = contentDescription,
+            tint = Color.Unspecified,
+            modifier = Modifier.size(32.dp)
+        )
     }
 }

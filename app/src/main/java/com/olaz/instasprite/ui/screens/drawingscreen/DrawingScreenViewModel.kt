@@ -18,7 +18,6 @@ data class DrawingScreenState(
     val selectedTool: Tool,
 
     val canvasSize: Pair<Int, Int> = Pair(16,16), // Height, Width ,
-//    val canvasPixels: List<Color>,
 
     val canvasOffset: Offset,
     val canvasScale: Float,
@@ -33,16 +32,12 @@ class DrawingScreenViewModel(
             selectedTool = PencilTool,
 
             canvasSize = canvasSize,
-//            canvasPixels = List(canvasSize.first * canvasSize.second) { Color.Transparent },
-
+            
             canvasScale = 1f,
             canvasOffset = Offset.Zero
         )
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
-
-    private val _isToolListExpanded = MutableStateFlow(false)
-    val isToolListExpanded: StateFlow<Boolean> = _isToolListExpanded.asStateFlow()
 
     private val _pixelChangeTrigger = MutableStateFlow(0)
     val pixelChangeTrigger: StateFlow<Int> = _pixelChangeTrigger
@@ -76,9 +71,5 @@ class DrawingScreenViewModel(
             selectColor(ColorPalette.activeColor)
         }
         _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
-    }
-
-    fun toggleToolList() {
-        _isToolListExpanded.value = !_isToolListExpanded.value
     }
 }

@@ -28,7 +28,7 @@ class DrawingScreenViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
-            selectedColor = ColorPalette.Color1,
+            selectedColor = Color(0xFF040519),
             selectedTool = PencilTool,
 
             canvasSize = canvasSize,

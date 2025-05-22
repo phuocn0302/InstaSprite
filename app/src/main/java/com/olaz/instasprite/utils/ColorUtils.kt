@@ -1,6 +1,11 @@
 package com.olaz.instasprite.utils
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import androidx.core.graphics.toColorInt
+import com.olaz.instasprite.R
 
 object ColorPalette {
     val Color1 = Color.Black
@@ -28,4 +33,35 @@ object ColorPalette {
     )
 
     var activeColor = Color1
+}
+
+fun loadColorsFromFile(context: Context, resourceId: Int = R.raw.sage57): List<Color> {
+    val colors = mutableListOf<Color>()
+    try {
+        val inputStream = context.resources.openRawResource(resourceId)
+        val reader = BufferedReader(InputStreamReader(inputStream))
+        var line: String?
+        while (reader.readLine().also { line = it } != null) {
+            line?.trim()?.let { hexColor ->
+                if (hexColor.isNotEmpty()) {
+                    try {
+                        // Assuming hexColor is like "RRGGBB" or "AARRGGBB"
+                        val colorValue = "#$hexColor".toColorInt()
+                        colors.add(Color(colorValue))
+                    } catch (e: IllegalArgumentException) {
+                        println("Warning: Invalid color format in file: $hexColor")
+                    }
+                }
+            }
+        }
+        reader.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return getDefaultColors()
+    }
+    return colors
+}
+
+fun getDefaultColors(): List<Color> {
+    return ColorPalette.ColorsList
 }

@@ -1,0 +1,62 @@
+;paint.net Palette File
+;Downloaded from Lospec.com/palette-list
+;Palette Name: SAGE57
+;Description: This is the palette that I made to use consistently across all of my pixel art!
+;Colors: 57
+FF040519
+FF22122c
+FF432547
+FF604c7d
+FF908cc7
+FFb0cfee
+FFffffff
+FFf5b554
+FFd58141
+FFac4c3f
+FF732c40
+FF4e1a34
+FF260a28
+FF2e0840
+FF6c0c5e
+FF9d1952
+FFcc353f
+FFf36150
+FFef8277
+FFffae71
+FFfff2c4
+FFfabc94
+FFfd8e82
+FFff5b5f
+FFea2a53
+FFb90e4a
+FF850950
+FF4b0843
+FFe82337
+FFfa6735
+FFff9d3e
+FFfff57a
+FF8de35d
+FF2cc94e
+FF0b9d5f
+FF0a6e65
+FF10325b
+FF0b1646
+FF164a67
+FF237c8a
+FF3db2ad
+FF5be5c0
+FFb8fff0
+FF5adbfa
+FF4c89ee
+FF4837c7
+FF3d1b83
+FF370950
+FF691d8c
+FF9e2cab
+FFd747bc
+FFff74be
+FFffc1d4
+FFff7eac
+FFd75192
+FFa4318e
+FF6b1f7a

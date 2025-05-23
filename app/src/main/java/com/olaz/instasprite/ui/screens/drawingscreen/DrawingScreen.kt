@@ -31,13 +31,11 @@ import kotlin.math.roundToInt
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun DrawingScreen(width: Int, height: Int) {
+fun DrawingScreen(canvasWidth: Int, canvasHeight: Int) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
     UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
 
-    val canvasSize = Pair(width, height)
-
-    val viewModel = DrawingScreenViewModel(canvasSize)
+    val viewModel = DrawingScreenViewModel(canvasWidth, canvasHeight)
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -104,7 +102,6 @@ fun DrawingScreen(width: Int, height: Int) {
                     .offset {
                         IntOffset(uiState.canvasOffset.x.roundToInt(), uiState.canvasOffset.y.roundToInt())
                     }
-                    .aspectRatio(1f)
                     .fillMaxSize()
                     .fillMaxHeight(0.7f),
                 viewModel = viewModel

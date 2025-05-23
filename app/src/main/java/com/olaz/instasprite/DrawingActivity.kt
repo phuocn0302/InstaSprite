@@ -14,7 +14,7 @@ class DrawingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val canvasWith = intent.getIntExtra(EXTRA_CANVAS_WIDTH, 16)
+        val canvasWidth = intent.getIntExtra(EXTRA_CANVAS_WIDTH, 16)
         val canvasHeight = intent.getIntExtra(EXTRA_CANVAS_HEIGHT, 16)
 
         setContent {
@@ -25,7 +25,7 @@ class DrawingActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    DrawingScreen(canvasWith, canvasHeight)
+                    DrawingScreen(canvasWidth, canvasHeight)
                 }
             }
         }

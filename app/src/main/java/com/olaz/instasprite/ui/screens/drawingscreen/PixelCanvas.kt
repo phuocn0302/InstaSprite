@@ -37,7 +37,7 @@ fun PixelCanvas(
 
     Box(
         modifier = modifier
-            .aspectRatio(uiState.canvasSize.second.toFloat() / uiState.canvasSize.first.toFloat())
+            .aspectRatio(uiState.canvasWidth.toFloat() / uiState.canvasHeight.toFloat())
             .border(10.dp, DrawingScreenColor.CanvasBorderColor)
             .padding(10.dp)
     ) {
@@ -49,7 +49,7 @@ fun PixelCanvas(
                         val down = awaitFirstDown()
                         val startCell = down.position.toGridCell(
                             size.width, size.height,
-                            uiState.canvasSize.first, uiState.canvasSize.second
+                            uiState.canvasWidth, uiState.canvasHeight
                         )
 
                         viewModel.applyTool(
@@ -65,7 +65,7 @@ fun PixelCanvas(
                                 change.consume()
                                 val dragCell = change.position.toGridCell(
                                     size.width, size.height,
-                                    uiState.canvasSize.first, uiState.canvasSize.second
+                                    uiState.canvasWidth, uiState.canvasHeight
                                 )
                                 viewModel.applyTool(
                                     model,
@@ -81,15 +81,15 @@ fun PixelCanvas(
         ) {
             val canvasWidth = size.width
             val canvasHeight = size.height
-            val cellWidth = canvasWidth / uiState.canvasSize.second
-            val cellHeight = canvasHeight / uiState.canvasSize.first
+            val cellWidth = canvasWidth / uiState.canvasWidth
+            val cellHeight = canvasHeight / uiState.canvasHeight
 
             // To recompose when pixelChangeTrigger changes
             pixelChangeTrigger.hashCode()
 
             // Draw grid
-            for (row in 0 until uiState.canvasSize.first) {
-                for (col in 0 until uiState.canvasSize.second) {
+            for (row in 0 until uiState.canvasHeight) {
+                for (col in 0 until uiState.canvasWidth) {
                     val topLeft = Offset(col * cellWidth, row * cellHeight)
                     val cellSize = Size(cellWidth, cellHeight)
 
@@ -118,9 +118,10 @@ fun PixelCanvas(
             }
         }
     }
+
 }
 
-fun Offset.toGridCell(canvasWidth: Int, canvasHeight: Int, rows: Int, cols: Int): IntOffset {
+fun Offset.toGridCell(canvasWidth: Int, canvasHeight: Int, cols: Int, rows: Int): IntOffset {
     val cellWidth = canvasWidth / cols
     val cellHeight = canvasHeight / rows
 

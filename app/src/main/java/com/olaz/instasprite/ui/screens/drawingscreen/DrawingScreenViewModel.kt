@@ -3,6 +3,7 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.lifecycle.ViewModel
 import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.domain.tool.EyedropperTool
@@ -17,21 +18,24 @@ data class DrawingScreenState(
     val selectedColor: Color,
     val selectedTool: Tool,
 
-    val canvasSize: Pair<Int, Int> = Pair(16,16), // Height, Width ,
+    val canvasWidth: Int,
+    val canvasHeight: Int,
 
     val canvasOffset: Offset,
     val canvasScale: Float,
 )
 
 class DrawingScreenViewModel(
-    canvasSize: Pair<Int, Int>,
+    canvasWidth: Int,
+    canvasHeight: Int
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
             selectedColor = Color(0xFF040519),
             selectedTool = PencilTool,
 
-            canvasSize = canvasSize,
+            canvasWidth = canvasWidth,
+            canvasHeight = canvasHeight,
             
             canvasScale = 1f,
             canvasOffset = Offset.Zero
@@ -42,7 +46,7 @@ class DrawingScreenViewModel(
     private val _pixelChangeTrigger = MutableStateFlow(0)
     val pixelChangeTrigger: StateFlow<Int> = _pixelChangeTrigger
 
-    val canvasModel = PixelCanvasModel(canvasSize.first, canvasSize.second)
+    val canvasModel = PixelCanvasModel(canvasWidth, canvasHeight)
 
     // Just for scaling and offsetting the canvas
     fun setCanvasScale(scale: Float) {

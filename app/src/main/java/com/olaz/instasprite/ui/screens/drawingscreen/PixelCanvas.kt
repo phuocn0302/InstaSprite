@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -21,75 +23,95 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.tool.EraserTool
+import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun PixelCanvas(
     modifier: Modifier = Modifier,
     viewModel: DrawingScreenViewModel
 ) {
     val model = viewModel.canvasModel
-    val uiState by viewModel.uiState.collectAsState()
-    val pixelChangeTrigger by viewModel.pixelChangeTrigger.collectAsState()
+    val canvasHistoryManager = viewModel.canvasHistoryManager
 
-    Log.d("RecomposeCheck", "PixelCanvas recomposed")
+    var canvasWidth = viewModel.uiState.value.canvasWidth
+    var canvasHeight = viewModel.uiState.value.canvasHeight
+    var selectedTool = viewModel.uiState.value.selectedTool
+    var selectedColor = viewModel.uiState.value.selectedColor
+
+    LaunchedEffect(Unit) {
+        viewModel.uiState.collect { state ->
+            canvasWidth = state.canvasWidth
+            canvasHeight = state.canvasHeight
+            selectedTool = state.selectedTool
+            selectedColor = state.selectedColor
+        }
+    }
+
+    val pixelChangeTrigger by viewModel.pixelChangeTrigger.collectAsState()
 
     Box(
         modifier = modifier
-            .aspectRatio(uiState.canvasWidth.toFloat() / uiState.canvasHeight.toFloat())
+            .aspectRatio(canvasWidth.toFloat() / canvasHeight.toFloat())
             .border(10.dp, DrawingScreenColor.CanvasBorderColor)
             .padding(10.dp)
     ) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(uiState.selectedTool) {
+                .pointerInput(Unit) {
                     awaitEachGesture {
+                        if (selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
+                            canvasHistoryManager.saveState(model.getAllPixels())
+                        }
+
                         val down = awaitFirstDown()
                         val startCell = down.position.toGridCell(
                             size.width, size.height,
-                            uiState.canvasWidth, uiState.canvasHeight
+                            canvasWidth, canvasHeight
                         )
 
                         viewModel.applyTool(
                             model,
-                            uiState.selectedTool,
+                            selectedTool,
                             startCell.y,
                             startCell.x,
-                            uiState.selectedColor
+                            selectedColor
                         )
 
-                        if (uiState.selectedTool is PencilTool || uiState.selectedTool is EraserTool) {
+                        if (selectedTool in listOf(PencilTool, EraserTool)) {
                             drag(down.id) { change ->
                                 change.consume()
                                 val dragCell = change.position.toGridCell(
                                     size.width, size.height,
-                                    uiState.canvasWidth, uiState.canvasHeight
+                                    canvasWidth, canvasHeight
                                 )
                                 viewModel.applyTool(
                                     model,
-                                    uiState.selectedTool,
+                                    selectedTool,
                                     dragCell.y,
                                     dragCell.x,
-                                    uiState.selectedColor
+                                    selectedColor
                                 )
                             }
                         }
                     }
                 }
         ) {
-            val canvasWidth = size.width
-            val canvasHeight = size.height
-            val cellWidth = canvasWidth / uiState.canvasWidth
-            val cellHeight = canvasHeight / uiState.canvasHeight
+            val _canvasWidth = size.width
+            val _canvasHeight = size.height
+            val cellWidth = _canvasWidth / canvasWidth
+            val cellHeight = _canvasHeight / canvasHeight
 
             // To recompose when pixelChangeTrigger changes
             pixelChangeTrigger.hashCode()
+            Log.d("RecomposeCheck", "PixelCanvas recomposed")
 
             // Draw grid
-            for (row in 0 until uiState.canvasHeight) {
-                for (col in 0 until uiState.canvasWidth) {
+            for (row in 0 until canvasHeight) {
+                for (col in 0 until canvasWidth) {
                     val topLeft = Offset(col * cellWidth, row * cellHeight)
                     val cellSize = Size(cellWidth, cellHeight)
 

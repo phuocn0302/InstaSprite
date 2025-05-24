@@ -105,7 +105,7 @@ fun ToolSelector(
             contentDescription = "Undo last change",
             selected = false,
             onClick = {
-                // TODO: Handle undo
+                viewModel.undo()
             }
         )
 
@@ -114,7 +114,7 @@ fun ToolSelector(
             contentDescription = "Redo last change",
             selected = false,
             onClick = {
-                // TODO: Handle redo
+                viewModel.redo()
             }
         )
 

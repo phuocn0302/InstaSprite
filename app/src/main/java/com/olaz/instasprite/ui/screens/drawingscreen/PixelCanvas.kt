@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.tool.EraserTool
+import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
@@ -47,7 +48,7 @@ fun PixelCanvas(
                 .fillMaxSize()
                 .pointerInput(uiState.selectedTool) {
                     awaitEachGesture {
-                        if (uiState.selectedTool in listOf(PencilTool, EraserTool)) {
+                        if (uiState.selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
                             canvasHistoryManager.saveState(model.getAllPixels())
                         }
 

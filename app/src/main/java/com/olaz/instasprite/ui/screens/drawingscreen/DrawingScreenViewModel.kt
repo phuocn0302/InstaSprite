@@ -45,10 +45,8 @@ class DrawingScreenViewModel(
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
 
-    private val _pixelChangeTrigger = MutableStateFlow(0)
-    val pixelChangeTrigger: StateFlow<Int> = _pixelChangeTrigger
-
     val canvasModel = PixelCanvasModel(canvasWidth, canvasHeight)
+    val pixelChangeTrigger = canvasModel.pixelChanged
 
     val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
 
@@ -78,20 +76,17 @@ class DrawingScreenViewModel(
         if (tool is EyedropperTool) {
             selectColor(ColorPalette.activeColor)
         }
-        _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
     }
 
     fun undo() {
         canvasHistoryManager.undo()?.let {
             canvasModel.setAllPixels(it)
-            _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
         }
     }
 
     fun redo() {
         canvasHistoryManager.redo()?.let {
             canvasModel.setAllPixels(it)
-            _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
         }
     }
 }

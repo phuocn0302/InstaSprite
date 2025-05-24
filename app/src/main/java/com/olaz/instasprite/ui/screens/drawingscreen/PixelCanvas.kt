@@ -30,6 +30,7 @@ fun PixelCanvas(
     viewModel: DrawingScreenViewModel
 ) {
     val model = viewModel.canvasModel
+    val canvasHistoryManager = viewModel.canvasHistoryManager
     val uiState by viewModel.uiState.collectAsState()
     val pixelChangeTrigger by viewModel.pixelChangeTrigger.collectAsState()
 
@@ -46,6 +47,10 @@ fun PixelCanvas(
                 .fillMaxSize()
                 .pointerInput(uiState.selectedTool) {
                     awaitEachGesture {
+                        if (uiState.selectedTool in listOf(PencilTool, EraserTool)) {
+                            canvasHistoryManager.saveState(model.getAllPixels())
+                        }
+
                         val down = awaitFirstDown()
                         val startCell = down.position.toGridCell(
                             size.width, size.height,
@@ -60,7 +65,7 @@ fun PixelCanvas(
                             uiState.selectedColor
                         )
 
-                        if (uiState.selectedTool is PencilTool || uiState.selectedTool is EraserTool) {
+                        if (uiState.selectedTool in listOf(PencilTool, EraserTool)) {
                             drag(down.id) { change ->
                                 change.consume()
                                 val dragCell = change.position.toGridCell(

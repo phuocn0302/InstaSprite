@@ -18,4 +18,17 @@ class PixelCanvasModel(val width: Int, val height: Int) {
             Color.Transparent
         }
     }
+
+    fun getAllPixels(): List<Color> {
+        return pixels.toList()
+    }
+
+    fun setAllPixels(colors: List<Color>) {
+        if (colors.size == pixels.size) {
+            colors.forEachIndexed { index, color ->
+                pixels[index] = color
+            }
+        }
+    }
+
 }

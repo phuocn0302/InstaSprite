@@ -1,12 +1,14 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.lifecycle.ViewModel
 import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.tool.EyedropperTool
+import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.utils.ColorPalette
@@ -36,7 +38,7 @@ class DrawingScreenViewModel(
 
             canvasWidth = canvasWidth,
             canvasHeight = canvasHeight,
-            
+
             canvasScale = 1f,
             canvasOffset = Offset.Zero
         )
@@ -47,6 +49,8 @@ class DrawingScreenViewModel(
     val pixelChangeTrigger: StateFlow<Int> = _pixelChangeTrigger
 
     val canvasModel = PixelCanvasModel(canvasWidth, canvasHeight)
+
+    val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
 
     // Just for scaling and offsetting the canvas
     fun setCanvasScale(scale: Float) {
@@ -75,5 +79,19 @@ class DrawingScreenViewModel(
             selectColor(ColorPalette.activeColor)
         }
         _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
+    }
+
+    fun undo() {
+        canvasHistoryManager.undo()?.let {
+            canvasModel.setAllPixels(it)
+            _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
+        }
+    }
+
+    fun redo() {
+        canvasHistoryManager.redo()?.let {
+            canvasModel.setAllPixels(it)
+            _pixelChangeTrigger.value = (_pixelChangeTrigger.value + 1) % 2
+        }
     }
 }

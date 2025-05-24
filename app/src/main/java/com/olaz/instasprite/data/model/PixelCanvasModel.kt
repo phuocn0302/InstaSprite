@@ -13,7 +13,7 @@ class PixelCanvasModel(val width: Int, val height: Int) {
     fun setPixel(row: Int, col: Int, color: Color) {
         if (row in 0 until height && col in 0 until width) {
             pixels[row * width + col] = color
-            _pixelChanged.value = (_pixelChanged.value + 1) % 1000
+            _pixelChanged.value = System.currentTimeMillis().toInt()
         }
     }
 
@@ -34,7 +34,7 @@ class PixelCanvasModel(val width: Int, val height: Int) {
             colors.forEachIndexed { index, color ->
                 pixels[index] = color
             }
-            _pixelChanged.value = (_pixelChanged.value + 1) % 1000
+            _pixelChanged.value = System.currentTimeMillis().toInt()
         }
     }
 

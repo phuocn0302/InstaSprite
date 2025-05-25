@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,17 +24,16 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
-import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
 import kotlin.math.roundToInt
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun DrawingScreen(canvasWidth: Int, canvasHeight: Int) {
+fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
     UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
 
-    val viewModel = DrawingScreenViewModel(canvasWidth, canvasHeight)
+    val viewModel = viewModel
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(

@@ -67,6 +67,8 @@ object DrawingScreenColor {
     val ColorItemBorder = Color(0xFF262B44)
     val ColorItemBorderOverlay = Color.White.copy(alpha = 0.3f)
 
+    val ButtonColor = Color(0xFF5A6988)
+
     // Canvas Colors
     val DefaultCanvasColor = Color(0xFF9BAFD9)
     val CheckerColor1 = Color(0xFF808080)

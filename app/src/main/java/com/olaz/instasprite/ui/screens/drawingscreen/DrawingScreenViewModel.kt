@@ -1,20 +1,24 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
+import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.domain.tool.EyedropperTool
-import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.utils.ColorPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import com.olaz.instasprite.data.repository.StorageLocationRepository
+import kotlinx.coroutines.launch
 
 data class DrawingScreenState(
     val selectedColor: Color,
@@ -29,7 +33,8 @@ data class DrawingScreenState(
 
 class DrawingScreenViewModel(
     canvasWidth: Int,
-    canvasHeight: Int
+    canvasHeight: Int,
+    private val storageLocationRepository: StorageLocationRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
@@ -49,6 +54,11 @@ class DrawingScreenViewModel(
     val pixelChangeTrigger = canvasModel.pixelChanged
 
     val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
+
+    private val exporter = ImageExporter()
+
+    private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
+    val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
 
     // Just for scaling and offsetting the canvas
     fun setCanvasScale(scale: Float) {
@@ -89,4 +99,26 @@ class DrawingScreenViewModel(
             canvasModel.setAllPixels(it)
         }
     }
+
+    suspend fun getLastSavedLocation(): Uri? {
+        _lastSavedLocation.value = storageLocationRepository.getLastSavedLocation()
+        return _lastSavedLocation.value
+    }
+
+    fun setLastSavedLocation(uri: Uri) {
+        _lastSavedLocation.value = uri
+        viewModelScope.launch {
+            storageLocationRepository.setLastSavedLocation(uri)
+        }
+    }
+
+    fun saveFile(
+        context: Context,
+        folderUri: Uri,
+        fileName: String,
+        scalePercent: Int = 100
+    ): Boolean {
+        return exporter.saveToFolder(canvasModel, context, folderUri, fileName, scalePercent)
+    }
+
 }

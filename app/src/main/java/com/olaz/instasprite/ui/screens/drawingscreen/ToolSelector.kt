@@ -50,6 +50,14 @@ fun ToolSelector(
     val uiState by viewModel.uiState.collectAsState()
     var toolListVisible by remember { mutableStateOf(false) }
     var menuListVisible by remember { mutableStateOf(false) }
+    var saveDialogVisible by remember { mutableStateOf(false) }
+
+    if (saveDialogVisible) {
+        SaveFileDialog(
+            onDismiss = { saveDialogVisible = false },
+            viewModel = viewModel
+        )
+    }
 
     val tools = listOf(
         PencilTool,
@@ -136,7 +144,7 @@ fun ToolSelector(
                 DropdownMenuItem(
                     text = { Text(text = "Save", color = Color.White) },
                     onClick = {
-                        // TODO: Handle save
+                        saveDialogVisible = true
                     }
                 )
 

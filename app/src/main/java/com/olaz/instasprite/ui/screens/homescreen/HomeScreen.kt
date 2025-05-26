@@ -1,8 +1,6 @@
 package com.olaz.instasprite.ui.screens.homescreen
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -24,17 +22,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.olaz.instasprite.ui.screens.drawingscreen.ColorPickerDialog
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
@@ -47,10 +46,22 @@ fun HomeScreen() {
 
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Create", "Search")
+    var showColorPicker by remember { mutableStateOf(false) }
+    var selectedColor by remember { mutableStateOf(Color.Blue) }
 
     if (selectedItem == 1) {
         CreateCanvasDialog(
             onDismiss = { selectedItem = 0 },
+        )
+    }
+
+    if (selectedItem == 2) {
+        ColorPickerDialog(
+            initialColor = selectedColor,
+            onDismiss = { selectedItem = 0 },
+            onColorSelected = { color ->
+                selectedColor = color
+            }
         )
     }
 
@@ -127,3 +138,4 @@ fun HomeScreen() {
 
     }
 }
+

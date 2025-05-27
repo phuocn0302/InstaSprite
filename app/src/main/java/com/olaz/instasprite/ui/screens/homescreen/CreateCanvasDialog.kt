@@ -179,7 +179,7 @@ fun CreateCanvasDialog(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .height(50.dp)
-                            .width(100.dp)
+                            .width(120.dp)
                     ) {
                         Text(
                             text = "Create",
@@ -196,7 +196,7 @@ fun CreateCanvasDialog(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .height(50.dp)
-                            .width(100.dp)
+                            .width(120.dp)
                     ) {
                         Text(
                             text = "Cancel",

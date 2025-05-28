@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.widget.Toast
@@ -56,6 +57,10 @@ fun SaveFileDialog(
         contract = ActivityResultContracts.OpenDocumentTree(),
         onResult = { uri ->
             if (uri != null) {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
                 folderUri = uri
                 viewModel.setLastSavedLocation(uri)
             }

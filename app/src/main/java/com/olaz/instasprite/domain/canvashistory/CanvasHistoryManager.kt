@@ -28,4 +28,12 @@ class CanvasHistoryManager<T> {
         }
         return null
     }
+
+    fun getUndoStack(): ArrayDeque<T> {
+        return undoStack
+    }
+
+    fun getRedoStack(): ArrayDeque<T> {
+        return redoStack
+    }
 }

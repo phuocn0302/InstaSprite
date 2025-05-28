@@ -195,7 +195,7 @@ fun SaveFileDialog(
 
                         else -> {
                             val scale = scalePercent.toIntOrNull()?.coerceIn(25, 2000) ?: 100
-                            val success = viewModel.saveFile(context, folderUri!!, fileName, scale)
+                            val success = viewModel.saveImage(context, folderUri!!, fileName, scale)
                             Toast.makeText(
                                 context,
                                 if (success) "Image saved successfully!" else "Failed to save image",

@@ -145,4 +145,27 @@ class DrawingScreenViewModel(
             }
         )
     }
+
+    fun saveISprite(
+        context: Context,
+        folderUri: Uri,
+        fileName: String
+    ): Boolean {
+        val result = saveFileUseCase.saveISpriteFile(
+            context,
+            canvasModel.getAllPixels(),
+            canvasModel.width,
+            canvasModel.height,
+            folderUri,
+            fileName
+            )
+
+        result.fold(
+            onSuccess = { return true },
+            onFailure = { exception ->
+                Log.e("SaveFile", "Failed to save file", exception)
+                return false
+            }
+        )
+    }
 }

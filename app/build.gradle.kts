@@ -40,24 +40,35 @@ android {
 }
 
 dependencies {
-
+    // --- Core Android & Kotlin ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // --- Jetpack Compose UI ---
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // --- UI Utilities & Theme ---
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.core.splashscreen)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.datastore.preferences)
+
+    // --- Testing ---
+    // Unit Testing
     testImplementation(libs.junit)
+
+    // Android Instrumentation Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // --- Debugging ---
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

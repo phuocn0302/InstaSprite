@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.olaz.instasprite.ui.screens.drawingscreen.ColorWheelDialog
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
@@ -51,6 +52,12 @@ fun HomeScreen() {
     if (selectedItem == 1) {
         CreateCanvasDialog(
             onDismiss = { selectedItem = 0 },
+        )
+    } else if (selectedItem == 2) {
+        ColorWheelDialog(
+            initialColor = Color.Blue,
+            onDismiss = {selectedItem = 0},
+            onColorSelected = {}
         )
     }
 

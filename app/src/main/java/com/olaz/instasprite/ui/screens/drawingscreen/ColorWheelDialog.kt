@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.graphics.Shader
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +28,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -34,9 +38,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -49,7 +55,10 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -60,13 +69,21 @@ import kotlinx.coroutines.launch
 import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.utils.ColorPalette
+import com.olaz.instasprite.utils.loadColorsFromFile
+import kotlin.math.ceil
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ColorPickerDialog(
+fun ColorWheelDialog(
     initialColor: Color = Color.Blue,
     onDismiss: () -> Unit,
     onColorSelected: (Color) -> Unit
 ) {
+    var showExploreDialog by remember { mutableStateOf(false) }
+//    val context = LocalContext.current
+    val colorPalette = remember { mutableStateOf(ColorPalette.ColorsList) }
+    
     val hsv = remember {
         val hsvArray = floatArrayOf(0f, 0f, 0f)
         AndroidColor.colorToHSV(initialColor.toArgb(), hsvArray)
@@ -127,6 +144,15 @@ fun ColorPickerDialog(
         }
     }
 
+    if (showExploreDialog) {
+        ExploreColorPalettesDialog(
+            onDismiss = { showExploreDialog = false },
+            onImportPalette = { colors ->
+                colorPalette.value = colors
+            }
+        )
+    }
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -146,11 +172,11 @@ fun ColorPickerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "Select Color",
-                    fontSize = 18.sp,
-                    color = Color.White
-                )
+//                Text(
+//                    text = "Select Color",
+//                    fontSize = 18.sp,
+//                    color = Color.White
+//                )
 
                 SatValPanel(
                     hue = hsv.value.first,
@@ -185,6 +211,69 @@ fun ColorPickerDialog(
                             )
                             .clip(RoundedCornerShape(8.dp))
                     )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(95.dp)  // Height for 2 rows + spacing
+                        .border(
+                            width = 2.dp,
+                            color = Color.White,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val itemsPerRow = 7
+                        val rows = ceil(colorPalette.value.size.toFloat() / itemsPerRow).toInt()
+                        
+                        for (rowIndex in 0 until rows) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val startIndex = rowIndex * itemsPerRow
+                                val endIndex = minOf((rowIndex + 1) * itemsPerRow, colorPalette.value.size)
+                                
+                                for (i in startIndex until endIndex) {
+                                    val color = colorPalette.value[i]
+                                    Box(
+                                        modifier = Modifier
+                                            .size(35.dp)
+                                            .border(
+                                                width = 2.dp,
+                                                color = Color.White,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = color,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .clickable {
+                                                val hsvArray = floatArrayOf(0f, 0f, 0f)
+                                                AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                                                hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                                                updateInputFields()
+                                            }
+                                    )
+                                }
+                                
+                                // Add spacers to maintain even spacing when row is not full
+                                if (endIndex - startIndex < itemsPerRow) {
+                                    repeat(itemsPerRow - (endIndex - startIndex)) {
+                                        Spacer(modifier = Modifier.size(35.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Row(
@@ -328,6 +417,24 @@ fun ColorPickerDialog(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
+                        onClick = { showExploreDialog = true },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = HomeScreenColor.ButtonColor
+                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text("Explore Color Palettes")
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
                         onClick = {
                             onColorSelected(selectedColor.value)
                             onDismiss()
@@ -361,6 +468,16 @@ fun ColorPickerDialog(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ColorWheelDialogPreview() {
+    ColorWheelDialog(
+        initialColor = Color.Blue,
+        onDismiss = {},
+        onColorSelected = {}
+    )
 }
 
 @Composable
@@ -469,7 +586,8 @@ fun SatValPanel(
 
     Canvas(
         modifier = Modifier
-            .size(280.dp)
+            .fillMaxWidth()
+            .height(200.dp)
             .border(
                 width = 2.dp,
                 color = Color.White,
@@ -586,6 +704,7 @@ fun CoroutineScope.collectForPress(
     setOffset: (Offset) -> Unit
 ) {
     launch {
+        Log.d("Collect Press", "Recomposed")
         interactionSource.interactions.collect { interaction ->
             (interaction as? PressInteraction.Press)
                 ?.pressPosition

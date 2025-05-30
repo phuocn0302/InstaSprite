@@ -31,46 +31,46 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
-//@Preview(showBackground = true, name = "BottomNavPanel Preview")
-//@Composable
-//fun PreviewBottomNavPanelWithCutOut() {
-//    // It's good practice to wrap previews in your app's theme or a default MaterialTheme
-//    // YourProjectTheme { // Replace with your actual theme if needed
-//    Box( // Create the Box environment
-//        modifier = Modifier
-//            .fillMaxSize() // Give the Box some space to see the alignment
-//            .background(Color.LightGray) // Optional: background for the parent Box
-//    ) {
-//        // Now you can call your BoxScope dependent composable
-//        BottomNavPanelWithCutOut()
-//    }
-//    // }
-//}
-//
-//@Composable
-//fun BoxScope.BottomNavPanelWithCutOut() {
-//    Box(
-//        modifier = Modifier
-//            .align(Alignment.BottomCenter)
-//            .fillMaxWidth()
-//            .height(64.dp)
-//            .clip(
-//                BottomNavShape(
-//                    dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
-//                ),
-//            ) // Apply the custom shape
-//            .background(Color.Blue)
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 56.dp),
-//            horizontalArrangement = Arrangement.SpaceBetween
-//        ) {
-//            // Navigation icons (left and right of the cutout)
-//        }
-//    }
-//}
+@Preview(showBackground = true, name = "BottomNavPanel Preview")
+@Composable
+fun PreviewBottomNavPanelWithCutOut() {
+    // It's good practice to wrap previews in your app's theme or a default MaterialTheme
+    // YourProjectTheme { // Replace with your actual theme if needed
+    Box( // Create the Box environment
+        modifier = Modifier
+            .fillMaxSize() // Give the Box some space to see the alignment
+            .background(Color.LightGray) // Optional: background for the parent Box
+    ) {
+        // Now you can call your BoxScope dependent composable
+        BottomNavPanelWithCutOut()
+    }
+    // }
+}
+
+@Composable
+fun BoxScope.BottomNavPanelWithCutOut() {
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(
+                BottomNavShape(
+                    dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
+                ),
+            ) // Apply the custom shape
+            .background(Color.Blue)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 56.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Navigation icons (left and right of the cutout)
+        }
+    }
+}
 
 class BottomNavShape(
     private val dockRadius: Float,
@@ -86,23 +86,22 @@ class BottomNavShape(
             )
         }
 
+        val rect1 = Path().apply {
+            addRect(
+                Rect(
+                    Offset(
+                        (size.width / 2 - dockRadius) - 1.65f * (dockRadius) + dockRadius, 0f
+                    ),
+                    Size(dockRadius * 3.4f, dockRadius / 2)
+                )
+            )
+        }
+
         val circle1 = Path().apply {
             addOval(
                 Rect(
                     Offset((size.width / 2 - dockRadius) - sqrt(3f) * (dockRadius), 0f),
                     Offset((size.width / 2 + dockRadius) - sqrt(3f) * (dockRadius), 2 * dockRadius),
-                )
-            )
-        }
-
-        val rect1A = Path().apply {
-            addRect(
-                Rect(
-                    Offset(
-                        ((size.width / 2 - dockRadius) - (sqrt(15f) * (dockRadius) / 2)) + dockRadius + dockRadius / 8,
-                        0f
-                    ),
-                    Size(dockRadius, dockRadius / 2)
                 )
             )
         }
@@ -116,19 +115,7 @@ class BottomNavShape(
             )
         }
 
-        val rect2A = Path().apply {
-            addRect(
-                Rect(
-                    Offset(
-                        ((size.width / 2 + dockRadius) + sqrt(15f) * (dockRadius) / 2) - 2 * dockRadius - dockRadius / 8,
-                        0f
-                    ),
-                    Size(dockRadius, dockRadius / 2)
-                ),
-            )
-        }
-
-        val circle = Path().apply {
+        val midlecircle = Path().apply {
             addOval(
                 Rect(
                     Offset(size.width / 2 - dockRadius, -dockRadius),
@@ -139,44 +126,28 @@ class BottomNavShape(
 
         val path1 = Path.combine(
             operation = PathOperation.Difference,
-            path1 = rect1A,
-            path2 = circle1,
+            path1 = rect1,
+            path2 = midlecircle,
         )
-
         val path2 = Path.combine(
             operation = PathOperation.Difference,
             path1 = path1,
-            path2 = circle,
+            path2 = circle1,
         )
-
         val path3 = Path.combine(
             operation = PathOperation.Difference,
-            path1 = rect2A,
+            path1 = path2,
             path2 = circle2,
         )
-
         val path4 = Path.combine(
             operation = PathOperation.Difference,
-            path1 = path3,
-            path2 = circle,
-        )
-
-        val path5 = Path.combine(
-            operation = PathOperation.Difference,
             path1 = baseRect,
-            path2 = circle,
+            path2 = midlecircle,
         )
-
-        val path6 = Path.combine(
-            operation = PathOperation.Difference,
-            path1 = path5,
-            path2 = path2,
-        )
-
         val path = Path.combine(
             operation = PathOperation.Difference,
-            path1 = path6,
-            path2 = path4,
+            path1 = path4,
+            path2 = path3,
         )
 
         return Outline.Generic(path)

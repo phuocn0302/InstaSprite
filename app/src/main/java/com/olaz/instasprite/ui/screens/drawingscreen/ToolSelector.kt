@@ -1,20 +1,13 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -24,13 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -40,6 +30,8 @@ import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.ui.screens.drawingscreen.dialog.SaveISpriteDialog
+import com.olaz.instasprite.ui.screens.drawingscreen.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
 @Composable
@@ -50,11 +42,16 @@ fun ToolSelector(
     val uiState by viewModel.uiState.collectAsState()
     var toolListVisible by remember { mutableStateOf(false) }
     var menuListVisible by remember { mutableStateOf(false) }
-    var saveDialogVisible by remember { mutableStateOf(false) }
+    var saveImageDialogVisible by remember { mutableStateOf(false) }
+    var saveISpriteDialogVisible by remember { mutableStateOf(false) }
 
-    if (saveDialogVisible) {
-        SaveFileDialog(
-            onDismiss = { saveDialogVisible = false },
+    when {
+        saveImageDialogVisible -> SaveImageDialog(
+            onDismiss = { saveImageDialogVisible = false },
+            viewModel = viewModel
+        )
+        saveISpriteDialogVisible -> SaveISpriteDialog(
+            onDismiss = { saveISpriteDialogVisible = false },
             viewModel = viewModel
         )
     }
@@ -144,7 +141,7 @@ fun ToolSelector(
                 DropdownMenuItem(
                     text = { Text(text = "Save", color = Color.White) },
                     onClick = {
-                        saveDialogVisible = true
+                        saveISpriteDialogVisible = true
                     }
                 )
 
@@ -152,6 +149,13 @@ fun ToolSelector(
                     text = { Text(text = "Load", color = Color.White) },
                     onClick = {
                         // TODO: Handle load
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(text = "Export image", color = Color.White) },
+                    onClick = {
+                        saveImageDialogVisible = true
                     }
                 )
 

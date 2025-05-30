@@ -3,6 +3,7 @@ package com.olaz.instasprite.ui.components.dialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.InputField
 
 
@@ -68,7 +70,11 @@ fun InputDialog(
                         },
                         trailingIcon = {
                             field.suffix?.let {
-                                Text(it, color = Color.White)
+                                Text(
+                                    it,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 14.dp)
+                                )
                             }
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = field.keyboardType),

@@ -66,6 +66,7 @@ fun SaveFileDialog(
     InputDialog(
         title = title,
         fields = fields,
+        confirmButtonText = "Save",
         onDismiss = onDismiss,
         onConfirm = { values ->
             if (folderUri == null) {

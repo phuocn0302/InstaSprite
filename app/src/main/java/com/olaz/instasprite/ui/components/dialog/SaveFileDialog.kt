@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.InputField
-import com.olaz.instasprite.ui.screens.drawingscreen.getFullPathFromTreeUri
+import com.olaz.instasprite.utils.getFullPathFromTreeUri
 
 @Composable
 fun SaveFileDialog(
@@ -41,7 +42,13 @@ fun SaveFileDialog(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
-    var folderUri by remember { mutableStateOf<Uri?>(lastSavedUri) }
+    var folderUri by remember(lastSavedUri) { mutableStateOf<Uri?>(lastSavedUri) }
+
+    LaunchedEffect(lastSavedUri) {
+        if (lastSavedUri != null && folderUri == null) {
+            folderUri = lastSavedUri
+        }
+    }
 
     val folderPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree(),

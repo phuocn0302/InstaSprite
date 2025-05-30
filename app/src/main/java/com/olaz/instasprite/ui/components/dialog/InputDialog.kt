@@ -47,7 +47,6 @@ fun InputDialog(
 
             if (allValid) {
                 onConfirm(inputStates.map { it.value })
-                onDismiss()
             } else {
                 Toast.makeText(context, "Input errors", Toast.LENGTH_SHORT).show()
             }

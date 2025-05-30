@@ -9,5 +9,5 @@ data class InputField(
     val suffix: String? = null,
     val validator: (String) -> Boolean = { true },
     val errorMessage: String = "",
-    var value: String = ""
+    var defaultValue: String = ""
 )

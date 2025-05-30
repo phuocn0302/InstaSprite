@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
+import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.StorageLocationRepository
+import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import kotlinx.coroutines.launch
 
@@ -56,6 +58,7 @@ class DrawingScreenViewModel(
     val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
 
     private val saveFileUseCase = SaveFileUseCase()
+    private val loadFileUseCase = LoadFileUseCase()
 
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
@@ -67,6 +70,10 @@ class DrawingScreenViewModel(
 
     fun setCanvasOffset(offset: Offset) {
         _uiState.value = _uiState.value.copy(canvasOffset = offset)
+    }
+
+    fun setCanvasSize(width: Int, height: Int) {
+        _uiState.value = _uiState.value.copy(canvasWidth = width, canvasHeight = height)
     }
 
     fun selectColor(color: Color) {
@@ -167,5 +174,15 @@ class DrawingScreenViewModel(
                 return false
             }
         )
+    }
+
+    fun loadFile(context: Context, fileUri: Uri): ISpriteData? {
+        return loadFileUseCase.loadFile(context, fileUri)
+    }
+
+    fun loadISprite(spriteData: ISpriteData) {
+        val decodedPixels = spriteData.pixelsData.map { Color(it) }
+        setCanvasSize(spriteData.width, spriteData.height)
+        canvasModel.setCanvas(spriteData.width, spriteData.height, decodedPixels)
     }
 }

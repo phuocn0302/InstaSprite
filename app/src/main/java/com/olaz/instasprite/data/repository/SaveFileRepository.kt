@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.utils.FileUtils.getFormatFromExtension
+import com.olaz.instasprite.utils.getFormatFromExtension
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException

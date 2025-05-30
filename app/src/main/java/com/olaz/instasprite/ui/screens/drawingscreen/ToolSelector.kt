@@ -30,6 +30,7 @@ import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.ui.screens.drawingscreen.dialog.LoadISpriteDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.SaveISpriteDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
@@ -44,14 +45,30 @@ fun ToolSelector(
     var menuListVisible by remember { mutableStateOf(false) }
     var saveImageDialogVisible by remember { mutableStateOf(false) }
     var saveISpriteDialogVisible by remember { mutableStateOf(false) }
+    var loadISpriteDialogVisible by remember { mutableStateOf(false) }
 
     when {
         saveImageDialogVisible -> SaveImageDialog(
-            onDismiss = { saveImageDialogVisible = false },
+            onDismiss = {
+                saveImageDialogVisible = false
+                menuListVisible = false
+            },
             viewModel = viewModel
         )
+
         saveISpriteDialogVisible -> SaveISpriteDialog(
-            onDismiss = { saveISpriteDialogVisible = false },
+            onDismiss = {
+                saveISpriteDialogVisible = false
+                menuListVisible = false
+            },
+            viewModel = viewModel
+        )
+
+        loadISpriteDialogVisible -> LoadISpriteDialog(
+            onDismiss = {
+                loadISpriteDialogVisible = false
+                menuListVisible = false
+            },
             viewModel = viewModel
         )
     }
@@ -148,7 +165,7 @@ fun ToolSelector(
                 DropdownMenuItem(
                     text = { Text(text = "Load", color = Color.White) },
                     onClick = {
-                        // TODO: Handle load
+                        loadISpriteDialogVisible = true
                     }
                 )
 

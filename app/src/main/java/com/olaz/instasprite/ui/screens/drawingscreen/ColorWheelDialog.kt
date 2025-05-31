@@ -428,7 +428,7 @@ fun ColorWheelDialog(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Button(
                         onClick = {
@@ -441,12 +441,10 @@ fun ColorWheelDialog(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .height(50.dp)
-                            .width(120.dp)
+                            .weight(1f)
                     ) {
                         Text("Select")
                     }
-
-                    Spacer(modifier = Modifier.width(60.dp))
 
                     Button(
                         onClick = onDismiss,
@@ -456,7 +454,7 @@ fun ColorWheelDialog(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .height(50.dp)
-                            .width(120.dp)
+                            .weight(1f)
                     ) {
                         Text("Cancel")
                     }

@@ -28,7 +28,7 @@ fun SaveISpriteDialog(
     }
 
     SaveFileDialog(
-        title = "Export Image",
+        title = "Save ISprite",
         fields = listOf(
             InputField(
                 label = "Name",

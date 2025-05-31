@@ -55,12 +55,9 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.graphics.toRect
@@ -70,7 +67,6 @@ import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.ColorPalette
-import com.olaz.instasprite.utils.loadColorsFromFile
 import kotlin.math.ceil
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -145,7 +141,7 @@ fun ColorWheelDialog(
     }
 
     if (showExploreDialog) {
-        ExploreColorPalettesDialog(
+        ImportColorPalettesDialog(
             onDismiss = { showExploreDialog = false },
             onImportPalette = { colors ->
                 colorPalette.value = colors
@@ -426,7 +422,7 @@ fun ColorWheelDialog(
                             .height(50.dp)
                             .fillMaxWidth()
                     ) {
-                        Text("Explore Color Palettes")
+                        Text("Import Color Palettes")
                     }
                 }
 

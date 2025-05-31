@@ -113,18 +113,12 @@ fun HomeScreen() {
                                     )
                                 }
                             },
-                            label = {
-                                when (item) {
-                                    "Home" -> Text("Home")
-                                    "Search" -> Text("Search")
-                                }
-                            },
                             selected = selectedItem == index,
                             onClick = { selectedItem = index },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = Color.White,
                                 selectedTextColor = Color.White,
-                                indicatorColor = HomeScreenColor.SelectedColor,
+                                indicatorColor = HomeScreenColor.BottombarColor,
                                 unselectedIconColor = Color.White,
                                 unselectedTextColor = Color.White,
                             ),
@@ -151,12 +145,14 @@ fun HomeScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 40.dp),
+                .padding(bottom = 50.dp),
             contentAlignment = Alignment.Center,
         ) {
             FloatingActionButton(
                 onClick = { selectedItem = 1 },
                 shape = CircleShape,
+                containerColor = HomeScreenColor.SelectedColor,
+                contentColor = Color.White,
                 modifier = Modifier.size(75.dp)
             ) {
                 Icon(Icons.Filled.Add, "Floating action button")

@@ -15,6 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -36,8 +39,8 @@ fun PixelCanvas(
     val model = viewModel.canvasModel
     val canvasHistoryManager = viewModel.canvasHistoryManager
 
-    var canvasWidth = viewModel.uiState.value.canvasWidth
-    var canvasHeight = viewModel.uiState.value.canvasHeight
+    var canvasWidth by remember { mutableIntStateOf(viewModel.uiState.value.canvasWidth) }
+    var canvasHeight by remember { mutableIntStateOf(viewModel.uiState.value.canvasHeight) }
     var selectedTool = viewModel.uiState.value.selectedTool
     var selectedColor = viewModel.uiState.value.selectedColor
 

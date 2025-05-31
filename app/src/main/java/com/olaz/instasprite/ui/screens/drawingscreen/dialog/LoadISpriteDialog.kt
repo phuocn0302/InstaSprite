@@ -126,40 +126,39 @@ fun LoadISpriteDialog(
 
 @Composable
 fun PreviewCanvas(spriteData: ISpriteData) {
-    Box(
+    val spriteAspectRatio = spriteData.width.toFloat() / spriteData.height.toFloat()
+
+    Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = 300.dp)
-            .border(5.dp, DrawingScreenColor.PaletteBackgroundColor),
-        contentAlignment = Alignment.Center
+            .aspectRatio(spriteAspectRatio, matchHeightConstraintsFirst = true)
+            .border(5.dp, DrawingScreenColor.PaletteBackgroundColor)
+            .clipToBounds()
     ) {
-        val spriteAspectRatio = spriteData.width.toFloat() / spriteData.height.toFloat()
+        val pixelSize = min(
+            size.width / spriteData.width,
+            size.height / spriteData.height
+        )
 
-        Canvas(
-            modifier = Modifier.fillMaxWidth().aspectRatio(spriteAspectRatio).clipToBounds()
-        ) {
-            val pixelSize = min(
-                size.width / spriteData.width, size.height / spriteData.height
+        spriteData.pixelsData.forEachIndexed { index, colorInt ->
+            val x = index % spriteData.width
+            val y = index / spriteData.width
+
+            val color = Color(colorInt)
+
+            drawRect(
+                color = color,
+                topLeft = Offset(
+                    x = x * pixelSize,
+                    y = y * pixelSize
+                ),
+                size = Size(pixelSize, pixelSize)
             )
-
-            spriteData.pixelsData.forEachIndexed { index, colorInt ->
-                val x = index % spriteData.width
-                val y = index / spriteData.width
-
-                val color = Color(colorInt)
-
-                drawRect(
-                    color = color,
-                    topLeft = Offset(
-                        x = x * pixelSize,
-                        y = y * pixelSize
-                    ),
-                    size = Size(pixelSize, pixelSize)
-                )
-            }
         }
     }
 }
+
 
 @Composable
 @Preview

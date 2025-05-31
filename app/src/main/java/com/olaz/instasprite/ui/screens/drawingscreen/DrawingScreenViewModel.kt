@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
-import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
@@ -17,7 +16,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
+import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.StorageLocationRepository
+import com.olaz.instasprite.domain.usecase.LoadFileUseCase
+import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import kotlinx.coroutines.launch
 
 data class DrawingScreenState(
@@ -55,7 +57,8 @@ class DrawingScreenViewModel(
 
     val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
 
-    private val exporter = ImageExporter()
+    private val saveFileUseCase = SaveFileUseCase()
+    private val loadFileUseCase = LoadFileUseCase()
 
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
@@ -69,6 +72,10 @@ class DrawingScreenViewModel(
         _uiState.value = _uiState.value.copy(canvasOffset = offset)
     }
 
+    fun setCanvasSize(width: Int, height: Int) {
+        _uiState.value = _uiState.value.copy(canvasWidth = width, canvasHeight = height)
+    }
+
     fun selectColor(color: Color) {
         _uiState.value = _uiState.value.copy(selectedColor = color)
         ColorPalette.activeColor = color
@@ -78,8 +85,17 @@ class DrawingScreenViewModel(
         _uiState.value = _uiState.value.copy(selectedTool = tool)
     }
 
-    fun applyTool(canvasModel: PixelCanvasModel ,tool: Tool, x: Int, y: Int, color: Color = ColorPalette.activeColor) {
-        Log.d("DrawingScreenViewModel", "Applying tool: ${tool.name} at x=$x, y=$y with color=$color")
+    fun applyTool(
+        canvasModel: PixelCanvasModel,
+        tool: Tool,
+        x: Int,
+        y: Int,
+        color: Color = ColorPalette.activeColor
+    ) {
+        Log.d(
+            "DrawingScreenViewModel",
+            "Applying tool: ${tool.name} at x=$x, y=$y with color=$color"
+        )
 
         tool.apply(canvasModel, x, y, color)
 
@@ -112,13 +128,61 @@ class DrawingScreenViewModel(
         }
     }
 
-    fun saveFile(
+    fun saveImage(
         context: Context,
         folderUri: Uri,
         fileName: String,
         scalePercent: Int = 100
     ): Boolean {
-        return exporter.saveToFolder(canvasModel, context, folderUri, fileName, scalePercent)
+        val result = saveFileUseCase.saveImageFile(
+            context,
+            canvasModel.getAllPixels(),
+            canvasModel.width,
+            canvasModel.height,
+            scalePercent,
+            folderUri,
+            fileName
+        )
+
+        result.fold(
+            onSuccess = { return true },
+            onFailure = { exception ->
+                Log.e("SaveFile", "Failed to save file", exception)
+                return false
+            }
+        )
     }
 
+    fun saveISprite(
+        context: Context,
+        folderUri: Uri,
+        fileName: String
+    ): Boolean {
+        val result = saveFileUseCase.saveISpriteFile(
+            context,
+            canvasModel.getAllPixels(),
+            canvasModel.width,
+            canvasModel.height,
+            folderUri,
+            fileName
+            )
+
+        result.fold(
+            onSuccess = { return true },
+            onFailure = { exception ->
+                Log.e("SaveFile", "Failed to save file", exception)
+                return false
+            }
+        )
+    }
+
+    fun loadFile(context: Context, fileUri: Uri): ISpriteData? {
+        return loadFileUseCase.loadFile(context, fileUri)
+    }
+
+    fun loadISprite(spriteData: ISpriteData) {
+        val decodedPixels = spriteData.pixelsData.map { Color(it) }
+        setCanvasSize(spriteData.width, spriteData.height)
+        canvasModel.setCanvas(spriteData.width, spriteData.height, decodedPixels)
+    }
 }

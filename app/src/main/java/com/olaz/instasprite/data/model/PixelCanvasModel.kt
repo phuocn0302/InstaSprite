@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class PixelCanvasModel(val width: Int, val height: Int) {
-    val pixels = MutableList(width * height) { Color.Transparent }
+class PixelCanvasModel(var width: Int, var height: Int) {
+    var pixels = MutableList(width * height) { Color.Transparent }
 
     private val _pixelChanged = MutableStateFlow(0)
     val pixelChanged = _pixelChanged.asStateFlow()
@@ -38,4 +38,14 @@ class PixelCanvasModel(val width: Int, val height: Int) {
         }
     }
 
+    fun setCanvas(width: Int, height: Int, pixelsData: List<Color>? = null) {
+        this.width = width
+        this.height = height
+        this.pixels = if (pixelsData != null && pixelsData.size == width * height) {
+            pixelsData.toMutableList()
+        } else {
+            MutableList(width * height) { Color.Transparent }
+        }
+        _pixelChanged.value = System.currentTimeMillis().toInt()
+    }
 }

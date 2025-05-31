@@ -1,0 +1,55 @@
+package com.olaz.instasprite.ui.screens.homescreen.dialog
+
+import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import com.olaz.instasprite.DrawingActivity
+import com.olaz.instasprite.data.model.InputField
+import com.olaz.instasprite.ui.components.dialog.InputDialog
+
+
+@Composable
+fun CreateCanvasDialog(
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+
+    InputDialog(
+        title = "New canvas",
+        fields = listOf(
+            InputField(
+                label = "Width",
+                placeholder = "16",
+                defaultValue = "16",
+                suffix = "px",
+                keyboardType = KeyboardType.Number,
+                validator = { it.toIntOrNull() != null && it.toIntOrNull() != 0 },
+                errorMessage = "Must be a number greater than 0"
+            ),
+            InputField(
+                label = "Height",
+                placeholder = "16",
+                defaultValue = "16",
+                suffix = "px",
+                keyboardType = KeyboardType.Number,
+                validator = { it.toIntOrNull() != null && it.toIntOrNull() != 0 },
+                errorMessage = "Must be a number greater than 0"
+            )
+        ),
+        onDismiss = onDismiss,
+        confirmButtonText = "Create",
+        onConfirm = { values ->
+            val width = values[0].toInt()
+            val height = values[1].toInt()
+
+            val intent = Intent(context, DrawingActivity::class.java).apply {
+                putExtra(DrawingActivity.EXTRA_CANVAS_WIDTH, width)
+                putExtra(DrawingActivity.EXTRA_CANVAS_HEIGHT, height)
+            }
+
+            onDismiss()
+            context.startActivity(intent)
+        },
+    )
+}

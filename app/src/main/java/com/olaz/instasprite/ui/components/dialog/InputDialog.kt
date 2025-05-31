@@ -2,7 +2,9 @@ package com.olaz.instasprite.ui.components.dialog
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -56,6 +58,7 @@ fun InputDialog(
         confirmButtonText = confirmButtonText,
         dismissButtonText = dismissButtonText,
         content = {
+            Spacer(modifier = Modifier.height(12.dp))
             Column {
                 extraTopContent()
 

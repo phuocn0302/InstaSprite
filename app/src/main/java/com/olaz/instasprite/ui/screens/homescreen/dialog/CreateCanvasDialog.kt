@@ -7,6 +7,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.olaz.instasprite.DrawingActivity
 import com.olaz.instasprite.data.model.InputField
 import com.olaz.instasprite.ui.components.dialog.InputDialog
+import java.util.UUID
 
 
 @Composable
@@ -46,6 +47,7 @@ fun CreateCanvasDialog(
             val intent = Intent(context, DrawingActivity::class.java).apply {
                 putExtra(DrawingActivity.EXTRA_CANVAS_WIDTH, width)
                 putExtra(DrawingActivity.EXTRA_CANVAS_HEIGHT, height)
+                putExtra(DrawingActivity.EXTRA_SPRITE_ID, UUID.randomUUID().toString())
             }
 
             onDismiss()

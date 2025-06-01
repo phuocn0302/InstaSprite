@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
@@ -37,8 +38,10 @@ data class DrawingScreenState(
 )
 
 class DrawingScreenViewModel(
+    private val spriteId: String,
     private val storageLocationRepository: StorageLocationRepository,
-    private val pixelCanvasRepository: PixelCanvasRepository
+    private val pixelCanvasRepository: PixelCanvasRepository,
+    private val spriteDataRepository: ISpriteDatabaseRepository
 ) : ViewModel() {
     private val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
     private val saveFileUseCase = SaveFileUseCase()
@@ -170,7 +173,7 @@ class DrawingScreenViewModel(
             pixelCanvasUseCase.getISpriteData(),
             folderUri,
             fileName
-            )
+        )
 
         result.fold(
             onSuccess = { return true },
@@ -190,5 +193,21 @@ class DrawingScreenViewModel(
         pixelCanvasUseCase.setCanvas(spriteData)
         canvasHistoryManager.reset()
         saveState()
+    }
+
+    fun saveToDB() {
+        viewModelScope.launch {
+            val spriteData = pixelCanvasUseCase.getISpriteData()
+            spriteDataRepository.saveSprite(spriteData.copy(id = spriteId))
+        }
+    }
+
+    fun loadFromDB() {
+        viewModelScope.launch {
+            val spriteData = spriteDataRepository.loadSprite(spriteId.toInt())
+            if (spriteData != null) {
+                loadISprite(spriteData)
+            }
+        }
     }
 }

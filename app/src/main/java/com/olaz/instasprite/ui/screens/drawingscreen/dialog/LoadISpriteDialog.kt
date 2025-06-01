@@ -117,15 +117,3 @@ fun LoadISpriteDialog(
     })
 }
 
-@Composable
-@Preview
-fun LoadISpriteDialogPreview() {
-    LoadISpriteDialog(
-        onDismiss = {}, viewModel = DrawingScreenViewModel(
-            storageLocationRepository = StorageLocationRepository(LocalContext.current),
-            pixelCanvasRepository = PixelCanvasRepository(
-                PixelCanvasModel(16,16)
-            )
-        )
-    )
-}

@@ -61,7 +61,7 @@ class PixelCanvasRepository(var model: PixelCanvasModel) {
     }
 
     fun getISpriteData(): ISpriteData {
-        return ISpriteData(width, height, pixels.map { it.toArgb() })
+        return ISpriteData(width = width, height = height, pixelsData =  pixels.map { it.toArgb() })
     }
 
     private fun updatePixelChangedTrigger() {

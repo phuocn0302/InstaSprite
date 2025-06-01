@@ -9,31 +9,56 @@ object FillTool : Tool {
     override val name: String = "Fill"
     override val description: String = "Fill canvas section with the selected color"
 
-    // DFS
+    // Scanline fill algorithm
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
+        val width = canvas.getCanvasWidth()
+        val height = canvas.getCanvasHeight()
+
         val targetColor = canvas.getPixel(row, col)
         if (targetColor == color) return
 
-        // we'll push (row, col) pairs onto this stack
-        val stack = ArrayDeque<Pair<Int, Int>>().apply {
-            add(row to col)
-        }
+        val visited = Array(height) { BooleanArray(width) }
+        val stack = ArrayDeque<Pair<Int, Int>>()
+        stack.add(row to col)
 
         while (stack.isNotEmpty()) {
-            val (r, c) = stack.removeLast()
+            val (startRow, startCol) = stack.removeLast()
+            var x = startCol
 
-            if (r < 0 || r >= canvas.getCanvasHeight() || c < 0 || c >= canvas.getCanvasWidth()) continue
+            // Move left from the start point
+            while (x >= 0 && canvas.getPixel(startRow, x) == targetColor && !visited[startRow][x]) {
+                x--
+            }
+            val leftBound = x + 1
 
-            // only fill pixels matching the original color
-            if (canvas.getPixel(r, c) != targetColor) continue
+            // Move right from the start point
+            x = startCol
+            while (x < width && canvas.getPixel(startRow, x) == targetColor && !visited[startRow][x]) {
+                x++
+            }
+            val rightBound = x - 1
 
-            canvas.setPixel(r, c, color)
+            // Fill the scanline from leftBound to rightBound
+            for (i in leftBound..rightBound) {
+                canvas.setPixel(startRow, i, color)
+                visited[startRow][i] = true
 
-            // push 4‑neighbors
-            stack.add(r + 1 to c)
-            stack.add(r - 1 to c)
-            stack.add(r to c + 1)
-            stack.add(r to c - 1)
+                // Check pixel above
+                if (startRow > 0 &&
+                    canvas.getPixel(startRow - 1, i) == targetColor &&
+                    !visited[startRow - 1][i]
+                ) {
+                    stack.add(startRow - 1 to i)
+                }
+
+                // Check pixel below
+                if (startRow < height - 1 &&
+                    canvas.getPixel(startRow + 1, i) == targetColor &&
+                    !visited[startRow + 1][i]
+                ) {
+                    stack.add(startRow + 1 to i)
+                }
+            }
         }
     }
 }

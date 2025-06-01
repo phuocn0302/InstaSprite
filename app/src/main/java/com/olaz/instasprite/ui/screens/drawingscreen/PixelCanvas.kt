@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -74,29 +76,40 @@ fun PixelCanvas(
     val gridStroke = remember { Stroke(width = 1f) }
     val gridColor = remember { Color.LightGray.copy(alpha = 0.2f) }
 
-    Box(
-        modifier = modifier
-            .aspectRatio(canvasWidth.toFloat() / canvasHeight.toFloat())
-            .border(10.dp, DrawingScreenColor.CanvasBorderColor)
-            .padding(10.dp)
-    ) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawingPointerInput(canvasWidth, canvasHeight, viewModel)
-        ) {
-            drawImage(
-                image = imageBitmap,
-                dstOffset = IntOffset.Zero,
-                dstSize = IntSize(
-                    width = size.width.toInt(),
-                    height = size.height.toInt()
-                ),
-                filterQuality = FilterQuality.None
-            )
+    val aspectRatio = canvasWidth.toFloat() / canvasHeight.toFloat()
+    val borderSize = 5.dp
 
-            if (canvasWidth < 32 && canvasHeight < 32) {
-                drawGridOverlay(canvasWidth, canvasHeight, gridColor, gridStroke)
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+
+        Box(
+            modifier = Modifier
+                .border(borderSize, DrawingScreenColor.CanvasBorderColor)
+                .padding(borderSize)
+        ) {
+            Box(
+                modifier = Modifier
+                    .aspectRatio(aspectRatio)
+                    .fillMaxWidth(0.9f)
+            ) {
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .drawingPointerInput(canvasWidth, canvasHeight, viewModel)
+                ) {
+                    drawImage(
+                        image = imageBitmap,
+                        dstOffset = IntOffset.Zero,
+                        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                        filterQuality = FilterQuality.None
+                    )
+
+                    if (canvasWidth < 32 && canvasHeight < 32) {
+                        drawGridOverlay(canvasWidth, canvasHeight, gridColor, gridStroke)
+                    }
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -22,9 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
@@ -48,6 +56,24 @@ fun PixelCanvas(
 
     val pixelChangeTrigger by viewModel.pixelChangeTrigger.collectAsState()
 
+    val bitmap = remember(canvasWidth, canvasHeight) {
+        createBitmap(canvasWidth, canvasHeight)
+    }
+
+    val imageBitmap: ImageBitmap = remember(bitmap, pixelChangeTrigger) {
+        updateBitmapPixels(
+            bitmap = bitmap,
+            viewModel = viewModel,
+            checkerColor1 = DrawingScreenColor.CheckerColor1.toArgb(),
+            checkerColor2 = DrawingScreenColor.CheckerColor2.toArgb()
+        )
+        bitmap.asImageBitmap()
+    }
+
+    // Store the stroke and color for the grid overlay once, maybe optimize memory
+    val gridStroke = remember { Stroke(width = 1f) }
+    val gridColor = remember { Color.LightGray.copy(alpha = 0.2f) }
+
     Box(
         modifier = modifier
             .aspectRatio(canvasWidth.toFloat() / canvasHeight.toFloat())
@@ -59,52 +85,84 @@ fun PixelCanvas(
                 .fillMaxSize()
                 .drawingPointerInput(canvasWidth, canvasHeight, viewModel)
         ) {
-            val _canvasWidth = size.width
-            val _canvasHeight = size.height
-            val cellWidth = _canvasWidth / canvasWidth
-            val cellHeight = _canvasHeight / canvasHeight
+            drawImage(
+                image = imageBitmap,
+                dstOffset = IntOffset.Zero,
+                dstSize = IntSize(
+                    width = size.width.toInt(),
+                    height = size.height.toInt()
+                ),
+                filterQuality = FilterQuality.None
+            )
 
-            // To recompose when pixelChangeTrigger changes
-            pixelChangeTrigger.hashCode()
-            Log.d("RecomposeCheck", "PixelCanvas recomposed")
+            if (canvasWidth < 32 && canvasHeight < 32) {
+                drawGridOverlay(canvasWidth, canvasHeight, gridColor, gridStroke)
+            }
+        }
+    }
+}
 
-            // Draw grid
-            for (row in 0 until canvasHeight) {
-                for (col in 0 until canvasWidth) {
-                    val topLeft = Offset(col * cellWidth, row * cellHeight)
-                    val cellSize = Size(cellWidth, cellHeight)
+private fun updateBitmapPixels(
+    bitmap: Bitmap,
+    viewModel: DrawingScreenViewModel,
+    checkerColor1: Int,
+    checkerColor2: Int
+) {
+    val width = bitmap.width
+    val height = bitmap.height
+    val pixels = IntArray(width * height)
 
-                    // Checkerboard
-                    drawRect(
-                        color = if ((row + col) % 2 == 0) DrawingScreenColor.CheckerColor1 else DrawingScreenColor.CheckerColor2,
-                        topLeft = topLeft,
-                        size = cellSize
-                    )
+    val useLargeCheckers = width >= 32 || height >= 32
+    val blockSize = if (useLargeCheckers) 16 else 1
 
-                    // Pixel
-                    drawRect(
-                        color = viewModel.getPixelData(row, col),
-                        topLeft = topLeft,
-                        size = cellSize
-                    )
+    for (row in 0 until height) {
+        for (col in 0 until width) {
+            val index = row * width + col
+            val pixelColor = viewModel.getPixelData(row, col)
 
-                    // Grid
-                    drawRect(
-                        color = Color.LightGray.copy(alpha = 0.2f),
-                        topLeft = topLeft,
-                        size = cellSize,
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)
-                    )
-                }
+            pixels[index] = if (pixelColor == Color.Transparent) {
+                val checkerRow = row / blockSize
+                val checkerCol = col / blockSize
+                if ((checkerRow + checkerCol) % 2 == 0) checkerColor1 else checkerColor2
+            } else {
+                pixelColor.toArgb()
             }
         }
     }
 
+    bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+}
+
+
+private fun DrawScope.drawGridOverlay(
+    canvasWidth: Int,
+    canvasHeight: Int,
+    gridColor: Color,
+    gridStroke: Stroke
+) {
+    val cellWidth = size.width / canvasWidth
+    val cellHeight = size.height / canvasHeight
+    val cellSize = Size(cellWidth, cellHeight)
+
+    for (row in 0 until canvasHeight) {
+        val y = row * cellHeight
+        for (col in 0 until canvasWidth) {
+            val x = col * cellWidth
+            val topLeft = Offset(x, y)
+
+            drawRect(
+                color = gridColor,
+                topLeft = topLeft,
+                size = cellSize,
+                style = gridStroke
+            )
+        }
+    }
 }
 
 fun Offset.toGridCell(canvasWidth: Int, canvasHeight: Int, cols: Int, rows: Int): IntOffset {
-    val cellWidth = canvasWidth / cols
-    val cellHeight = canvasHeight / rows
+    val cellWidth = canvasWidth.toFloat() / cols.toFloat()
+    val cellHeight = canvasHeight.toFloat() / rows.toFloat()
 
     val gridX = (x / cellWidth).toInt().coerceIn(0, cols - 1)
     val gridY = (y / cellHeight).toInt().coerceIn(0, rows - 1)
@@ -116,7 +174,7 @@ fun Modifier.drawingPointerInput(
     canvasWidth: Int,
     canvasHeight: Int,
     viewModel: DrawingScreenViewModel
-): Modifier = this.pointerInput(Unit) {
+): Modifier = this.pointerInput(canvasWidth, canvasHeight) {
     awaitEachGesture {
         val selectedTool = viewModel.uiState.value.selectedTool
 

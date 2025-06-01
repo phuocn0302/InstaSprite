@@ -2,7 +2,7 @@ package com.olaz.instasprite.domain.tool
 
 import androidx.compose.ui.graphics.Color
 import com.olaz.instasprite.R
-import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 
 object FillTool : Tool {
     override val icon: Int = R.drawable.ic_fill_tool
@@ -10,7 +10,7 @@ object FillTool : Tool {
     override val description: String = "Fill canvas section with the selected color"
 
     // DFS
-    override fun apply(canvas: PixelCanvasModel, row: Int, col: Int, color: Color) {
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         val targetColor = canvas.getPixel(row, col)
         if (targetColor == color) return
 
@@ -22,7 +22,7 @@ object FillTool : Tool {
         while (stack.isNotEmpty()) {
             val (r, c) = stack.removeLast()
 
-            if (r < 0 || r >= canvas.height || c < 0 || c >= canvas.width) continue
+            if (r < 0 || r >= canvas.getCanvasHeight() || c < 0 || c >= canvas.getCanvasWidth()) continue
 
             // only fill pixels matching the original color
             if (canvas.getPixel(r, c) != targetColor) continue

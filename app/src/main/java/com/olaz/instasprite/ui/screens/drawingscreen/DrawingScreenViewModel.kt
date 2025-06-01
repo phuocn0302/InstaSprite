@@ -6,20 +6,21 @@ import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.olaz.instasprite.data.model.PixelCanvasModel
+import androidx.lifecycle.viewModelScope
+import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.data.repository.PixelCanvasRepository
+import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
+import com.olaz.instasprite.domain.usecase.LoadFileUseCase
+import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
+import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.utils.ColorPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import androidx.lifecycle.viewModelScope
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.repository.StorageLocationRepository
-import com.olaz.instasprite.domain.usecase.LoadFileUseCase
-import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import kotlinx.coroutines.launch
 
 data class DrawingScreenState(
@@ -34,31 +35,28 @@ data class DrawingScreenState(
 )
 
 class DrawingScreenViewModel(
-    canvasWidth: Int,
-    canvasHeight: Int,
-    private val storageLocationRepository: StorageLocationRepository
+    private val storageLocationRepository: StorageLocationRepository,
+    private val pixelCanvasRepository: PixelCanvasRepository
 ) : ViewModel() {
+    private val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
+    private val saveFileUseCase = SaveFileUseCase()
+    private val loadFileUseCase = LoadFileUseCase()
+    private val pixelCanvasUseCase = PixelCanvasUseCase(repo = pixelCanvasRepository)
+
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
             selectedColor = Color(0xFF040519),
             selectedTool = PencilTool,
 
-            canvasWidth = canvasWidth,
-            canvasHeight = canvasHeight,
+            canvasWidth = pixelCanvasUseCase.getCanvasWidth(),
+            canvasHeight = pixelCanvasUseCase.getCanvasHeight(),
 
             canvasScale = 1f,
             canvasOffset = Offset.Zero
         )
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
-
-    val canvasModel = PixelCanvasModel(canvasWidth, canvasHeight)
-    val pixelChangeTrigger = canvasModel.pixelChanged
-
-    val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
-
-    private val saveFileUseCase = SaveFileUseCase()
-    private val loadFileUseCase = LoadFileUseCase()
+    val pixelChangeTrigger = pixelCanvasUseCase.pixelChanged
 
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
@@ -73,6 +71,7 @@ class DrawingScreenViewModel(
     }
 
     fun setCanvasSize(width: Int, height: Int) {
+        pixelCanvasUseCase.setCanvas(width, height)
         _uiState.value = _uiState.value.copy(canvasWidth = width, canvasHeight = height)
     }
 
@@ -86,7 +85,6 @@ class DrawingScreenViewModel(
     }
 
     fun applyTool(
-        canvasModel: PixelCanvasModel,
         tool: Tool,
         x: Int,
         y: Int,
@@ -97,22 +95,30 @@ class DrawingScreenViewModel(
             "Applying tool: ${tool.name} at x=$x, y=$y with color=$color"
         )
 
-        tool.apply(canvasModel, x, y, color)
+        tool.apply(pixelCanvasUseCase, x, y, color)
 
         if (tool is EyedropperTool) {
             selectColor(ColorPalette.activeColor)
         }
     }
 
+    fun getPixelData(row: Int, col: Int): Color {
+        return pixelCanvasUseCase.getPixel(row, col)
+    }
+
+    fun saveState() {
+        canvasHistoryManager.saveState(pixelCanvasUseCase.getAllPixels())
+    }
+
     fun undo() {
         canvasHistoryManager.undo()?.let {
-            canvasModel.setAllPixels(it)
+            pixelCanvasUseCase.setAllPixels(it)
         }
     }
 
     fun redo() {
         canvasHistoryManager.redo()?.let {
-            canvasModel.setAllPixels(it)
+            pixelCanvasUseCase.setAllPixels(it)
         }
     }
 
@@ -136,9 +142,7 @@ class DrawingScreenViewModel(
     ): Boolean {
         val result = saveFileUseCase.saveImageFile(
             context,
-            canvasModel.getAllPixels(),
-            canvasModel.width,
-            canvasModel.height,
+            pixelCanvasUseCase.getISpriteData(),
             scalePercent,
             folderUri,
             fileName
@@ -160,9 +164,7 @@ class DrawingScreenViewModel(
     ): Boolean {
         val result = saveFileUseCase.saveISpriteFile(
             context,
-            canvasModel.getAllPixels(),
-            canvasModel.width,
-            canvasModel.height,
+            pixelCanvasUseCase.getISpriteData(),
             folderUri,
             fileName
             )
@@ -176,13 +178,14 @@ class DrawingScreenViewModel(
         )
     }
 
-    fun loadFile(context: Context, fileUri: Uri): ISpriteData? {
+    fun getISpriteDataFromFile(context: Context, fileUri: Uri): ISpriteData? {
         return loadFileUseCase.loadFile(context, fileUri)
     }
 
     fun loadISprite(spriteData: ISpriteData) {
-        val decodedPixels = spriteData.pixelsData.map { Color(it) }
         setCanvasSize(spriteData.width, spriteData.height)
-        canvasModel.setCanvas(spriteData.width, spriteData.height, decodedPixels)
+        pixelCanvasUseCase.setCanvas(spriteData)
+        canvasHistoryManager.reset()
+        saveState()
     }
 }

@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
@@ -59,7 +61,7 @@ fun LoadISpriteDialog(
                 val fileName = getFileName(context, it)
                 if (fileName?.endsWith(".isprite") == true) {
                     fileUri = it
-                    spriteData = viewModel.loadFile(context, it)
+                    spriteData = viewModel.getISpriteDataFromFile(context, it)
                 } else {
                     Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show()
                 }
@@ -165,9 +167,10 @@ fun PreviewCanvas(spriteData: ISpriteData) {
 fun LoadISpriteDialogPreview() {
     LoadISpriteDialog(
         onDismiss = {}, viewModel = DrawingScreenViewModel(
-            canvasWidth = 100,
-            canvasHeight = 100,
-            storageLocationRepository = StorageLocationRepository(LocalContext.current)
+            storageLocationRepository = StorageLocationRepository(LocalContext.current),
+            pixelCanvasRepository = PixelCanvasRepository(
+                PixelCanvasModel(16,16)
+            )
         )
     )
 }

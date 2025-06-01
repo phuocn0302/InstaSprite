@@ -36,9 +36,6 @@ fun PixelCanvas(
     modifier: Modifier = Modifier,
     viewModel: DrawingScreenViewModel
 ) {
-    val model = viewModel.canvasModel
-    val canvasHistoryManager = viewModel.canvasHistoryManager
-
     var canvasWidth by remember { mutableIntStateOf(viewModel.uiState.value.canvasWidth) }
     var canvasHeight by remember { mutableIntStateOf(viewModel.uiState.value.canvasHeight) }
     var selectedTool = viewModel.uiState.value.selectedTool
@@ -67,7 +64,7 @@ fun PixelCanvas(
                 .pointerInput(Unit) {
                     awaitEachGesture {
                         if (selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
-                            canvasHistoryManager.saveState(model.getAllPixels())
+                            viewModel.saveState()
                         }
 
                         val down = awaitFirstDown()
@@ -77,7 +74,6 @@ fun PixelCanvas(
                         )
 
                         viewModel.applyTool(
-                            model,
                             selectedTool,
                             startCell.y,
                             startCell.x,
@@ -92,7 +88,6 @@ fun PixelCanvas(
                                     canvasWidth, canvasHeight
                                 )
                                 viewModel.applyTool(
-                                    model,
                                     selectedTool,
                                     dragCell.y,
                                     dragCell.x,
@@ -127,7 +122,7 @@ fun PixelCanvas(
 
                     // Pixel
                     drawRect(
-                        color = model.getPixel(row, col),
+                        color = viewModel.getPixelData(row, col),
                         topLeft = topLeft,
                         size = cellSize
                     )

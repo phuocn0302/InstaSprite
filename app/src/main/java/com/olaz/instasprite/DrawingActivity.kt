@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreen
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
@@ -18,11 +20,14 @@ class DrawingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val storageLocationRepository = StorageLocationRepository(applicationContext)
         val canvasWidth = intent.getIntExtra(EXTRA_CANVAS_WIDTH, 16)
         val canvasHeight = intent.getIntExtra(EXTRA_CANVAS_HEIGHT, 16)
 
-        viewModel = DrawingScreenViewModel(canvasWidth, canvasHeight, storageLocationRepository)
+        val storageLocationRepository = StorageLocationRepository(applicationContext)
+        val pixelCanvasRepository =
+            PixelCanvasRepository(PixelCanvasModel(canvasWidth, canvasHeight))
+
+        viewModel = DrawingScreenViewModel(storageLocationRepository, pixelCanvasRepository)
 
         setContent {
             MaterialTheme(

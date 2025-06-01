@@ -78,10 +78,6 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(DrawingScreenColor.BackgroundColor)
-                .graphicsLayer(
-                    scaleX = uiState.canvasScale,
-                    scaleY = uiState.canvasScale,
-                )
                 .pointerInput(uiState.selectedTool) {
                     detectTransformGestures(
                         onGesture = { _, pan, zoom, _ ->
@@ -100,6 +96,10 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                     .offset {
                         IntOffset(uiState.canvasOffset.x.roundToInt(), uiState.canvasOffset.y.roundToInt())
                     }
+                    .graphicsLayer(
+                        scaleX = uiState.canvasScale,
+                        scaleY = uiState.canvasScale,
+                    )
                     .fillMaxSize()
                     .fillMaxHeight(0.7f),
                 viewModel = viewModel

@@ -36,4 +36,9 @@ class CanvasHistoryManager<T> {
     fun getRedoStack(): ArrayDeque<T> {
         return redoStack
     }
+
+    fun reset() {
+        undoStack.clear()
+        redoStack.clear()
+    }
 }

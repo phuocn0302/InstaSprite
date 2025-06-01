@@ -11,9 +11,7 @@ import com.olaz.instasprite.domain.export.ImageExporter
 class SaveFileUseCase {
     fun saveImageFile(
         context: Context,
-        pixelsData: List<Color>,
-        pixelWidth: Int,
-        pixelHeight: Int,
+        isprite: ISpriteData,
         scalePercent: Int = 100,
         folderUri: Uri,
         fileName: String
@@ -23,7 +21,12 @@ class SaveFileUseCase {
         }
 
         val bitmap =
-            ImageExporter.convertToBitmap(pixelsData, pixelWidth, pixelHeight, scalePercent)
+            ImageExporter.convertToBitmap(
+                isprite.pixelsData.map { Color(it) },
+                isprite.width,
+                isprite.height,
+                scalePercent
+            )
         if (bitmap == null) {
             return Result.failure(IllegalArgumentException("Failed to convert image"))
         }
@@ -38,23 +41,13 @@ class SaveFileUseCase {
 
     fun saveISpriteFile(
         context: Context,
-        pixelsData: List<Color>,
-        pixelWidth: Int,
-        pixelHeight: Int,
+        isprite: ISpriteData,
         folderUri: Uri,
         fileName: String
     ): Result<Unit> {
         if (fileName.isBlank()) {
             return Result.failure(IllegalArgumentException("File name cannot be blank"))
         }
-
-        val encodedPixels = pixelsData.map { it.toArgb() }
-
-        val isprite = ISpriteData(
-            width = pixelWidth,
-            height = pixelHeight,
-            pixelsData = encodedPixels,
-        )
 
         val success = SaveFileRepository.saveFile(context, isprite, folderUri, fileName)
         return if (success) {

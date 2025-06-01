@@ -11,7 +11,9 @@ import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
+import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.EyedropperTool
+import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
@@ -85,17 +87,18 @@ class DrawingScreenViewModel(
     }
 
     fun applyTool(
-        tool: Tool,
-        x: Int,
-        y: Int,
-        color: Color = ColorPalette.activeColor
+        row: Int,
+        col: Int,
     ) {
+        val tool = _uiState.value.selectedTool
+        val color = _uiState.value.selectedColor
+
         Log.d(
             "DrawingScreenViewModel",
-            "Applying tool: ${tool.name} at x=$x, y=$y with color=$color"
+            "Applying tool: ${tool.name} at row=$row, col=$col with color=$color"
         )
 
-        tool.apply(pixelCanvasUseCase, x, y, color)
+        tool.apply(pixelCanvasUseCase, row, col, color)
 
         if (tool is EyedropperTool) {
             selectColor(ColorPalette.activeColor)

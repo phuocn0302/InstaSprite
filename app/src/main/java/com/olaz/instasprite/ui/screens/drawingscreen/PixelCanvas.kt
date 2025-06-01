@@ -38,15 +38,11 @@ fun PixelCanvas(
 ) {
     var canvasWidth by remember { mutableIntStateOf(viewModel.uiState.value.canvasWidth) }
     var canvasHeight by remember { mutableIntStateOf(viewModel.uiState.value.canvasHeight) }
-    var selectedTool = viewModel.uiState.value.selectedTool
-    var selectedColor = viewModel.uiState.value.selectedColor
 
     LaunchedEffect(Unit) {
         viewModel.uiState.collect { state ->
             canvasWidth = state.canvasWidth
             canvasHeight = state.canvasHeight
-            selectedTool = state.selectedTool
-            selectedColor = state.selectedColor
         }
     }
 
@@ -61,42 +57,7 @@ fun PixelCanvas(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    awaitEachGesture {
-                        if (selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
-                            viewModel.saveState()
-                        }
-
-                        val down = awaitFirstDown()
-                        val startCell = down.position.toGridCell(
-                            size.width, size.height,
-                            canvasWidth, canvasHeight
-                        )
-
-                        viewModel.applyTool(
-                            selectedTool,
-                            startCell.y,
-                            startCell.x,
-                            selectedColor
-                        )
-
-                        if (selectedTool in listOf(PencilTool, EraserTool)) {
-                            drag(down.id) { change ->
-                                change.consume()
-                                val dragCell = change.position.toGridCell(
-                                    size.width, size.height,
-                                    canvasWidth, canvasHeight
-                                )
-                                viewModel.applyTool(
-                                    selectedTool,
-                                    dragCell.y,
-                                    dragCell.x,
-                                    selectedColor
-                                )
-                            }
-                        }
-                    }
-                }
+                .drawingPointerInput(canvasWidth, canvasHeight, viewModel)
         ) {
             val _canvasWidth = size.width
             val _canvasHeight = size.height
@@ -148,4 +109,38 @@ fun Offset.toGridCell(canvasWidth: Int, canvasHeight: Int, cols: Int, rows: Int)
     val gridX = (x / cellWidth).toInt().coerceIn(0, cols - 1)
     val gridY = (y / cellHeight).toInt().coerceIn(0, rows - 1)
     return IntOffset(gridX, gridY)
+}
+
+@Composable
+fun Modifier.drawingPointerInput(
+    canvasWidth: Int,
+    canvasHeight: Int,
+    viewModel: DrawingScreenViewModel
+): Modifier = this.pointerInput(Unit) {
+    awaitEachGesture {
+        val selectedTool = viewModel.uiState.value.selectedTool
+
+        if (selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
+            viewModel.saveState()
+        }
+
+        val down = awaitFirstDown()
+        val startCell = down.position.toGridCell(
+            size.width, size.height,
+            canvasWidth, canvasHeight
+        )
+
+        viewModel.applyTool(startCell.y, startCell.x)
+
+        if (selectedTool in listOf(PencilTool, EraserTool)) {
+            drag(down.id) { change ->
+                change.consume()
+                val dragCell = change.position.toGridCell(
+                    size.width, size.height,
+                    canvasWidth, canvasHeight
+                )
+                viewModel.applyTool(dragCell.y, dragCell.x)
+            }
+        }
+    }
 }

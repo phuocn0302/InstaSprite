@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
+import com.olaz.instasprite.domain.draw.DrawUtils
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
@@ -187,30 +188,46 @@ fun Modifier.drawingPointerInput(
     canvasWidth: Int,
     canvasHeight: Int,
     viewModel: DrawingScreenViewModel
-): Modifier = this.pointerInput(canvasWidth, canvasHeight) {
-    awaitEachGesture {
-        val selectedTool = viewModel.uiState.value.selectedTool
+): Modifier {
+    val selectedTool = viewModel.uiState.collectAsState().value.selectedTool
 
-        if (selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
-            viewModel.saveState()
-        }
+    return this.pointerInput(canvasWidth, canvasHeight, selectedTool) {
+        awaitEachGesture {
+            if (selectedTool in listOf(PencilTool, EraserTool, FillTool)) {
+                viewModel.saveState()
+            }
 
-        val down = awaitFirstDown()
-        val startCell = down.position.toGridCell(
-            size.width, size.height,
-            canvasWidth, canvasHeight
-        )
+            val down = awaitFirstDown()
+            val startCell = down.position.toGridCell(
+                size.width, size.height,
+                canvasWidth, canvasHeight
+            )
 
-        viewModel.applyTool(startCell.y, startCell.x)
+            viewModel.applyTool(startCell.y, startCell.x)
 
-        if (selectedTool in listOf(PencilTool, EraserTool)) {
-            drag(down.id) { change ->
-                change.consume()
-                val dragCell = change.position.toGridCell(
-                    size.width, size.height,
-                    canvasWidth, canvasHeight
-                )
-                viewModel.applyTool(dragCell.y, dragCell.x)
+            if (selectedTool in listOf(PencilTool, EraserTool)) {
+                var lastCell = startCell
+
+                drag(down.id) { change ->
+                    change.consume()
+                    val dragCell = change.position.toGridCell(
+                        size.width, size.height,
+                        canvasWidth, canvasHeight
+                    )
+
+                    if (dragCell != lastCell) {
+                        val linePoints = DrawUtils.bresenhamLine(
+                            lastCell.x.toInt(), lastCell.y.toInt(),
+                            dragCell.x.toInt(), dragCell.y.toInt()
+                        )
+
+                        for ((x, y) in linePoints) {
+                            viewModel.applyTool(y, x)
+                        }
+
+                        lastCell = dragCell
+                    }
+                }
             }
         }
     }

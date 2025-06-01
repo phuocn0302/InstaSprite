@@ -23,6 +23,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.screens.homescreen.dialog.CreateCanvasDialog
@@ -42,10 +42,11 @@ import com.olaz.instasprite.utils.UiUtils
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-@Preview
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeScreenViewModel) {
     UiUtils.SetStatusBarColor(HomeScreenColor.TopbarColor)
     UiUtils.SetNavigationBarColor(HomeScreenColor.BottombarColor)
+
+    val sprites by viewModel.sprites.collectAsState()
 
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Dummy", "Search")
@@ -127,14 +128,24 @@ fun HomeScreen() {
                 }
 
             },
-        ) {
-            // WIP
+        ) { innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(HomeScreenColor.BackgroundColor)
-            )
+            ) {
+                Box(modifier = Modifier
+                    .padding(innerPadding)
+                ) {
+                    SpriteList(
+                        spritesWithMetaData = sprites,
+                        onSpriteClick = { sprite ->
+
+                        }
+                    )
+                }
+            }
 
         }
 

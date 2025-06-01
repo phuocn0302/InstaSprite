@@ -9,7 +9,7 @@ import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.model.SpriteMetaData
 import com.olaz.instasprite.data.model.IntListConverter
 
-@Database(entities = [ISpriteData::class, SpriteMetaData::class], version = 3, exportSchema = false)
+@Database(entities = [ISpriteData::class, SpriteMetaData::class], version = 4, exportSchema = false)
 @TypeConverters(IntListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 

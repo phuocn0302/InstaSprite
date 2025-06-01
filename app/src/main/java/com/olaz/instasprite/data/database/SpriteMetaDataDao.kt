@@ -19,4 +19,7 @@ interface SpriteMetaDataDao {
     @Update
     suspend fun update(meta: SpriteMetaData)
 
+    @Query("SELECT * FROM sprite_metadata")
+    suspend fun getAllMeta(): List<SpriteMetaData>
+
 }

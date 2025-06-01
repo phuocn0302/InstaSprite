@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
+
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ComposeShader
@@ -28,8 +29,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -67,7 +68,7 @@ import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.ColorPalette
-import kotlin.math.ceil
+
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -209,66 +210,33 @@ fun ColorWheelDialog(
                     )
                 }
 
-                Box(
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(95.dp)  // Height for 2 rows + spacing
-                        .border(
-                            width = 2.dp,
-                            color = Color.White,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(8.dp)
+                        .height(40.dp)
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val itemsPerRow = 7
-                        val rows = ceil(colorPalette.value.size.toFloat() / itemsPerRow).toInt()
-                        
-                        for (rowIndex in 0 until rows) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                val startIndex = rowIndex * itemsPerRow
-                                val endIndex = minOf((rowIndex + 1) * itemsPerRow, colorPalette.value.size)
-                                
-                                for (i in startIndex until endIndex) {
-                                    val color = colorPalette.value[i]
-                                    Box(
-                                        modifier = Modifier
-                                            .size(35.dp)
-                                            .border(
-                                                width = 2.dp,
-                                                color = Color.White,
-                                                shape = RoundedCornerShape(8.dp)
-                                            )
-                                            .background(
-                                                color = color,
-                                                shape = RoundedCornerShape(8.dp)
-                                            )
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .clickable {
-                                                val hsvArray = floatArrayOf(0f, 0f, 0f)
-                                                AndroidColor.colorToHSV(color.toArgb(), hsvArray)
-                                                hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-                                                updateInputFields()
-                                            }
-                                    )
+                    items(colorPalette.value){ color ->
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.White.copy(alpha = 0.5f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .background(
+                                    color = color,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .clickable {
+                                    val hsvArray = floatArrayOf(0f, 0f, 0f)
+                                    AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                                    hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                                    updateInputFields()
                                 }
-                                
-                                // Add spacers to maintain even spacing when row is not full
-                                if (endIndex - startIndex < itemsPerRow) {
-                                    repeat(itemsPerRow - (endIndex - startIndex)) {
-                                        Spacer(modifier = Modifier.size(35.dp))
-                                    }
-                                }
-                            }
-                        }
+                        )
                     }
                 }
 

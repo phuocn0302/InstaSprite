@@ -1,6 +1,7 @@
 package com.olaz.instasprite.ui.screens.homescreen
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -9,12 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -23,9 +27,11 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,6 +62,30 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
             onDismiss = { selectedItem = 0 },
         )
     }
+
+    val lazyListState = rememberLazyListState()
+    var firstLaunchDone by remember { mutableStateOf(false) }
+    var previousScrollOffset by remember { mutableIntStateOf(0) }
+    var isScrollingUp by remember { mutableStateOf(true) }
+
+    LaunchedEffect(
+        lazyListState.firstVisibleItemIndex, lazyListState.firstVisibleItemScrollOffset
+    ) {
+        val currentOffset =
+            lazyListState.firstVisibleItemIndex * 100_000 + lazyListState.firstVisibleItemScrollOffset
+
+        if (firstLaunchDone) {
+            isScrollingUp = currentOffset < previousScrollOffset
+        } else {
+            firstLaunchDone = true
+        }
+
+        previousScrollOffset = currentOffset
+    }
+
+    val animationScale by animateFloatAsState(
+        targetValue = if (isScrollingUp) 1f else 0f, label = "animationScale"
+    )
 
     Box {
         Scaffold(
@@ -95,22 +125,21 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                                 dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
                             ),
                         )
+                        .height(80.dp * animationScale),
                 ) {
                     items.forEachIndexed { index, item ->
                         NavigationBarItem(
                             icon = {
-                                when (item) {
-                                    "Home" -> Icon(
-                                        Icons.Default.Home,
-                                        contentDescription = item
-                                    )
+                            when (item) {
+                                "Home" -> Icon(
+                                    Icons.Default.Home, contentDescription = item
+                                )
 
-                                    "Search" -> Icon(
-                                        Icons.Default.Search,
-                                        contentDescription = item
-                                    )
-                                }
-                            },
+                                "Search" -> Icon(
+                                    Icons.Default.Search, contentDescription = item
+                                )
+                            }
+                        },
                             selected = selectedItem == index,
                             onClick = { selectedItem = index },
                             colors = NavigationBarItemDefaults.colors(
@@ -120,13 +149,10 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                                 unselectedIconColor = Color.White,
                                 unselectedTextColor = Color.White,
                             ),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(1.dp))
+                            modifier = Modifier.clip(RoundedCornerShape(1.dp))
                         )
                     }
-
                 }
-
             },
         ) { innerPadding ->
             Box(
@@ -135,25 +161,23 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                     .fillMaxHeight()
                     .background(HomeScreenColor.BackgroundColor)
             ) {
-                Box(modifier = Modifier
-                    .padding(innerPadding)
+                Box(
+                    modifier = Modifier.padding(10.dp, 50.dp, 10.dp, 0.dp)
                 ) {
                     SpriteList(
                         spritesWithMetaData = sprites,
-                        onSpriteClick = { sprite ->
-
-                        }
-                    )
+                        lazyListState = lazyListState,
+                        onSpriteClick = { sprite -> })
                 }
             }
-
         }
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 50.dp),
+                .padding(bottom = 50.dp)
+                .background(Color.Transparent),
             contentAlignment = Alignment.Center,
         ) {
             FloatingActionButton(
@@ -161,9 +185,13 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                 shape = CircleShape,
                 containerColor = HomeScreenColor.SelectedColor,
                 contentColor = Color.White,
-                modifier = Modifier.size(75.dp)
+                modifier = Modifier.size((75.dp) * animationScale)
             ) {
-                Icon(Icons.Filled.Add, "Floating action button")
+                Icon(
+                    Icons.Filled.Add,
+                    "Floating action button",
+                    modifier = Modifier.size(30.dp * animationScale)
+                )
             }
         }
     }

@@ -7,16 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
-import kotlin.math.min
 
 @Composable
 fun CanvasPreviewer(
@@ -28,6 +33,17 @@ fun CanvasPreviewer(
     if (spriteData.width == 0 || spriteData.height == 0) return
 
     val spriteAspectRatio = spriteData.width.toFloat() / spriteData.height.toFloat()
+
+    val bitmapImage by remember(spriteData) {
+        mutableStateOf(
+            ImageExporter.convertToBitmap(
+                spriteData.pixelsData.map { Color(it) },
+                spriteData.width,
+                spriteData.height,
+            )?.asImageBitmap()
+        )
+    }
+    if (bitmapImage == null) return
 
     Canvas(
         modifier = Modifier
@@ -41,25 +57,11 @@ fun CanvasPreviewer(
             )
             .clipToBounds()
     ) {
-        val pixelSize = min(
-            size.width / spriteData.width,
-            size.height / spriteData.height
+        drawImage(
+            image = bitmapImage!!,
+            dstOffset = IntOffset.Zero,
+            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+            filterQuality = FilterQuality.None
         )
-
-        spriteData.pixelsData.forEachIndexed { index, colorInt ->
-            val x = index % spriteData.width
-            val y = index / spriteData.width
-
-            val color = Color(colorInt)
-
-            drawRect(
-                color = color,
-                topLeft = Offset(
-                    x = x * pixelSize,
-                    y = y * pixelSize
-                ),
-                size = Size(pixelSize, pixelSize)
-            )
-        }
     }
 }

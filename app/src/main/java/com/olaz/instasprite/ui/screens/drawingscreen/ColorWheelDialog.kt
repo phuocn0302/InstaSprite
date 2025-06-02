@@ -78,8 +78,7 @@ fun ColorWheelDialog(
     onColorSelected: (Color) -> Unit
 ) {
     var showExploreDialog by remember { mutableStateOf(false) }
-//    val context = LocalContext.current
-    val colorPalette = remember { mutableStateOf(ColorPalette.ColorsList) }
+    var colorPalette by remember { mutableStateOf(ColorPalette.ColorsList) }
     
     val hsv = remember {
         val hsvArray = floatArrayOf(0f, 0f, 0f)
@@ -145,7 +144,8 @@ fun ColorWheelDialog(
         ImportColorPalettesDialog(
             onDismiss = { showExploreDialog = false },
             onImportPalette = { colors ->
-                colorPalette.value = colors
+                colorPalette = colors
+                showExploreDialog = false
             }
         )
     }
@@ -217,7 +217,7 @@ fun ColorWheelDialog(
                         .padding(horizontal = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(colorPalette.value){ color ->
+                    items(colorPalette) { color ->
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
@@ -376,22 +376,14 @@ fun ColorWheelDialog(
                     )
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                Button(
+                    onClick = { showExploreDialog = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HomeScreenColor.ButtonColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(
-                        onClick = { showExploreDialog = true },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = HomeScreenColor.ButtonColor
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier
-                            .height(50.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text("Import Color Palettes")
-                    }
+                    Text("Import Color Palettes")
                 }
 
                 Row(

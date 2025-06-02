@@ -1,10 +1,13 @@
 package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,26 +26,63 @@ import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import kotlinx.coroutines.launch
 
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ImportColorPalettesDialog(
     onDismiss: () -> Unit,
     onImportPalette: (List<Color>) -> Unit
 ) {
-    var paletteName by remember { mutableStateOf("") }
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val repository = remember { ColorPaletteRepository() }
+    var showImportOptions by remember { mutableStateOf(true) }
+    var showLospecImport by remember { mutableStateOf(false) }
+    var showFileImport by remember { mutableStateOf(false) }
 
+    if (showImportOptions) {
+        ImportOptionsDialog(
+            onDismiss = onDismiss,
+            onLospecSelected = {
+                showImportOptions = false
+                showLospecImport = true
+            },
+            onFileSelected = {
+                showImportOptions = false
+                showFileImport = true
+            }
+        )
+    }
+
+    if (showLospecImport) {
+        LospecImportDialog(
+            onDismiss = {
+                showLospecImport = false
+                showImportOptions = true
+            },
+            onImportPalette = onImportPalette
+        )
+    }
+
+    if (showFileImport) {
+        FileImportDialog(
+            onDismiss = {
+                showFileImport = false
+                showImportOptions = true
+            },
+            onImportPalette = onImportPalette
+        )
+    }
+}
+
+@Composable
+fun ImportOptionsDialog(
+    onDismiss: () -> Unit,
+    onLospecSelected: () -> Unit,
+    onFileSelected: () -> Unit
+) {
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
             modifier = Modifier
-                .width(380.dp)
+                .width(300.dp)
                 .background(
                     color = HomeScreenColor.BackgroundColor,
                     shape = RoundedCornerShape(16.dp)
@@ -59,35 +99,79 @@ fun ImportColorPalettesDialog(
                     color = Color.White
                 )
 
-                // WebView
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                        .background(Color.White, RoundedCornerShape(8.dp))
+                Button(
+                    onClick = onLospecSelected,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HomeScreenColor.ButtonColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    AndroidView(
-                        factory = { context ->
-                            WebView(context).apply {
-                                layoutParams = ViewGroup.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT
-                                )
-                                webViewClient = WebViewClient()
-                                settings.javaScriptEnabled = true
-                                loadUrl("https://lospec.com/palette-list")
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    Text("Import from Lospec")
                 }
 
-                // Palette name input
+                Button(
+                    onClick = onFileSelected,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HomeScreenColor.ButtonColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Import from File")
+                }
+
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HomeScreenColor.ButtonColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Cancel")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LospecImportDialog(
+    onDismiss: () -> Unit,
+    onImportPalette: (List<Color>) -> Unit
+) {
+    var paletteUrl by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val repository = remember { ColorPaletteRepository() }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(380.dp)
+                .background(
+                    color = HomeScreenColor.BackgroundColor,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Import from Lospec",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+
+
                 OutlinedTextField(
-                    value = paletteName,
-                    onValueChange = { paletteName = it },
-                    label = { Text("Palette Name", color = Color.White) },
-                    placeholder = { Text("e.g., greyt-bit", color = Color.Gray) },
+                    value = paletteUrl,
+                    onValueChange = { paletteUrl = it },
+                    label = { Text("Lospec URL", color = Color.White) },
+                    placeholder = { Text("https://lospec.com/palette-list/example", color = Color.Gray) },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -101,7 +185,6 @@ fun ImportColorPalettesDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -109,20 +192,24 @@ fun ImportColorPalettesDialog(
                     Button(
                         onClick = {
                             scope.launch {
-                                if (paletteName.isBlank()) {
-                                    Toast.makeText(context, "Please enter a palette name", Toast.LENGTH_SHORT).show()
+                                if (paletteUrl.isBlank()) {
+                                    Toast.makeText(context, "Please enter a Lospec URL", Toast.LENGTH_SHORT).show()
                                     return@launch
                                 }
 
-                                repository.fetchPaletteFromLospec(paletteName.trim())
-                                    .onSuccess { palette ->
-                                        val colors = repository.convertPaletteToColors(palette)
+                                if (!paletteUrl.contains("lospec.com")) {
+                                    Toast.makeText(context, "Please enter a valid Lospec URL", Toast.LENGTH_SHORT).show()
+                                    return@launch
+                                }
+
+                                repository.fetchPaletteFromUrl(paletteUrl)
+                                    .onSuccess { colors ->
                                         onImportPalette(colors)
-                                        onDismiss()
                                         Toast.makeText(context, "Palette imported successfully!", Toast.LENGTH_SHORT).show()
+                                        onDismiss()
                                     }
                                     .onFailure {
-                                        Toast.makeText(context, "Failed to import palette. Please check the name and try again.", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Failed to import palette. Please check the URL and try again.", Toast.LENGTH_SHORT).show()
                                     }
                             }
                         },
@@ -141,8 +228,88 @@ fun ImportColorPalettesDialog(
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text("Back")
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FileImportDialog(
+    onDismiss: () -> Unit,
+    onImportPalette: (List<Color>) -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val repository = remember { ColorPaletteRepository() }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            scope.launch {
+                repository.importPaletteFromFile(context, uri)
+                    .onSuccess { colors ->
+                        onImportPalette(colors)
+                        Toast.makeText(context, "Palette imported successfully!", Toast.LENGTH_SHORT).show()
+                        onDismiss()
+                    }
+                    .onFailure {
+                        Toast.makeText(context, "Failed to import palette from file.", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .background(
+                    color = HomeScreenColor.BackgroundColor,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Import from File",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+
+//                Text(
+//                    text = "Select file contain color values",
+//                    fontSize = 14.sp,
+//                    color = Color.White
+//                )
+
+                Button(
+                    onClick = { filePickerLauncher.launch("text/plain") },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HomeScreenColor.ButtonColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Choose File")
+                }
+
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HomeScreenColor.ButtonColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Back")
                 }
             }
         }

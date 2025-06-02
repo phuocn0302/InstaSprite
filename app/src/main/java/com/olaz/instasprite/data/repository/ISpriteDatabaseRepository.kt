@@ -29,7 +29,7 @@ class ISpriteDatabaseRepository(
         metaDao.insert(meta)
     }
 
-    suspend fun loadSprite(id: Int): ISpriteData? {
+    suspend fun loadSprite(id: String): ISpriteData? {
         return dao.getById(id)
     }
 
@@ -39,6 +39,10 @@ class ISpriteDatabaseRepository(
 
     fun getAllSpritesWithMeta(): Flow<List<ISpriteWithMetaData>> {
         return dao.getAllSpritesWithMeta()
+    }
+
+    fun deleteSpriteById(spriteId: String) {
+        dao.delete(spriteId)
     }
 
 }

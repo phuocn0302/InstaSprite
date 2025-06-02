@@ -39,6 +39,7 @@ class DrawingActivity : ComponentActivity() {
         viewModel = DrawingScreenViewModel(spriteId!!, storageLocationRepository, pixelCanvasRepository, spriteDataRepository)
 
         lifecycleScope.launch {
+            viewModel.loadFromDB()
             viewModel.saveToDB()
         }
 

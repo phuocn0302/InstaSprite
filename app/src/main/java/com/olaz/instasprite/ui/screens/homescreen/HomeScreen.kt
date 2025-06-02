@@ -132,16 +132,16 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                     items.forEachIndexed { index, item ->
                         NavigationBarItem(
                             icon = {
-                            when (item) {
-                                "Home" -> Icon(
-                                    Icons.Default.Home, contentDescription = item
-                                )
+                                when (item) {
+                                    "Home" -> Icon(
+                                        Icons.Default.Home, contentDescription = item
+                                    )
 
-                                "Search" -> Icon(
-                                    Icons.Default.Search, contentDescription = item
-                                )
-                            }
-                        },
+                                    "Search" -> Icon(
+                                        Icons.Default.Search, contentDescription = item
+                                    )
+                                }
+                            },
                             selected = selectedItem == index,
                             onClick = { selectedItem = index },
                             colors = NavigationBarItemDefaults.colors(
@@ -169,7 +169,6 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                     SpriteList(
                         spritesWithMetaData = sprites,
                         lazyListState = lazyListState,
-                        onSpriteClick = { sprite -> })
                         onSpriteClick = { sprite -> },
                         onSpriteDelete = { sprite -> viewModel.deleteSpriteById(sprite.id) },
                         onSpriteEdit = { sprite -> viewModel.openDrawingActivity(context, sprite) }

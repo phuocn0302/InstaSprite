@@ -39,9 +39,7 @@ import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.data.model.SpriteMetaData
 import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
 import com.olaz.instasprite.ui.theme.HomeScreenColor
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+
 
 @Composable
 fun SpriteList(

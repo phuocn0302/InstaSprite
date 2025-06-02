@@ -41,4 +41,8 @@ class ISpriteDatabaseRepository(
         return dao.getAllSpritesWithMeta()
     }
 
+    fun deleteSpriteById(spriteId: String) {
+        dao.delete(spriteId)
+    }
+
 }

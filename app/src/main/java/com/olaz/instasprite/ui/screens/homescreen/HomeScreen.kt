@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ import com.olaz.instasprite.utils.UiUtils
 fun HomeScreen(viewModel: HomeScreenViewModel) {
     UiUtils.SetStatusBarColor(HomeScreenColor.TopbarColor)
     UiUtils.SetNavigationBarColor(HomeScreenColor.BottombarColor)
+    val context = LocalContext.current
 
     val sprites by viewModel.sprites.collectAsState()
 
@@ -140,9 +142,9 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                 ) {
                     SpriteList(
                         spritesWithMetaData = sprites,
-                        onSpriteClick = { sprite ->
-
-                        }
+                        onSpriteClick = { sprite -> },
+                        onSpriteDelete = { sprite -> viewModel.deleteSpriteById(sprite.id) },
+                        onSpriteEdit = { sprite -> viewModel.openDrawingActivity(context, sprite) }
                     )
                 }
             }

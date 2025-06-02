@@ -24,4 +24,7 @@ interface SpriteDataDao {
     @Query("SELECT * FROM sprite_data")
     fun getAllSpritesWithMeta(): Flow<List<ISpriteWithMetaData>>
 
+    @Query("DELETE FROM sprite_data WHERE id = :id")
+    fun delete(id: String)
+
 }

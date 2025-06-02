@@ -15,7 +15,7 @@ interface SpriteDataDao {
     suspend fun insert(sprite: ISpriteData)
 
     @Query("SELECT * FROM sprite_data WHERE id = :id")
-    suspend fun getById(id: Int): ISpriteData?
+    suspend fun getById(id: String): ISpriteData?
 
     @Query("SELECT * FROM sprite_data")
     suspend fun getAllSprites(): List<ISpriteData>

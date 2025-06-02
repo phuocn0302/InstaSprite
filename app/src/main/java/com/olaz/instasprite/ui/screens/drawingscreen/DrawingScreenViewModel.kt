@@ -204,7 +204,7 @@ class DrawingScreenViewModel(
 
     fun loadFromDB() {
         viewModelScope.launch {
-            val spriteData = spriteDataRepository.loadSprite(spriteId.toInt())
+            val spriteData = spriteDataRepository.loadSprite(spriteId)
             if (spriteData != null) {
                 loadISprite(spriteData)
             }

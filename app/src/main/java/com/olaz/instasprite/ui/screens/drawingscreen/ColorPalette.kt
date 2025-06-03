@@ -15,16 +15,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
-import com.olaz.instasprite.utils.loadColorsFromFile
+
 
 @Composable
 fun ColorPalette(
@@ -32,11 +29,7 @@ fun ColorPalette(
     viewModel: DrawingScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    val context = LocalContext.current
-    val colorsFromFile by remember(context) {
-        mutableStateOf(loadColorsFromFile(context))
-    }
+    val colorPalette by viewModel.colorPalette.collectAsState()
 
     Box(
         modifier = modifier
@@ -50,7 +43,7 @@ fun ColorPalette(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
-            items(colorsFromFile) { color ->
+            items(colorPalette) { color ->
                 val borderColor = if (color == uiState.selectedColor) {
                     Color.White
                 } else {
@@ -67,6 +60,7 @@ fun ColorPalette(
         }
     }
 }
+
 @Composable
 fun ColorItem(
     color: Color,

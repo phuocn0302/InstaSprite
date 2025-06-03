@@ -3,11 +3,9 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +20,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -32,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -43,9 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
 import kotlin.math.roundToInt
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.Surface
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.foundation.layout.PaddingValues
 
 @SuppressLint("DefaultLocale")
@@ -65,27 +58,19 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
             onColorSelected = { color ->
                 viewModel.selectColor(color)
                 showColorWheel = false
-            }
+            },
+            viewModel = viewModel
         )
     }
 
     Scaffold(
         topBar = {
-            Column(
-                modifier = Modifier
-                    .background(DrawingScreenColor.PaletteBarColor)
-                    .padding(horizontal = 8.dp, vertical = 8.dp)
-                    .fillMaxWidth(),
-            ) {
                 ColorPalette(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .background(DrawingScreenColor.PaletteBarColor)
                         .padding(bottom = 4.dp),
                     viewModel = viewModel
                 )
-
-
-            }
         },
 
         bottomBar = {

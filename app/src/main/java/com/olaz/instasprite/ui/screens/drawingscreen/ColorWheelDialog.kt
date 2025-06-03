@@ -68,6 +68,8 @@ import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.ColorPalette
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -75,10 +77,11 @@ import com.olaz.instasprite.utils.ColorPalette
 fun ColorWheelDialog(
     initialColor: Color = Color.Blue,
     onDismiss: () -> Unit,
-    onColorSelected: (Color) -> Unit
+    onColorSelected: (Color) -> Unit,
+    viewModel: DrawingScreenViewModel
 ) {
-    var showExploreDialog by remember { mutableStateOf(false) }
-    var colorPalette by remember { mutableStateOf(ColorPalette.ColorsList) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    val colorPalette by viewModel.colorPalette.collectAsState()
     
     val hsv = remember {
         val hsvArray = floatArrayOf(0f, 0f, 0f)
@@ -140,12 +143,12 @@ fun ColorWheelDialog(
         }
     }
 
-    if (showExploreDialog) {
+    if (showImportDialog) {
         ImportColorPalettesDialog(
-            onDismiss = { showExploreDialog = false },
+            onDismiss = { showImportDialog = false },
             onImportPalette = { colors ->
-                colorPalette = colors
-                showExploreDialog = false
+                viewModel.updateColorPalette(colors)
+                showImportDialog = false
             }
         )
     }
@@ -377,7 +380,7 @@ fun ColorWheelDialog(
                 }
 
                 Button(
-                    onClick = { showExploreDialog = true },
+                    onClick = { showImportDialog = true },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = HomeScreenColor.ButtonColor
                     ),
@@ -424,15 +427,7 @@ fun ColorWheelDialog(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ColorWheelDialogPreview() {
-    ColorWheelDialog(
-        initialColor = Color.Blue,
-        onDismiss = {},
-        onColorSelected = {}
-    )
-}
+
 
 @Composable
 fun HueBar(

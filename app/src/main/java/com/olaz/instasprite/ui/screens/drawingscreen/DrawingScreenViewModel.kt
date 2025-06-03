@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.repository.StorageLocationRepository
+import com.olaz.instasprite.utils.loadColorsFromFile
 import kotlinx.coroutines.launch
 
 data class DrawingScreenState(
@@ -34,7 +35,8 @@ data class DrawingScreenState(
 class DrawingScreenViewModel(
     canvasWidth: Int,
     canvasHeight: Int,
-    private val storageLocationRepository: StorageLocationRepository
+    private val storageLocationRepository: StorageLocationRepository,
+    context: Context
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
@@ -60,6 +62,9 @@ class DrawingScreenViewModel(
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
 
+    private val _colorPalette = MutableStateFlow(loadColorsFromFile(context))
+    val colorPalette: StateFlow<List<Color>> = _colorPalette.asStateFlow()
+
     // Just for scaling and offsetting the canvas
     fun setCanvasScale(scale: Float) {
         _uiState.value = _uiState.value.copy(canvasScale = scale)
@@ -72,6 +77,12 @@ class DrawingScreenViewModel(
     fun selectColor(color: Color) {
         _uiState.value = _uiState.value.copy(selectedColor = color)
         ColorPalette.activeColor = color
+        
+
+        val currentColors = _colorPalette.value
+        if (!currentColors.contains(color)) {
+            _colorPalette.value = listOf(color) + currentColors
+        }
     }
 
     fun selectTool(tool: Tool) {
@@ -119,6 +130,10 @@ class DrawingScreenViewModel(
         scalePercent: Int = 100
     ): Boolean {
         return exporter.saveToFolder(canvasModel, context, folderUri, fileName, scalePercent)
+    }
+
+    fun updateColorPalette(colors: List<Color>) {
+        _colorPalette.value = colors
     }
 
 }

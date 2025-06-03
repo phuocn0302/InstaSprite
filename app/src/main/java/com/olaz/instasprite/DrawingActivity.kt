@@ -22,7 +22,12 @@ class DrawingActivity : ComponentActivity() {
         val canvasWidth = intent.getIntExtra(EXTRA_CANVAS_WIDTH, 16)
         val canvasHeight = intent.getIntExtra(EXTRA_CANVAS_HEIGHT, 16)
 
-        viewModel = DrawingScreenViewModel(canvasWidth, canvasHeight, storageLocationRepository)
+        viewModel = DrawingScreenViewModel(
+            canvasWidth = canvasWidth,
+            canvasHeight = canvasHeight,
+            storageLocationRepository = storageLocationRepository,
+            context = applicationContext
+        )
 
         setContent {
             MaterialTheme(

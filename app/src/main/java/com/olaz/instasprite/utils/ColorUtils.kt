@@ -33,6 +33,16 @@ object ColorPalette {
     )
 
     var activeColor = Color1
+
+    private var _colorsList = ColorsList.toMutableList()
+    
+    fun addColorToStart(color: Color) {
+        if (!_colorsList.contains(color)) {
+            _colorsList.add(0, color)
+        }
+    }
+    
+    fun getColors(): List<Color> = _colorsList.toList()
 }
 
 fun loadColorsFromFile(context: Context, resourceId: Int = R.raw.sage57): List<Color> {

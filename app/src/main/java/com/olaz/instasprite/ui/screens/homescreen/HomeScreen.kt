@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,16 +30,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,18 +49,20 @@ import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.screens.homescreen.dialog.CreateCanvasDialog
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel) {
     UiUtils.SetStatusBarColor(HomeScreenColor.TopbarColor)
     UiUtils.SetNavigationBarColor(HomeScreenColor.BottombarColor)
-    val context = LocalContext.current
 
     val sprites by viewModel.sprites.collectAsState()
-
+    val lazyListState = rememberLazyListState()
     var selectedItem by remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Dummy", "Search")
+
 
     if (selectedItem == 1) {
         CreateCanvasDialog(
@@ -65,29 +70,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
         )
     }
 
-    val lazyListState = rememberLazyListState()
-    var firstLaunchDone by remember { mutableStateOf(false) }
-    var previousScrollOffset by remember { mutableIntStateOf(0) }
-    var isScrollingUp by remember { mutableStateOf(true) }
 
-    LaunchedEffect(
-        lazyListState.firstVisibleItemIndex, lazyListState.firstVisibleItemScrollOffset
-    ) {
-        val currentOffset =
-            lazyListState.firstVisibleItemIndex * 100_000 + lazyListState.firstVisibleItemScrollOffset
-
-        if (firstLaunchDone) {
-            isScrollingUp = currentOffset < previousScrollOffset
-        } else {
-            firstLaunchDone = true
-        }
-
-        previousScrollOffset = currentOffset
-    }
-
-    val animationScale by animateFloatAsState(
-        targetValue = if (isScrollingUp) 1f else 0f, label = "animationScale"
-    )
 
     Box {
         Scaffold(
@@ -119,42 +102,9 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                 }
             },
             bottomBar = {
-                NavigationBar(
-                    containerColor = (HomeScreenColor.BottombarColor),
-                    modifier = Modifier
-                        .clip(
-                            BottomNavShape(
-                                dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
-                            ),
-                        )
-                        .height(80.dp * animationScale),
-                ) {
-                    items.forEachIndexed { index, item ->
-                        NavigationBarItem(
-                            icon = {
-                                when (item) {
-                                    "Home" -> Icon(
-                                        Icons.Default.Home, contentDescription = item
-                                    )
-
-                                    "Search" -> Icon(
-                                        Icons.Default.Search, contentDescription = item
-                                    )
-                                }
-                            },
-                            selected = selectedItem == index,
-                            onClick = { selectedItem = index },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Color.White,
-                                selectedTextColor = Color.White,
-                                indicatorColor = HomeScreenColor.BottombarColor,
-                                unselectedIconColor = Color.White,
-                                unselectedTextColor = Color.White,
-                            ),
-                            modifier = Modifier.clip(RoundedCornerShape(1.dp))
-                        )
-                    }
-                }
+                NavBar(lazyListState = lazyListState,
+                    selectedItem = selectedItem,
+                    onItemSelected = { selectedItem = it })
             },
         ) { innerPadding ->
             Box(
@@ -169,14 +119,10 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                     SpriteList(
                         spritesWithMetaData = sprites,
                         lazyListState = lazyListState,
-                        onSpriteClick = { sprite -> },
-                        onSpriteDelete = { sprite -> viewModel.deleteSpriteById(sprite.id) },
-                        onSpriteEdit = { sprite -> viewModel.openDrawingActivity(context, sprite) }
-                    )
+                        onSpriteClick = { sprite -> })
                 }
             }
         }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -185,19 +131,101 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                 .background(Color.Transparent),
             contentAlignment = Alignment.Center,
         ) {
-            FloatingActionButton(
-                onClick = { selectedItem = 1 },
-                shape = CircleShape,
-                containerColor = HomeScreenColor.SelectedColor,
-                contentColor = Color.White,
-                modifier = Modifier.size((75.dp) * animationScale)
-            ) {
-                Icon(
-                    Icons.Filled.Add,
-                    "Floating action button",
-                    modifier = Modifier.size(30.dp * animationScale)
-                )
-            }
+            FAB(lazyListState = lazyListState,  onClick = { selectedItem = 1 })
         }
+
+    }
+}
+
+@Composable
+fun NavBar(lazyListState: LazyListState,
+           selectedItem: Int,
+           onItemSelected: (Int) -> Unit,){
+    val items = listOf("Home", "Dummy", "Search")
+
+    val animationScale by animateFloatAsState(
+        targetValue = if (lazyListState.isScrollingUp().value) 1f else 0f, label = "animationScale"
+    )
+    NavigationBar(
+        containerColor = (HomeScreenColor.BottombarColor),
+        modifier = Modifier
+            .clip(
+                BottomNavShape(
+                    dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
+                ),
+            )
+            .height( 80.dp * animationScale),
+    ) {
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                icon = {
+                    when (item) {
+                        "Home" -> Icon(
+                            Icons.Default.Home, contentDescription = item
+                        )
+
+                        "Search" -> Icon(
+                            Icons.Default.Search, contentDescription = item
+                        )
+                    }
+                },
+                selected = selectedItem == index,
+                onClick = { onItemSelected(index) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    indicatorColor = HomeScreenColor.BottombarColor,
+                    unselectedIconColor = Color.White,
+                    unselectedTextColor = Color.White,
+                ),
+                modifier = Modifier.clip(RoundedCornerShape(1.dp))
+            )
+        }
+    }
+}
+
+@Composable
+fun FAB(
+    lazyListState: LazyListState,
+    onClick: ()->Unit){
+    var isScrollingUp by remember { mutableStateOf(true) }
+
+
+    val animationScale by animateFloatAsState(
+        targetValue = if (lazyListState.isScrollingUp().value) 1f else 0f, label = "animationScale"
+    )
+
+    FloatingActionButton(
+        onClick = onClick,
+        shape = CircleShape,
+        containerColor = HomeScreenColor.SelectedColor,
+        contentColor = Color.White,
+        modifier = Modifier.size((75.dp) * animationScale)
+    ) {
+        Icon(
+            Icons.Filled.Add,
+            "Floating action button",
+            modifier = Modifier.size(30.dp * animationScale)
+        )
+    }
+}
+@OptIn(FlowPreview::class)
+@Composable
+fun LazyListState.isScrollingUp(): androidx.compose.runtime.State<Boolean> {
+    return produceState(initialValue = true) {
+        var lastIndex = 0
+        var lastScroll = Int.MAX_VALUE
+        snapshotFlow {
+            firstVisibleItemIndex to firstVisibleItemScrollOffset
+        }
+            .distinctUntilChanged()
+            .collect { (currentIndex, currentScroll) ->
+                if (currentIndex != lastIndex || currentScroll != lastScroll) {
+                    value = currentIndex < lastIndex ||
+                            (currentIndex == lastIndex && currentScroll < lastScroll)
+                    lastIndex = currentIndex
+                    lastScroll = currentScroll
+                }
+            }
     }
 }

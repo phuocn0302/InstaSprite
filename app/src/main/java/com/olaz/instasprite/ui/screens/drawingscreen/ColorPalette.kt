@@ -43,7 +43,7 @@ fun ColorPalette(
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(10.dp))
             .background(DrawingScreenColor.PaletteBackgroundColor)
-            .padding(vertical = 8.dp, horizontal = 4.dp),
+            .padding(vertical = 4.dp, horizontal = 4.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         LazyRow(
@@ -60,8 +60,8 @@ fun ColorPalette(
                     color = color,
                     onColorSelected = viewModel::selectColor,
                     modifier = Modifier
-                        .size(46.dp)
-                        .border(5.dp, borderColor, RoundedCornerShape(4.dp))
+                        .size(32.dp)
+                        .border(3.dp, borderColor, RoundedCornerShape(4.dp))
                 )
             }
         }

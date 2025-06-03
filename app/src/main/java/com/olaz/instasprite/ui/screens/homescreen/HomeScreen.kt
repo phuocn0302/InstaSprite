@@ -53,12 +53,6 @@ fun HomeScreen() {
         CreateCanvasDialog(
             onDismiss = { selectedItem = 0 },
         )
-    } else if (selectedItem == 2) {
-        ColorWheelDialog(
-            initialColor = Color.Blue,
-            onDismiss = {selectedItem = 0},
-            onColorSelected = {}
-        )
     }
 
     Scaffold(

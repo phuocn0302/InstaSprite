@@ -17,6 +17,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val display = window.windowManager.defaultDisplay
+        val modes = display.supportedModes
+        val highest = modes.maxByOrNull { it.refreshRate }
+
+        highest?.let {
+            val params = window.attributes
+            params.preferredDisplayModeId = it.modeId
+            window.attributes = params
+        }
+
         val database = AppDatabase.getInstance(applicationContext)
         val spriteDataRepository = ISpriteDatabaseRepository(database.spriteDataDao(), database.spriteMetaDataDao())
         val viewModel = HomeScreenViewModel(spriteDataRepository)

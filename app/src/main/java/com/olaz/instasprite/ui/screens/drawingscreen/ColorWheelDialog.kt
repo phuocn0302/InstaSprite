@@ -148,8 +148,16 @@ fun ColorWheelDialog(
             onDismiss = { showImportDialog = false },
             onImportPalette = { colors ->
                 viewModel.updateColorPalette(colors)
+                if (colors.isNotEmpty()) {
+                    val firstColor = colors.first()
+                    val hsvArray = floatArrayOf(0f, 0f, 0f)
+                    AndroidColor.colorToHSV(firstColor.toArgb(), hsvArray)
+                    hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                    updateInputFields()
+                }
                 showImportDialog = false
-            }
+            },
+            viewModel = viewModel
         )
     }
 
@@ -172,11 +180,7 @@ fun ColorWheelDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-//                Text(
-//                    text = "Select Color",
-//                    fontSize = 18.sp,
-//                    color = Color.White
-//                )
+
 
                 SatValPanel(
                     hue = hsv.value.first,

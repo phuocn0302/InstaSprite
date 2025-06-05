@@ -64,7 +64,8 @@ object DrawingScreenColor {
     val PaletteBackgroundColor = Color(0xFF5A6988)
     val CanvasBorderColor = Color(0xFF2D3250)
     val SelectedToolColor = Color(0xFF4D5881)
-    val ColorItemBorder = Color(0xFF262B44)
+    val ColorItemBorder = Color(0xFF8B9BB4)
+//        Color(0xFF262B50)
     val ColorItemBorderOverlay = Color.White.copy(alpha = 0.3f)
 
     val ButtonColor = Color(0xFF5A6988)

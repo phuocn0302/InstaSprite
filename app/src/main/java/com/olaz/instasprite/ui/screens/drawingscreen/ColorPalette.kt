@@ -35,7 +35,6 @@ fun ColorPalette(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(10.dp))
-            .background(DrawingScreenColor.PaletteBackgroundColor)
             .padding(vertical = 4.dp, horizontal = 4.dp),
         contentAlignment = Alignment.CenterStart
     ) {

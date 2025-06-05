@@ -4,13 +4,12 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -40,6 +40,7 @@ import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
 import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -65,12 +66,43 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
 
     Scaffold(
         topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(DrawingScreenColor.PaletteBarColor)
+                    .padding(vertical = 12.dp, horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 ColorPalette(
-                    modifier = Modifier
-                        .background(DrawingScreenColor.PaletteBarColor)
-                        .padding(bottom = 4.dp),
+                    modifier = Modifier.weight(1f),
                     viewModel = viewModel
                 )
+
+                Button(
+                    onClick = { showColorWheel = true },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .size(32.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.White.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(4.dp)
+                        ),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DrawingScreenColor.PaletteBackgroundColor
+                    ),
+                    contentPadding = PaddingValues(4.dp),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Color",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         },
 
         bottomBar = {
@@ -118,35 +150,6 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                     )
                 }
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 8.dp)
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = { showColorWheel = true },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color.White.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(4.dp)
-                        ),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = DrawingScreenColor.PaletteBackgroundColor
-                    ),
-                    contentPadding = PaddingValues(4.dp),
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Color",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
                 // Canvas section
                 PixelCanvas(
                     modifier = Modifier
@@ -158,7 +161,6 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                         .fillMaxHeight(0.7f),
                     viewModel = viewModel
                 )
-            }
         }
     }
 }

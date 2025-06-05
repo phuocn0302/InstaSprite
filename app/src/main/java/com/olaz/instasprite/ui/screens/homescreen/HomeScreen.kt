@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -47,7 +47,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
         )
     }
 
-    val lazyListState = LazyListState()
+    val lazyListState = rememberLazyListState()
 
     Box {
         Scaffold(

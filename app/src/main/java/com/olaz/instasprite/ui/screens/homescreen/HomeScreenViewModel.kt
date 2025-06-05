@@ -10,10 +10,12 @@ import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
 
 class HomeScreenViewModel(
     private val spriteDatabaseRepository: ISpriteDatabaseRepository
@@ -35,6 +37,13 @@ class HomeScreenViewModel(
             } catch (e: Exception) {
                 Log.e("HomeScreenViewModel", "Error deleting sprite", e)
             }
+        }
+    }
+
+    fun deleteSpriteByIdDelay(spriteId: String, duration: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            delay(duration)
+            deleteSpriteById(spriteId)
         }
     }
 

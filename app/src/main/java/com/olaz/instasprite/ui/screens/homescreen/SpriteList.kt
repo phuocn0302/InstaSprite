@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.screens.homescreen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +26,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +42,9 @@ import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.data.model.SpriteMetaData
 import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
+import com.olaz.instasprite.ui.screens.homescreen.dialog.DeleteSpriteConfirmDialog
 import com.olaz.instasprite.ui.theme.HomeScreenColor
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -46,10 +52,13 @@ fun SpriteList(
     spritesWithMetaData: List<ISpriteWithMetaData>,
     lazyListState: LazyListState = rememberLazyListState(),
     onSpriteClick: (ISpriteData) -> Unit = {},
-    onSpriteDelete: (ISpriteData) -> Unit = {},
+    onSpriteDelete: suspend (ISpriteData) -> Unit = {},
     onSpriteEdit: (ISpriteData) -> Unit = {}
-
 ) {
+    // for deleting sprite with animation
+    val hiddenSprites = remember { mutableStateMapOf<String, Boolean>() }
+    val coroutineScope = rememberCoroutineScope()
+
     LazyColumn(
         state = lazyListState,
         modifier = Modifier.padding(8.dp)
@@ -58,13 +67,25 @@ fun SpriteList(
             items = spritesWithMetaData,
             key = { it.sprite.id }
         ) { (sprite, meta) ->
-            SpriteCard(
-                sprite = sprite,
-                meta = meta,
-                onClick = { onSpriteClick(sprite) },
-                onDelete = { onSpriteDelete(sprite) },
-                onEdit = { onSpriteEdit(sprite) }
-            )
+            val isVisible = hiddenSprites[sprite.id] != true
+
+            AnimatedVisibility(
+                visible = isVisible,
+                exit = shrinkVertically()
+            ) {
+                SpriteCard(
+                    sprite = sprite,
+                    meta = meta,
+                    onClick = { onSpriteClick(sprite) },
+                    onDelete = {
+                        hiddenSprites[sprite.id] = true
+                        coroutineScope.launch {
+                            onSpriteDelete(sprite)
+                        }
+                    },
+                    onEdit = { onSpriteEdit(sprite) }
+                )
+            }
         }
     }
 }
@@ -80,6 +101,18 @@ fun SpriteCard(
     onEdit: () -> Unit = {}
 ) {
     var showDropdown by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        DeleteSpriteConfirmDialog(
+            spriteName = sprite.id, // for testing, will be replace by sprite.name when name is implement
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                onDelete()
+                showDeleteDialog = false
+            }
+        )
+    }
 
     Card(
         colors = CardDefaults.cardColors(
@@ -123,7 +156,7 @@ fun SpriteCard(
                     expanded = showDropdown,
                     onDismissRequest = { showDropdown = false },
                     onDelete = {
-                        onDelete()
+                        showDeleteDialog = true
                         showDropdown = false
                     },
                     onEdit = {

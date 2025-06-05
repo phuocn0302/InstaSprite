@@ -99,7 +99,9 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                         spritesWithMetaData = sprites,
                         lazyListState = lazyListState,
                         onSpriteClick = { sprite -> },
-                        onSpriteDelete = { sprite -> viewModel.deleteSpriteById(sprite.id) },
+                        onSpriteDelete = { sprite ->
+                            viewModel.deleteSpriteByIdDelay(sprite.id, 300)
+                        },
                         onSpriteEdit = { sprite -> viewModel.openDrawingActivity(context, sprite) }
                     )
                 }

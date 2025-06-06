@@ -2,8 +2,12 @@ package com.olaz.instasprite.ui.components.composable
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
@@ -12,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -23,6 +28,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
@@ -54,12 +61,26 @@ fun CanvasPreviewer(
         modifier = modifier.border(5.dp, DrawingScreenColor.PaletteBackgroundColor)
     }
 
+    var showZoom by remember { mutableStateOf(false) }
+
     Image(
         bitmap = bitmapImage!!,
         contentDescription = "Sprite Preview",
         contentScale = ContentScale.FillBounds,
         filterQuality = FilterQuality.None,
         modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
             .aspectRatio(spriteAspectRatio)
+            .clickable { showZoom = true }
     )
+
+    if (showZoom) {
+        ImageZoomableOverlay(
+            bitmap = bitmapImage!!,
+            onDismiss = {
+                showZoom = false
+            }
+        )
+    }
+
 }

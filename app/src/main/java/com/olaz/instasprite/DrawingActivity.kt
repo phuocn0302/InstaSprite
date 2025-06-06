@@ -1,6 +1,7 @@
 package com.olaz.instasprite
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,9 +25,20 @@ class DrawingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val display = window.windowManager.defaultDisplay
+        val modes = display.supportedModes
+        val highest = modes.maxByOrNull { it.refreshRate }
+
+        highest?.let {
+            val params = window.attributes
+            params.preferredDisplayModeId = it.modeId
+            window.attributes = params
+        }
+
         val spriteId = intent?.getStringExtra(EXTRA_SPRITE_ID)
         require(spriteId != "") { "Sprite ID must be passed to DrawingActivity" }
 
+        val spriteName = intent?.getStringExtra(EXTRA_SPRITE_NAME)
         val canvasWidth = intent?.getIntExtra(EXTRA_CANVAS_WIDTH, 16) ?: 16
         val canvasHeight = intent?.getIntExtra(EXTRA_CANVAS_HEIGHT, 16) ?: 16
 
@@ -39,7 +51,8 @@ class DrawingActivity : ComponentActivity() {
         viewModel = DrawingScreenViewModel(spriteId!!, storageLocationRepository, pixelCanvasRepository, spriteDataRepository)
 
         lifecycleScope.launch {
-            viewModel.saveToDB()
+            viewModel.loadFromDB()
+            viewModel.saveToDB(spriteName)
         }
 
         setContent {
@@ -65,5 +78,6 @@ class DrawingActivity : ComponentActivity() {
         const val EXTRA_CANVAS_WIDTH = "com.olaz.instasprite.CANVAS_WIDTH"
         const val EXTRA_CANVAS_HEIGHT = "com.olaz.instasprite.CANVAS_HEIGHT"
         const val EXTRA_SPRITE_ID = "com.olaz.instasprite.SPRITE_ID"
+        const val EXTRA_SPRITE_NAME = "com.olaz.instasprite.SPRITE_NAME"
     }
 }

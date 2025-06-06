@@ -45,4 +45,7 @@ class ISpriteDatabaseRepository(
         dao.delete(spriteId)
     }
 
+    suspend fun changeName(spriteId: String, newName: String) {
+        metaDao.changeSpriteName(spriteId, newName)
+    }
 }

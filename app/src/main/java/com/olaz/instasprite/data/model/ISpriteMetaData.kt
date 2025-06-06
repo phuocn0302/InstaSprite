@@ -15,6 +15,7 @@ import androidx.room.PrimaryKey
 )
 data class SpriteMetaData(
     @PrimaryKey val spriteId: String,
+    val spriteName: String = "Untitled",
     val createdAt: Long = System.currentTimeMillis(),
     val lastModifiedAt: Long = System.currentTimeMillis()
 )

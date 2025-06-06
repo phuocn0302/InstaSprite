@@ -105,7 +105,7 @@ fun SpriteCard(
 
     if (showDeleteDialog) {
         DeleteSpriteConfirmDialog(
-            spriteName = sprite.id, // for testing, will be replace by sprite.name when name is implement
+            spriteName = meta?.spriteName ?: "Untitled",
             onDismiss = { showDeleteDialog = false },
             onConfirm = {
                 onDelete()
@@ -133,7 +133,7 @@ fun SpriteCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Name: WIP",
+                text = meta?.spriteName ?: "Untitled",
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
 

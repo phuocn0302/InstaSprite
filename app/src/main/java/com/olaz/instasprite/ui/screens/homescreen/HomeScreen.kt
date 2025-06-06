@@ -35,7 +35,6 @@ import com.olaz.instasprite.utils.UiUtils
 fun HomeScreen(viewModel: HomeScreenViewModel) {
     UiUtils.SetStatusBarColor(HomeScreenColor.TopbarColor)
     UiUtils.SetNavigationBarColor(HomeScreenColor.BottombarColor)
-    val context = LocalContext.current
 
     val sprites by viewModel.sprites.collectAsState()
 
@@ -96,13 +95,9 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                     modifier = Modifier.padding(10.dp, 50.dp, 10.dp, 0.dp)
                 ) {
                     SpriteList(
+                        viewModel = viewModel,
                         spritesWithMetaData = sprites,
                         lazyListState = lazyListState,
-                        onSpriteClick = { sprite -> },
-                        onSpriteDelete = { sprite ->
-                            viewModel.deleteSpriteByIdDelay(sprite.id, 300)
-                        },
-                        onSpriteEdit = { sprite -> viewModel.openDrawingActivity(context, sprite) }
                     )
                 }
             }

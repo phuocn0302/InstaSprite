@@ -52,4 +52,10 @@ class HomeScreenViewModel(
         intent.putExtra(DrawingActivity.EXTRA_SPRITE_ID, sprite.id)
         context.startActivity(intent)
     }
+
+    fun renameSprite(spriteId: String, newName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            spriteDatabaseRepository.changeName(spriteId, newName)
+        }
+    }
 }

@@ -3,6 +3,9 @@ package com.olaz.instasprite.ui.screens.homescreen
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.DrawingActivity
@@ -29,6 +32,7 @@ class HomeScreenViewModel(
                 emptyList()
             )
 
+    var lastEditedSpriteId by mutableStateOf<String?>(null)
 
     fun deleteSpriteById(spriteId: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -48,6 +52,7 @@ class HomeScreenViewModel(
     }
 
     fun openDrawingActivity(context: Context, sprite: ISpriteData) {
+        lastEditedSpriteId = sprite.id
         val intent = Intent(context, DrawingActivity::class.java)
         intent.putExtra(DrawingActivity.EXTRA_SPRITE_ID, sprite.id)
         context.startActivity(intent)

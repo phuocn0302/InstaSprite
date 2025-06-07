@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,18 +56,35 @@ fun SpriteList(
     spritesWithMetaData: List<ISpriteWithMetaData>,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
+    val sortedSprites = remember(spritesWithMetaData) {
+        spritesWithMetaData.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
+    }
+
+    // Scroll to last edited item, on top for now
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(spritesWithMetaData) {
+        viewModel.lastEditedSpriteId?.let {
+            coroutineScope.launch {
+                lazyListState.animateScrollToItem(0)
+            }
+        }
+        viewModel.lastEditedSpriteId = null
+    }
+
     LazyColumn(
         state = lazyListState,
         modifier = Modifier.padding(8.dp)
     ) {
         items(
-            items = spritesWithMetaData,
+            items = sortedSprites,
             key = { it.sprite.id }
         ) { (sprite, meta) ->
             SpriteCard(
                 sprite = sprite,
                 meta = meta,
                 viewModel = viewModel,
+                modifier = Modifier.animateItem()
             )
         }
     }
@@ -79,6 +97,7 @@ fun SpriteCard(
     sprite: ISpriteData,
     meta: SpriteMetaData?,
     viewModel: HomeScreenViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -94,6 +113,7 @@ fun SpriteCard(
             spriteId = sprite.id,
             onDismiss = { showRenameDialog = false },
         )
+
         showDeleteDialog -> DeleteSpriteConfirmDialog(
             spriteName = meta?.spriteName ?: "Untitled",
             onDismiss = { showDeleteDialog = false },
@@ -110,7 +130,8 @@ fun SpriteCard(
     AnimatedVisibility(
         visible = isVisible,
         enter = expandVertically(),
-        exit = shrinkVertically()
+        exit = shrinkVertically(),
+        modifier = modifier
     ) {
         Card(
             colors = CardDefaults.cardColors(

@@ -7,6 +7,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -50,11 +51,13 @@ fun HomeBottomBar(
 
         BottomAppBar(
             containerColor = HomeScreenColor.BottombarColor,
-            modifier = Modifier.clip(
-                BottomNavShape(
-                    dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
-                ),
-            )
+            modifier = Modifier
+                .height(56.dp)
+                .clip(
+                    BottomNavShape(
+                        dockRadius = with(LocalDensity.current) { 40.dp.toPx() },
+                    ),
+                )
         ) {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
@@ -91,28 +94,21 @@ fun HomeFab(
     val isBottomBarVisible by rememberBottomBarVisibleState(lazyListState)
     AnimatedVisibility(
         visible = isBottomBarVisible,
-        enter = fadeIn() + slideInVertically { fullHeight -> fullHeight },
-        exit = fadeOut() + slideOutVertically { fullHeight -> fullHeight }
+        enter = fadeIn() + slideInVertically { fullHeight -> fullHeight } + scaleIn(),
+        exit = fadeOut() + slideOutVertically { fullHeight -> fullHeight } + scaleOut()
     ) {
-
-        AnimatedVisibility(
-            visible = isBottomBarVisible,
-            enter = scaleIn(),
-            exit = scaleOut()
+        FloatingActionButton(
+            onClick = onClick,
+            shape = CircleShape,
+            containerColor = HomeScreenColor.SelectedColor,
+            contentColor = Color.White,
+            modifier = Modifier.size(70.dp)
         ) {
-            FloatingActionButton(
-                onClick = onClick,
-                shape = CircleShape,
-                containerColor = HomeScreenColor.SelectedColor,
-                contentColor = Color.White,
-                modifier = Modifier.size(75.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = "Floating action button",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
+            Icon(
+                Icons.Filled.Add,
+                contentDescription = "Floating action button",
+                modifier = Modifier.size(30.dp)
+            )
         }
     }
 }

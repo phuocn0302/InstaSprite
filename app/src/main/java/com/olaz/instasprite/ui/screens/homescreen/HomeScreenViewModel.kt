@@ -15,8 +15,10 @@ import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,10 +31,20 @@ enum class SpriteListOrder {
     LastModifiedDesc
 }
 
+data class HomeScreenState(
+    val showCreateCanvasDialog: Boolean = false,
+    val showSelectSortOptionDialog: Boolean = false,
+)
+
 class HomeScreenViewModel(
     private val spriteDatabaseRepository: ISpriteDatabaseRepository,
     private val sortSettingRepository: SortSettingRepository
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        HomeScreenState()
+    )
+    val uiState: StateFlow<HomeScreenState> = _uiState.asStateFlow()
 
     val sprites: StateFlow<List<ISpriteWithMetaData>> =
         spriteDatabaseRepository.getAllSpritesWithMeta()
@@ -51,6 +63,18 @@ class HomeScreenViewModel(
                 spriteListOrder = it
             }
         }
+    }
+
+    fun toggleCreateCanvasDialog() {
+        _uiState.value = _uiState.value.copy(
+            showCreateCanvasDialog = !_uiState.value.showCreateCanvasDialog
+        )
+    }
+
+    fun toggleSelectSortOptionDialog() {
+        _uiState.value = _uiState.value.copy(
+            showSelectSortOptionDialog = !_uiState.value.showSelectSortOptionDialog
+        )
     }
 
     fun deleteSpriteById(spriteId: String) {

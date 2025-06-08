@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreen
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreenViewModel
 import com.olaz.instasprite.ui.theme.Typography
@@ -28,8 +29,14 @@ class MainActivity : ComponentActivity() {
         }
 
         val database = AppDatabase.getInstance(applicationContext)
-        val spriteDataRepository = ISpriteDatabaseRepository(database.spriteDataDao(), database.spriteMetaDataDao())
-        val viewModel = HomeScreenViewModel(spriteDataRepository)
+        val spriteDataRepository =
+            ISpriteDatabaseRepository(database.spriteDataDao(), database.spriteMetaDataDao())
+        val sortSettingRepository = SortSettingRepository(applicationContext)
+
+        val viewModel = HomeScreenViewModel(
+            spriteDatabaseRepository = spriteDataRepository,
+            sortSettingRepository = sortSettingRepository
+        )
 
         setContent {
             MaterialTheme(

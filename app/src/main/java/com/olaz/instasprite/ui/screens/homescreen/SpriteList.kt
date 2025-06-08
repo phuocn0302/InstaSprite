@@ -56,17 +56,39 @@ fun SpriteList(
     spritesWithMetaData: List<ISpriteWithMetaData>,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val sortedSprites = remember(spritesWithMetaData) {
-        spritesWithMetaData.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
+    val order = remember(viewModel.spriteListOrder) { viewModel.spriteListOrder }
+
+    val sortedSprites = remember(order, spritesWithMetaData) {
+        when (order) {
+            SpriteListOrder.Name ->
+                spritesWithMetaData.sortedBy { it.meta?.spriteName?.lowercase() ?: "" }
+
+            SpriteListOrder.NameDesc ->
+                spritesWithMetaData.sortedByDescending { it.meta?.spriteName?.lowercase() ?: "" }
+
+            SpriteListOrder.DateCreated ->
+                spritesWithMetaData.sortedBy { it.meta?.createdAt ?: 0L }
+
+            SpriteListOrder.DateCreatedDesc ->
+                spritesWithMetaData.sortedByDescending { it.meta?.createdAt ?: 0L }
+
+            SpriteListOrder.LastModified ->
+                spritesWithMetaData.sortedBy { it.meta?.lastModifiedAt ?: 0L }
+
+            SpriteListOrder.LastModifiedDesc ->
+                spritesWithMetaData.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
+        }
     }
 
-    // Scroll to last edited item, on top for now
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(spritesWithMetaData) {
-        viewModel.lastEditedSpriteId?.let {
-            coroutineScope.launch {
-                lazyListState.animateScrollToItem(0)
+        viewModel.lastEditedSpriteId?.let { editedId ->
+            val index = sortedSprites.indexOfFirst { it.sprite.id == editedId }
+            if (index != -1) {
+                coroutineScope.launch {
+                    lazyListState.animateScrollToItem(index)
+                }
             }
         }
         viewModel.lastEditedSpriteId = null

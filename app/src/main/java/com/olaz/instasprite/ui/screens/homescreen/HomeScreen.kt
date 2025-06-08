@@ -21,11 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.screens.homescreen.dialog.CreateCanvasDialog
+import com.olaz.instasprite.ui.screens.homescreen.dialog.SelectSortOptionDialog
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import com.olaz.instasprite.utils.UiUtils
 
@@ -42,6 +42,12 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
 
     if (selectedItem == 1) {
         CreateCanvasDialog(
+            onDismiss = { selectedItem = 0 },
+        )
+    }
+    if (selectedItem == 3) {
+        SelectSortOptionDialog(
+            viewModel = viewModel,
             onDismiss = { selectedItem = 0 },
         )
     }

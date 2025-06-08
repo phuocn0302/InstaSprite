@@ -12,6 +12,7 @@ import com.olaz.instasprite.DrawingActivity
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.data.repository.SortSettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,9 +20,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+enum class SpriteListOrder {
+    Name,
+    NameDesc,
+    DateCreated,
+    DateCreatedDesc,
+    LastModified,
+    LastModifiedDesc
+}
 
 class HomeScreenViewModel(
-    private val spriteDatabaseRepository: ISpriteDatabaseRepository
+    private val spriteDatabaseRepository: ISpriteDatabaseRepository,
+    private val sortSettingRepository: SortSettingRepository
 ) : ViewModel() {
 
     val sprites: StateFlow<List<ISpriteWithMetaData>> =
@@ -33,6 +43,15 @@ class HomeScreenViewModel(
             )
 
     var lastEditedSpriteId by mutableStateOf<String?>(null)
+    var spriteListOrder by mutableStateOf(SpriteListOrder.LastModifiedDesc)
+
+    init {
+        viewModelScope.launch {
+            sortSettingRepository.getLastSortSetting()?.let {
+                spriteListOrder = it
+            }
+        }
+    }
 
     fun deleteSpriteById(spriteId: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -61,6 +80,12 @@ class HomeScreenViewModel(
     fun renameSprite(spriteId: String, newName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             spriteDatabaseRepository.changeName(spriteId, newName)
+        }
+    }
+
+    fun saveSortSetting(spriteListOrder: SpriteListOrder) {
+        viewModelScope.launch {
+            sortSettingRepository.setLastSortSetting(spriteListOrder)
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +39,7 @@ fun HomeBottomBar(
     onItemSelected: (Int) -> Unit,
     lazyListState: LazyListState
 ) {
-    val items = listOf("Home", "Dummy", "Search")
+    val items = listOf("Home", "Dummy", "Search", "Sort")
 
     val isBottomBarVisible by rememberBottomBarVisibleState(lazyListState)
     AnimatedVisibility(
@@ -61,6 +62,7 @@ fun HomeBottomBar(
                         when (item) {
                             "Home" -> Icon(Icons.Default.Home, contentDescription = item)
                             "Search" -> Icon(Icons.Default.Search, contentDescription = item)
+                            "Sort" -> Icon(Icons.Default.Menu, contentDescription = item)
                             else -> {}
                         }
                     },

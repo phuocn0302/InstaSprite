@@ -102,6 +102,12 @@ fun SpriteList(
         viewModel.lastEditedSpriteId = null
     }
 
+    LaunchedEffect(viewModel.searchQuery) {
+        coroutineScope.launch {
+            lazyListState.animateScrollToItem(0)
+        }
+    }
+
     LazyColumn(
         state = lazyListState,
         modifier = modifier

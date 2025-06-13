@@ -54,35 +54,43 @@ import kotlinx.coroutines.launch
 fun SpriteList(
     viewModel: HomeScreenViewModel,
     spritesWithMetaData: List<ISpriteWithMetaData>,
+    modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val order = remember(viewModel.spriteListOrder) { viewModel.spriteListOrder }
 
-    val sortedSprites = remember(order, spritesWithMetaData) {
+    val filteredSprites = remember(viewModel.searchQuery, spritesWithMetaData) {
+        spritesWithMetaData.filter {
+            val name = it.meta?.spriteName ?: ""
+            name.contains(viewModel.searchQuery, ignoreCase = true)
+        }
+    }
+
+    val sortedSprites = remember(order, filteredSprites) {
         when (order) {
             SpriteListOrder.Name ->
-                spritesWithMetaData.sortedBy { it.meta?.spriteName?.lowercase() ?: "" }
+                filteredSprites.sortedBy { it.meta?.spriteName?.lowercase() ?: "" }
 
             SpriteListOrder.NameDesc ->
-                spritesWithMetaData.sortedByDescending { it.meta?.spriteName?.lowercase() ?: "" }
+                filteredSprites.sortedByDescending { it.meta?.spriteName?.lowercase() ?: "" }
 
             SpriteListOrder.DateCreated ->
-                spritesWithMetaData.sortedBy { it.meta?.createdAt ?: 0L }
+                filteredSprites.sortedBy { it.meta?.createdAt ?: 0L }
 
             SpriteListOrder.DateCreatedDesc ->
-                spritesWithMetaData.sortedByDescending { it.meta?.createdAt ?: 0L }
+                filteredSprites.sortedByDescending { it.meta?.createdAt ?: 0L }
 
             SpriteListOrder.LastModified ->
-                spritesWithMetaData.sortedBy { it.meta?.lastModifiedAt ?: 0L }
+                filteredSprites.sortedBy { it.meta?.lastModifiedAt ?: 0L }
 
             SpriteListOrder.LastModifiedDesc ->
-                spritesWithMetaData.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
+                filteredSprites.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
         }
     }
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(spritesWithMetaData) {
+    LaunchedEffect(spritesWithMetaData, sortedSprites) {
         viewModel.lastEditedSpriteId?.let { editedId ->
             val index = sortedSprites.indexOfFirst { it.sprite.id == editedId }
             if (index != -1) {
@@ -96,7 +104,7 @@ fun SpriteList(
 
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier.padding(8.dp)
+        modifier = modifier
     ) {
         items(
             items = sortedSprites,

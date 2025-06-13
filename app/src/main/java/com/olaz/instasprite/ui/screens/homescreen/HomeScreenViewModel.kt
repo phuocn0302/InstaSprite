@@ -34,6 +34,7 @@ enum class SpriteListOrder {
 data class HomeScreenState(
     val showCreateCanvasDialog: Boolean = false,
     val showSelectSortOptionDialog: Boolean = false,
+    val showSearchBar: Boolean = false
 )
 
 class HomeScreenViewModel(
@@ -53,6 +54,9 @@ class HomeScreenViewModel(
                 SharingStarted.WhileSubscribed(5000),
                 emptyList()
             )
+
+    var searchQuery by mutableStateOf("")
+        private set
 
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var spriteListOrder by mutableStateOf(SpriteListOrder.LastModifiedDesc)
@@ -74,6 +78,12 @@ class HomeScreenViewModel(
     fun toggleSelectSortOptionDialog() {
         _uiState.value = _uiState.value.copy(
             showSelectSortOptionDialog = !_uiState.value.showSelectSortOptionDialog
+        )
+    }
+
+    fun toggleSearchBar() {
+        _uiState.value = _uiState.value.copy(
+            showSearchBar = !_uiState.value.showSearchBar
         )
     }
 
@@ -111,5 +121,9 @@ class HomeScreenViewModel(
         viewModelScope.launch {
             sortSettingRepository.setLastSortSetting(spriteListOrder)
         }
+    }
+
+    fun updateSearchQuery(query: String) {
+        searchQuery = query
     }
 }

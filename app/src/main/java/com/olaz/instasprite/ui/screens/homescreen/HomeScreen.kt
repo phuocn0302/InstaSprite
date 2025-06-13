@@ -1,6 +1,10 @@
 package com.olaz.instasprite.ui.screens.homescreen
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -63,7 +67,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .background(HomeScreenColor.TopbarColor)
-                        .height(50.dp)
+                        .height(56.dp)
                 ) {
                     Text(
                         text = "Home",
@@ -84,29 +88,42 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                             .padding(10.dp)
                     )
                 }
+
+                AnimatedVisibility(
+                    visible = uiState.showSearchBar,
+                    enter = slideInVertically(initialOffsetY = { -it }),
+                    exit = slideOutVertically(targetOffsetY = { -it }),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    SearchBar(
+                        viewModel = viewModel,
+                    )
+                }
             },
             bottomBar = {
                 HomeBottomBar(
                     viewModel = viewModel,
-                    lazyListState = lazyListState
+                    lazyListState = lazyListState,
+                    modifier = Modifier.height(56.dp)
                 )
             },
         ) { innerPadding ->
             Box(
                 modifier = Modifier
+                    .padding(top = innerPadding.calculateTopPadding())
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(HomeScreenColor.BackgroundColor)
+                    .animateContentSize()
             ) {
-                Box(
-                    modifier = Modifier.padding(10.dp, 50.dp, 10.dp, 0.dp)
-                ) {
-                    SpriteList(
-                        viewModel = viewModel,
-                        spritesWithMetaData = sprites,
-                        lazyListState = lazyListState,
-                    )
-                }
+                SpriteList(
+                    viewModel = viewModel,
+                    spritesWithMetaData = sprites,
+                    lazyListState = lazyListState,
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
             }
         }
 

@@ -11,7 +11,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
@@ -43,7 +42,8 @@ import com.olaz.instasprite.utils.rememberBottomBarVisibleState
 @Composable
 fun HomeBottomBar(
     viewModel: HomeScreenViewModel,
-    lazyListState: LazyListState
+    lazyListState: LazyListState,
+    modifier: Modifier = Modifier
 ) {
     val isBottomBarVisible by rememberBottomBarVisibleState(lazyListState)
     AnimatedVisibility(
@@ -54,8 +54,7 @@ fun HomeBottomBar(
 
         BottomAppBar(
             containerColor = HomeScreenColor.BottombarColor,
-            modifier = Modifier
-                .height(56.dp)
+            modifier = modifier
                 .clip(
                     BottomNavShape(
                         dockRadius = with(LocalDensity.current) { 40.dp.toPx() },
@@ -88,7 +87,7 @@ fun HomeBottomBar(
                 BottomBarItem(
                     imageVector = Icons.Default.Search,
                     onClick = {
-                        //TODO
+                        viewModel.toggleSearchBar()
                     },
                     iconTint = Color.White
                 )

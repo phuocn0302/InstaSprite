@@ -21,10 +21,12 @@ import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.utils.ColorPalette
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class DrawingScreenState(
     val selectedColor: Color,
@@ -195,16 +197,19 @@ class DrawingScreenViewModel(
         saveState()
     }
 
-    fun saveToDB() {
+    fun saveToDB(spriteName: String? = null) {
         viewModelScope.launch {
             val spriteData = pixelCanvasUseCase.getISpriteData()
             spriteDataRepository.saveSprite(spriteData.copy(id = spriteId))
+            spriteName?.let {
+                spriteDataRepository.changeName(spriteId, it)
+            }
         }
     }
 
     fun loadFromDB() {
         viewModelScope.launch {
-            val spriteData = spriteDataRepository.loadSprite(spriteId.toInt())
+            val spriteData = spriteDataRepository.loadSprite(spriteId)
             if (spriteData != null) {
                 loadISprite(spriteData)
             }

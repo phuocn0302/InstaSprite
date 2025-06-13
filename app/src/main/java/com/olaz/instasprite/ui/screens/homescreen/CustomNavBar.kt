@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import kotlin.math.sqrt
 
 @Preview(showBackground = true, name = "BottomNavPanel Preview")
 @Composable
@@ -73,7 +72,7 @@ fun BoxScope.BottomNavPanelWithCutOut() {
 }
 
 class BottomNavShape(
-    private val dockRadius: Float,
+    private val dockRadius: Float
 ) : Shape {
     override fun createOutline(
         size: Size,
@@ -88,69 +87,81 @@ class BottomNavShape(
 
         val rect1 = Path().apply {
             addRect(
-                Rect(
-                    Offset(
-                        (size.width / 2 - dockRadius) - 1.65f * (dockRadius) + dockRadius, 0f
+                Rect(Offset.Zero, Offset(size.width / 2 - dockRadius + 4f, size.height)),
+            )
+        }
+
+        val rect1A = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    Rect(Offset.Zero, Offset(size.width / 2 - dockRadius + 4f, size.height)),
+                    topRight = CornerRadius(32f, 32f),
+                ),
+            )
+        }
+
+        val rect1B = Path.combine(
+            operation = PathOperation.Difference,
+            path1 = rect1,
+            path2 = rect1A,
+        )
+
+        val rect2 = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    Rect(
+                        Offset(size.width / 2 + dockRadius - 4f, 0f),
+                        Offset(size.width, size.height)
                     ),
-                    Size(dockRadius * 3.4f, dockRadius / 2)
-                )
+                ),
             )
         }
 
-        val circle1 = Path().apply {
-            addOval(
-                Rect(
-                    Offset((size.width / 2 - dockRadius) - sqrt(3f) * (dockRadius), 0f),
-                    Offset((size.width / 2 + dockRadius) - sqrt(3f) * (dockRadius), 2 * dockRadius),
-                )
+        val rect2A = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    Rect(
+                        Offset(size.width / 2 + dockRadius - 4f, 0f),
+                        Offset(size.width, size.height)
+                    ),
+                    topLeft = CornerRadius(32f, 32f),
+                ),
             )
         }
 
-        val circle2 = Path().apply {
-            addOval(
-                Rect(
-                    Offset((size.width / 2 - dockRadius) + sqrt(3f) * (dockRadius), 0f),
-                    Offset((size.width / 2 + dockRadius) + sqrt(3f) * (dockRadius), 2 * dockRadius),
-                )
-            )
-        }
+        val rect2B = Path.combine(
+            operation = PathOperation.Difference,
+            path1 = rect2,
+            path2 = rect2A,
+        )
 
-        val midlecircle = Path().apply {
+        val circle = Path().apply {
             addOval(
                 Rect(
                     Offset(size.width / 2 - dockRadius, -dockRadius),
                     Offset(size.width / 2 + dockRadius, dockRadius),
-                )
+                ),
             )
         }
 
         val path1 = Path.combine(
             operation = PathOperation.Difference,
-            path1 = rect1,
-            path2 = midlecircle,
+            path1 = baseRect,
+            path2 = circle,
         )
+
         val path2 = Path.combine(
             operation = PathOperation.Difference,
             path1 = path1,
-            path2 = circle1,
+            path2 = rect1B,
         )
-        val path3 = Path.combine(
-            operation = PathOperation.Difference,
-            path1 = path2,
-            path2 = circle2,
-        )
-        val path4 = Path.combine(
-            operation = PathOperation.Difference,
-            path1 = baseRect,
-            path2 = midlecircle,
-        )
+
         val path = Path.combine(
             operation = PathOperation.Difference,
-            path1 = path4,
-            path2 = path3,
+            path1 = path2,
+            path2 = rect2B,
         )
 
         return Outline.Generic(path)
-
     }
 }

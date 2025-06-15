@@ -4,7 +4,9 @@ import android.util.Log
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.database.SpriteDataDao
 import com.olaz.instasprite.data.database.SpriteMetaDataDao
+import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.data.model.SpriteMetaData
+import kotlinx.coroutines.flow.Flow
 
 class ISpriteDatabaseRepository(
     private val dao: SpriteDataDao,
@@ -23,11 +25,27 @@ class ISpriteDatabaseRepository(
                 lastModifiedAt = now
             )
 
-        metaDao.insert(meta)
         dao.insert(sprite)
+        metaDao.insert(meta)
     }
 
-    suspend fun loadSprite(id: Int): ISpriteData? {
+    suspend fun loadSprite(id: String): ISpriteData? {
         return dao.getById(id)
+    }
+
+    suspend fun getSpriteList(): Pair<List<ISpriteData>, List<SpriteMetaData>> {
+        return Pair(dao.getAllSprites(), metaDao.getAllMeta())
+    }
+
+    fun getAllSpritesWithMeta(): Flow<List<ISpriteWithMetaData>> {
+        return dao.getAllSpritesWithMeta()
+    }
+
+    fun deleteSpriteById(spriteId: String) {
+        dao.delete(spriteId)
+    }
+
+    suspend fun changeName(spriteId: String, newName: String) {
+        metaDao.changeSpriteName(spriteId, newName)
     }
 }

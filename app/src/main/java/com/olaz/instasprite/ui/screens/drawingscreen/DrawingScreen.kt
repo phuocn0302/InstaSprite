@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -78,13 +79,26 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(DrawingScreenColor.BackgroundColor)
+                .graphicsLayer(
+                    scaleX = uiState.canvasScale,
+                    scaleY = uiState.canvasScale,
+                )
                 .pointerInput(uiState.selectedTool) {
-                    detectTransformGestures(
-                        onGesture = { _, pan, zoom, _ ->
-                            viewModel.setCanvasScale(uiState.canvasScale * zoom)
-                            viewModel.setCanvasOffset(uiState.canvasOffset + pan)
-                        }
-                    )
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        val newScale = (uiState.canvasScale * zoom).coerceIn(0.5f, 10f)
+
+                        val maxOffsetX = 500f
+                        val maxOffsetY = 500f
+
+                        val newOffset = uiState.canvasOffset + pan
+                        val clampedOffset = Offset(
+                            x = newOffset.x.coerceIn(-maxOffsetX, maxOffsetX),
+                            y = newOffset.y.coerceIn(-maxOffsetY, maxOffsetY)
+                        )
+
+                        viewModel.setCanvasScale(newScale)
+                        viewModel.setCanvasOffset(clampedOffset)
+                    }
                 }
         ) {
 
@@ -96,10 +110,6 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                     .offset {
                         IntOffset(uiState.canvasOffset.x.roundToInt(), uiState.canvasOffset.y.roundToInt())
                     }
-                    .graphicsLayer(
-                        scaleX = uiState.canvasScale,
-                        scaleY = uiState.canvasScale,
-                    )
                     .fillMaxSize()
                     .fillMaxHeight(0.7f),
                 viewModel = viewModel

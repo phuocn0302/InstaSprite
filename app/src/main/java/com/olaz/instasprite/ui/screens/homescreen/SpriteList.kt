@@ -19,6 +19,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -272,14 +276,35 @@ fun SpriteDropdownMenu(
     ) {
         DropdownMenuItem(
             text = { Text("Rename", color = Color.White) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Rename",
+                    tint = Color.White
+                )
+            },
             onClick = onRename,
         )
         DropdownMenuItem(
             text = { Text("Edit", color = Color.White) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit",
+                    tint = Color.White
+                )
+            },
             onClick = onEdit,
         )
         DropdownMenuItem(
             text = { Text("Delete", color = Color.White) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = Color.White
+                )
+            },
             onClick = onDelete,
         )
     }

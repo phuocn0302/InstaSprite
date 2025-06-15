@@ -57,6 +57,16 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
         )
     }
 
+    if (uiState.showImagePager) {
+        ImagePagerOverlay(
+            viewModel = viewModel,
+            onDismiss = { lastSpriteSeen ->
+                viewModel.toggleImagePager(null)
+                viewModel.lastSpriteSeenInPager = lastSpriteSeen
+            }
+        )
+    }
+
     val sprites by viewModel.sprites.collectAsState()
 
     val lazyListState = rememberLazyListState()

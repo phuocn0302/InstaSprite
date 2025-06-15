@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -87,6 +88,7 @@ fun SpriteList(
                 filteredSprites.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
         }
     }
+    viewModel.spriteList = sortedSprites
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -105,6 +107,18 @@ fun SpriteList(
     LaunchedEffect(viewModel.searchQuery) {
         coroutineScope.launch {
             lazyListState.animateScrollToItem(0)
+        }
+    }
+
+    LaunchedEffect(viewModel.lastSpriteSeenInPager) {
+        viewModel.lastSpriteSeenInPager?.let { sprite ->
+            val index = sortedSprites.indexOfFirst { it.sprite.id == sprite.id }
+            if (index != -1) {
+                coroutineScope.launch {
+                    lazyListState.animateScrollToItem(index)
+                }
+            }
+            viewModel.lastSpriteSeenInPager = null
         }
     }
 
@@ -156,7 +170,7 @@ fun SpriteCard(
             onConfirm = {
                 coroutineScope.launch {
                     isVisible = false
-                    viewModel.deleteSpriteByIdDelay(sprite.id, 300)
+                    viewModel.deleteSpriteByIdDelay(sprite.id, 0)
                 }
                 showDeleteDialog = false
             }
@@ -177,6 +191,8 @@ fun SpriteCard(
             modifier = Modifier
                 .padding(vertical = 8.dp)
                 .combinedClickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
                     onClick = {},
                     onLongClick = { showDropdown = true }
                 )
@@ -230,7 +246,8 @@ fun SpriteCard(
                 modifier = Modifier
                     .fillMaxWidth(0.95f)
                     .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp)),
+                onClick = { viewModel.toggleImagePager(sprite) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))

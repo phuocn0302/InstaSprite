@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -34,7 +35,8 @@ enum class SpriteListOrder {
 data class HomeScreenState(
     val showCreateCanvasDialog: Boolean = false,
     val showSelectSortOptionDialog: Boolean = false,
-    val showSearchBar: Boolean = false
+    val showSearchBar: Boolean = false,
+    val showImagePager: Boolean = false
 )
 
 class HomeScreenViewModel(
@@ -60,6 +62,9 @@ class HomeScreenViewModel(
 
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var spriteListOrder by mutableStateOf(SpriteListOrder.LastModifiedDesc)
+    var spriteList by mutableStateOf(emptyList<ISpriteWithMetaData>())
+    var currentSelectedSpriteIndex by mutableIntStateOf(0)
+    var lastSpriteSeenInPager by mutableStateOf<ISpriteData?>(null)
 
     init {
         viewModelScope.launch {
@@ -85,6 +90,13 @@ class HomeScreenViewModel(
         _uiState.value = _uiState.value.copy(
             showSearchBar = !_uiState.value.showSearchBar
         )
+    }
+
+    fun toggleImagePager(selectedSprite: ISpriteData?) {
+        _uiState.value = _uiState.value.copy(
+            showImagePager = !_uiState.value.showImagePager
+        )
+        currentSelectedSpriteIndex = spriteList.map { it.sprite }.indexOf(selectedSprite)
     }
 
     fun deleteSpriteById(spriteId: String) {

@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.screens.homescreen.dialog.CreateCanvasDialog
 import com.olaz.instasprite.ui.screens.homescreen.dialog.SelectSortOptionDialog
@@ -85,16 +84,6 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
                         text = "Home",
                         color = Color.White,
                         textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(10.dp)
-                    )
-                    Text(
-                        text = "Feed",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
                         modifier = Modifier
                             .weight(1f)
                             .padding(10.dp)

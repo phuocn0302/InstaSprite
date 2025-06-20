@@ -3,7 +3,6 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,21 +11,17 @@ import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
-import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.EyedropperTool
-import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.utils.ColorPalette
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class DrawingScreenState(
     val selectedColor: Color,
@@ -34,9 +29,6 @@ data class DrawingScreenState(
 
     val canvasWidth: Int,
     val canvasHeight: Int,
-
-    val canvasOffset: Offset,
-    val canvasScale: Float,
 )
 
 class DrawingScreenViewModel(
@@ -57,9 +49,6 @@ class DrawingScreenViewModel(
 
             canvasWidth = pixelCanvasUseCase.getCanvasWidth(),
             canvasHeight = pixelCanvasUseCase.getCanvasHeight(),
-
-            canvasScale = 1f,
-            canvasOffset = Offset.Zero
         )
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
@@ -67,15 +56,6 @@ class DrawingScreenViewModel(
 
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
-
-    // Just for scaling and offsetting the canvas
-    fun setCanvasScale(scale: Float) {
-        _uiState.value = _uiState.value.copy(canvasScale = scale)
-    }
-
-    fun setCanvasOffset(offset: Offset) {
-        _uiState.value = _uiState.value.copy(canvasOffset = offset)
-    }
 
     fun setCanvasSize(width: Int, height: Int) {
         pixelCanvasUseCase.setCanvas(width, height)

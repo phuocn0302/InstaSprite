@@ -197,7 +197,14 @@ fun Modifier.drawingPointerInput(
                 viewModel.saveState()
             }
 
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val event = awaitPointerEvent()
+            val pointerCount = event.changes.count { it.pressed }
+
+            if (pointerCount > 1) {
+                return@awaitEachGesture
+            }
+
             val startCell = down.position.toGridCell(
                 size.width, size.height,
                 canvasWidth, canvasHeight

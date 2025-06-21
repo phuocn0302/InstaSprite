@@ -2,33 +2,36 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
-import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
+import net.engawapg.lib.zoomable.ZoomState
+import net.engawapg.lib.zoomable.zoomable
 
-@SuppressLint("DefaultLocale")
+@SuppressLint("DefaultLocale", "ConfigurationScreenWidthHeight")
 @Composable
 fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
@@ -36,6 +39,21 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
 
     val viewModel = viewModel
     val uiState by viewModel.uiState.collectAsState()
+
+    val maxScale by remember(uiState.canvasWidth, uiState.canvasHeight) {
+        derivedStateOf {
+            val canvasSize = maxOf(uiState.canvasWidth, uiState.canvasHeight).toFloat()
+            canvasSize.div(8f).coerceAtLeast(2f).coerceAtMost(100f)
+        }
+    }
+
+    val canvasZoomState = remember(maxScale) {
+        ZoomState(maxScale = maxScale)
+    }
+
+    val layoutSize = remember { mutableStateOf(IntSize.Zero) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -50,9 +68,19 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
         bottomBar = {
             Column {
                 Slider(
-                    value = uiState.canvasScale,
-                    onValueChange = { viewModel.setCanvasScale(it) },
-                    valueRange = 0.5f..10f,
+                    value = canvasZoomState.scale,
+                    onValueChange = {
+                        coroutineScope.launch {
+                            canvasZoomState.changeScale(
+                                targetScale = it,
+                                position = Offset(
+                                    x = layoutSize.value.width / 2f,
+                                    y = layoutSize.value.height / 2f
+                                )
+                            )
+                        }
+                    },
+                    valueRange = 1f..maxScale,
                     colors = SliderDefaults.colors(
                         thumbColor = Color.White,
                         activeTrackColor = DrawingScreenColor.SelectedToolColor,
@@ -79,26 +107,15 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(DrawingScreenColor.BackgroundColor)
-                .graphicsLayer(
-                    scaleX = uiState.canvasScale,
-                    scaleY = uiState.canvasScale,
+                .zoomable(
+                    zoomState = canvasZoomState,
+                    enableOneFingerZoom = false,
+                    onTap = null,
+                    onDoubleTap = null,
+                    onLongPress = null
                 )
-                .pointerInput(uiState.selectedTool) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        val newScale = (uiState.canvasScale * zoom).coerceIn(0.5f, 10f)
-
-                        val maxOffsetX = 500f
-                        val maxOffsetY = 500f
-
-                        val newOffset = uiState.canvasOffset + pan
-                        val clampedOffset = Offset(
-                            x = newOffset.x.coerceIn(-maxOffsetX, maxOffsetX),
-                            y = newOffset.y.coerceIn(-maxOffsetY, maxOffsetY)
-                        )
-
-                        viewModel.setCanvasScale(newScale)
-                        viewModel.setCanvasOffset(clampedOffset)
-                    }
+                .onSizeChanged {
+                    layoutSize.value = it
                 }
         ) {
 
@@ -107,9 +124,6 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(10.dp)
-                    .offset {
-                        IntOffset(uiState.canvasOffset.x.roundToInt(), uiState.canvasOffset.y.roundToInt())
-                    }
                     .fillMaxSize()
                     .fillMaxHeight(0.7f),
                 viewModel = viewModel

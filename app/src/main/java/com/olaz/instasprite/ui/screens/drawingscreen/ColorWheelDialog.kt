@@ -67,7 +67,6 @@ import kotlinx.coroutines.launch
 import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.ui.theme.HomeScreenColor
-import com.olaz.instasprite.utils.ColorPalette
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 
@@ -81,7 +80,7 @@ fun ColorWheelDialog(
     viewModel: DrawingScreenViewModel
 ) {
     var showImportDialog by remember { mutableStateOf(false) }
-    val colorPalette by viewModel.colorPalette.collectAsState()
+    val colorPaletteState by viewModel.uiState.collectAsState()
     
     val hsv = remember {
         val hsvArray = floatArrayOf(0f, 0f, 0f)
@@ -153,6 +152,7 @@ fun ColorWheelDialog(
                     val hsvArray = floatArrayOf(0f, 0f, 0f)
                     AndroidColor.colorToHSV(firstColor.toArgb(), hsvArray)
                     hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                    selectedColor.value = Color.hsv(hsvArray[0], hsvArray[1], hsvArray[2])
                     updateInputFields()
                 }
                 showImportDialog = false
@@ -224,7 +224,7 @@ fun ColorWheelDialog(
                         .padding(horizontal = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(colorPalette) { color ->
+                    items(colorPaletteState.colorPalette) { color ->
                         Box(
                             modifier = Modifier
                                 .size(40.dp)

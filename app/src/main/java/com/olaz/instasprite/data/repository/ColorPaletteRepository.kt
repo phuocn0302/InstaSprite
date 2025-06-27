@@ -12,6 +12,61 @@ import com.olaz.instasprite.utils.convertHexToColor
 
 class ColorPaletteRepository(private val colorPaletteModel: ColorPaletteModel) {
 
+    companion object {
+        fun createDefaultPalette(context: Context): ColorPaletteModel {
+            val colors = mutableListOf<Color>()
+            
+            try {
+                context.resources.openRawResource(com.olaz.instasprite.R.raw.sage57).use { inputStream ->
+                    inputStream.bufferedReader().useLines { lines ->
+                        lines.forEach { line ->
+                            try {
+                                if (!line.startsWith(";") && line.isNotBlank()) {
+                                    val cleanHex = when {
+                                        line.startsWith("FF") -> line.substring(2)
+                                        else -> line.trim().removePrefix("#")
+                                    }
+                                    
+                                    if (cleanHex.length == 6) {
+                                        colors.add(convertHexToColor(cleanHex))
+                                    }
+                                }
+                            } catch (e: Exception) {
+
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+  
+                colors.addAll(listOf(
+                    Color.Black,
+                    Color(0xFF1D2B53),
+                    Color(0xFF7e2553),
+                    Color(0xFF008751),
+                    Color(0xFFab5236),
+                    Color(0xFF5f574f),
+                    Color(0xFFc2c3c7),
+                    Color(0xFFfff1e8),
+                    Color(0xFFff004d),
+                    Color(0xFFffa300),
+                    Color(0xFFffec27),
+                    Color(0xFF00e436),
+                    Color(0xFF29adff),
+                    Color(0xFF83769c),
+                    Color(0xFFff77a8),
+                    Color(0xFFffccaa),
+                ))
+            }
+            
+            return ColorPaletteModel(
+                name = "SAGE57",
+                author = "Lospec",
+                colors = colors,
+            )
+        }
+    }
+
     suspend fun fetchPaletteFromUrl(url: String): Result<ColorPaletteModel> = withContext(Dispatchers.IO) {
         try {
 
@@ -97,21 +152,20 @@ class ColorPaletteRepository(private val colorPaletteModel: ColorPaletteModel) {
         }
     }
 
-    fun addColorToPalette(color: Color): ColorPaletteModel {
-        val updatedColors = listOf(color) + colorPaletteModel.colors
-        return colorPaletteModel.copy(colors = updatedColors)
-    }
-
-    fun removeColorFromPalette(color: Color): ColorPaletteModel {
-        val updatedColors = colorPaletteModel.colors.filter { it != color }
-        return colorPaletteModel.copy(colors = updatedColors)
-    }
-
-    fun clearPalette(): ColorPaletteModel {
-        return colorPaletteModel.copy(colors = emptyList())
-    }
-
-    fun getCurrentPalette(): ColorPaletteModel {
-        return colorPaletteModel
-    }
+//    fun addColorToPalette(color: Color): ColorPaletteModel {
+//        val updatedColors = listOf(color) + colorPaletteModel.colors
+//        return colorPaletteModel.copy(colors = updatedColors)
+//    }
+//
+//    fun setActiveColor(color: Color): ColorPaletteModel {
+//        return colorPaletteModel.copy(activeColor = color)
+//    }
+//
+//    fun getActiveColor(): Color {
+//        return colorPaletteModel.activeColor
+//    }
+//
+//    fun loadDefaultPalette(context: Context): ColorPaletteModel {
+//        return createDefaultPalette(context)
+//    }
 } 

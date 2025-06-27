@@ -110,6 +110,18 @@ class DrawingScreenViewModel(
         }
     }
 
+    fun rotate() {
+        pixelCanvasUseCase.rotateCanvas(pixelCanvasUseCase.getAllPixels())
+    }
+
+    fun hFlip() {
+        pixelCanvasUseCase.hFlipCanvas(pixelCanvasUseCase.getAllPixels())
+    }
+
+    fun vFlip() {
+        pixelCanvasUseCase.vFlipCanvas(pixelCanvasUseCase.getAllPixels())
+    }
+
     suspend fun getLastSavedLocation(): Uri? {
         _lastSavedLocation.value = storageLocationRepository.getLastSavedLocation()
         return _lastSavedLocation.value

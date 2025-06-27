@@ -10,35 +10,11 @@ import org.json.JSONObject
 import java.net.URL
 import java.util.Locale
 import androidx.core.graphics.toColorInt
+import com.olaz.instasprite.utils.convertHexToColor
 
 class ColorPaletteRepository {
-//    suspend fun fetchPaletteFromLospec(paletteName: String): Result<ColorPaletteModel> = withContext(Dispatchers.IO) {
-//        try {
-//            val formattedName = paletteName.trim()
-//                .lowercase(Locale.getDefault())
-//
-//            val url = URL("https://lospec.com/palette-list/$formattedName.json")
-//            val jsonString = url.readText()
-//            val jsonObject = JSONObject(jsonString)
-//
-//            val name = jsonObject.getString("name")
-//            val author = jsonObject.getString("author")
-//            val colorsArray = jsonObject.getJSONArray("colors")
-//            val colors = List(colorsArray.length()) { colorsArray.getString(it) }
-//
-//            Result.success(ColorPaletteModel(name, author, colors))
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
 
-    fun convertHexToColor(hexColor: String): Color {
-        return Color("#$hexColor".toColorInt())
-    }
 
-//    fun convertPaletteToColors(palette: ColorPaletteModel): List<Color> {
-//        return palette.colors.map { convertHexToColor(it) }
-//    }
 
     suspend fun fetchPaletteFromUrl(url: String): Result<List<Color>> = withContext(Dispatchers.IO) {
         try {
@@ -110,8 +86,4 @@ class ColorPaletteRepository {
             Result.failure(e)
         }
     }
-
-//    private fun parseColorsFromJson(jsonString: String): List<Color> {
-//        return emptyList()
-//    }
 } 

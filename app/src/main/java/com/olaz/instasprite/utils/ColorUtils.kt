@@ -72,6 +72,10 @@ fun loadColorsFromFile(context: Context, resourceId: Int = R.raw.sage57): List<C
     return colors
 }
 
+fun convertHexToColor(hexColor: String): Color {
+    return Color("#$hexColor".toColorInt())
+}
+
 fun getDefaultColors(): List<Color> {
     return ColorPalette.ColorsList
 }

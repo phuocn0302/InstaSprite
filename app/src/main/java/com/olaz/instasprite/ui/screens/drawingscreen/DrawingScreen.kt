@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -54,6 +55,20 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     val layoutSize = remember { mutableStateOf(IntSize.Zero) }
 
     val coroutineScope = rememberCoroutineScope()
+
+    var showColorWheel by remember { mutableStateOf(false) }
+    if (showColorWheel) {
+        ColorWheelDialog(
+            initialColor = uiState.selectedColor,
+            onDismiss = { showColorWheel = false },
+            onColorSelected = { color ->
+                viewModel.selectColor(color)
+                showColorWheel = false
+            },
+            viewModel = viewModel
+        )
+    }
+
 
     Scaffold(
         topBar = {

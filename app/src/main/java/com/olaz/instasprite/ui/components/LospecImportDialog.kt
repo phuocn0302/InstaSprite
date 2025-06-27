@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.ColorPaletteContent
-import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import kotlinx.coroutines.launch
 
@@ -30,7 +29,8 @@ import kotlinx.coroutines.launch
 fun LospecImportDialog(
     onDismiss: () -> Unit,
     onImportSuccess: (List<Color>) -> Unit,
-    viewModel: DrawingScreenViewModel
+    onImportFromUrl: suspend (String) -> List<Color>,
+    onUpdateColorPalette: (List<Color>) -> Unit
 ) {
     var paletteUrl by remember { mutableStateOf("") }
     var previewColors by remember { mutableStateOf<List<Color>?>(null) }
@@ -42,7 +42,7 @@ fun LospecImportDialog(
         onDismiss = onDismiss,
         onConfirm = {
             if (previewColors != null && previewColors!!.isNotEmpty()) {
-                viewModel.updateColorPalette(previewColors!!)
+                onUpdateColorPalette(previewColors!!)
                 Toast.makeText(
                     context,
                     "Palette imported successfully!",
@@ -121,7 +121,7 @@ fun LospecImportDialog(
                             }
 
                             try {
-                                val colors = viewModel.importFromUrl(trimmedUrl)
+                                val colors = onImportFromUrl(trimmedUrl)
                                 if (colors.isEmpty()) {
                                     Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT).show()
                                     previewColors = null

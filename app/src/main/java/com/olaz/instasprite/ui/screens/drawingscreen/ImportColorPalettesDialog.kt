@@ -10,7 +10,9 @@ import com.olaz.instasprite.ui.components.LospecImportDialog
 fun ImportColorPalettesDialog(
     onDismiss: () -> Unit,
     onImportPalette: (List<Color>) -> Unit,
-    viewModel: DrawingScreenViewModel
+    onImportFromUrl: suspend (String) -> List<Color>,
+    onImportFromFile: suspend (android.content.Context, android.net.Uri) -> List<Color>,
+    onUpdateColorPalette: (List<Color>) -> Unit
 ) {
     var showImportOptions by remember { mutableStateOf(true) }
     var showLospecImport by remember { mutableStateOf(false) }
@@ -39,7 +41,8 @@ fun ImportColorPalettesDialog(
             onImportSuccess = { colors ->
                 onImportPalette(colors)
             },
-            viewModel = viewModel
+            onImportFromUrl = onImportFromUrl,
+            onUpdateColorPalette = onUpdateColorPalette
         )
     }
 
@@ -52,7 +55,8 @@ fun ImportColorPalettesDialog(
             onImportSuccess = { colors ->
                 onImportPalette(colors)
             },
-            viewModel = viewModel
+            onImportFromFile = onImportFromFile,
+            onUpdateColorPalette = onUpdateColorPalette
         )
     }
 }

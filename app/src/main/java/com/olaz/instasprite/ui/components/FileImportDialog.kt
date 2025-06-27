@@ -25,14 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.olaz.instasprite.ui.components.dialog.InputDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.ColorPaletteContent
-import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun FileImportDialog(
     onDismiss: () -> Unit,
     onImportSuccess: (List<Color>) -> Unit,
-    viewModel: DrawingScreenViewModel
+    onImportFromFile: suspend (android.content.Context, android.net.Uri) -> List<Color>,
+    onUpdateColorPalette: (List<Color>) -> Unit
 ) {
     val context = LocalContext.current
     var previewColors by remember { mutableStateOf<List<Color>?>(null) }
@@ -56,7 +56,7 @@ fun FileImportDialog(
 
                 scope.launch {
                     try {
-                        val colors = viewModel.importFromFile(context, it)
+                        val colors = onImportFromFile(context, it)
                         if (colors.isEmpty()) {
                                 Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT).show()
                             previewColors = null
@@ -79,7 +79,7 @@ fun FileImportDialog(
         onDismiss = onDismiss,
         onConfirm = {
             if (previewColors != null && previewColors!!.isNotEmpty()) {
-                viewModel.updateColorPalette(previewColors!!)
+                onUpdateColorPalette(previewColors!!)
                 Toast.makeText(context, "Palette imported successfully!", Toast.LENGTH_SHORT).show()
                 onImportSuccess(previewColors!!)
             } else {

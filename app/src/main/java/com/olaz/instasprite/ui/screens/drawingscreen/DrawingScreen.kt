@@ -38,7 +38,6 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
     UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
 
-    val viewModel = viewModel
     val uiState by viewModel.uiState.collectAsState()
 
     val maxScale by remember(uiState.canvasWidth, uiState.canvasHeight) {
@@ -57,6 +56,7 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
     var showColorWheel by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
     if (showColorWheel) {
         ColorWheelDialog(
             initialColor = uiState.selectedColor,
@@ -65,7 +65,25 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                 viewModel.selectColor(color)
                 showColorWheel = false
             },
+            onImportPalette = { colors ->
+                viewModel.updateColorPalette(colors)
+                showImportDialog = false
+            },
+            onShowImportDialog = { showImportDialog = true },
             viewModel = viewModel
+        )
+    }
+
+    if (showImportDialog) {
+        ImportColorPalettesDialog(
+            onDismiss = { showImportDialog = false },
+            onImportPalette = { colors ->
+                viewModel.updateColorPalette(colors)
+                showImportDialog = false
+            },
+            onImportFromUrl = { url -> viewModel.importFromUrl(url) },
+            onImportFromFile = { context, uri -> viewModel.importFromFile(context, uri) },
+            onUpdateColorPalette = { colors -> viewModel.updateColorPalette(colors) }
         )
     }
 

@@ -43,7 +43,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -57,7 +56,6 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -68,18 +66,18 @@ import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 
 
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 fun ColorWheelDialog(
     initialColor: Color = Color.Blue,
     onDismiss: () -> Unit,
     onColorSelected: (Color) -> Unit,
+    onImportPalette: (List<Color>) -> Unit,
+    onShowImportDialog: () -> Unit,
     viewModel: DrawingScreenViewModel
 ) {
-    var showImportDialog by remember { mutableStateOf(false) }
     val colorPaletteState by viewModel.uiState.collectAsState()
     
     val hsv = remember {
@@ -140,25 +138,6 @@ fun ColorWheelDialog(
             }
         } catch (e: Exception) {
         }
-    }
-
-    if (showImportDialog) {
-        ImportColorPalettesDialog(
-            onDismiss = { showImportDialog = false },
-            onImportPalette = { colors ->
-                viewModel.updateColorPalette(colors)
-                if (colors.isNotEmpty()) {
-                    val firstColor = colors.first()
-                    val hsvArray = floatArrayOf(0f, 0f, 0f)
-                    AndroidColor.colorToHSV(firstColor.toArgb(), hsvArray)
-                    hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-                    selectedColor.value = Color.hsv(hsvArray[0], hsvArray[1], hsvArray[2])
-                    updateInputFields()
-                }
-                showImportDialog = false
-            },
-            viewModel = viewModel
-        )
     }
 
     Dialog(
@@ -384,7 +363,7 @@ fun ColorWheelDialog(
                 }
 
                 Button(
-                    onClick = { showImportDialog = true },
+                    onClick = { onShowImportDialog() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = HomeScreenColor.ButtonColor
                     ),

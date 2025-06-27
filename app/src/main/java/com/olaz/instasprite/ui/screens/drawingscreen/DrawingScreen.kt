@@ -2,47 +2,37 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.UiUtils
-import kotlin.math.roundToInt
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import kotlinx.coroutines.launch
+import net.engawapg.lib.zoomable.ZoomState
+import net.engawapg.lib.zoomable.zoomable
 
-@SuppressLint("DefaultLocale")
+@SuppressLint("DefaultLocale", "ConfigurationScreenWidthHeight")
 @Composable
 fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
@@ -50,8 +40,23 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
 
     val viewModel = viewModel
     val uiState by viewModel.uiState.collectAsState()
-    var showColorWheel by remember { mutableStateOf(false) }
 
+    val maxScale by remember(uiState.canvasWidth, uiState.canvasHeight) {
+        derivedStateOf {
+            val canvasSize = maxOf(uiState.canvasWidth, uiState.canvasHeight).toFloat()
+            canvasSize.div(8f).coerceAtLeast(2f).coerceAtMost(100f)
+        }
+    }
+
+    val canvasZoomState = remember(maxScale) {
+        ZoomState(maxScale = maxScale)
+    }
+
+    val layoutSize = remember { mutableStateOf(IntSize.Zero) }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    var showColorWheel by remember { mutableStateOf(false) }
     if (showColorWheel) {
         ColorWheelDialog(
             initialColor = uiState.selectedColor,
@@ -64,53 +69,33 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
         )
     }
 
+
     Scaffold(
         topBar = {
-            Row(
+            ColorPalette(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .background(DrawingScreenColor.PaletteBarColor)
-                    .padding(vertical = 12.dp, horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ColorPalette(
-                    modifier = Modifier.weight(1f),
-                    viewModel = viewModel
-                )
-
-                Button(
-                    onClick = { showColorWheel = true },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color.White.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(4.dp)
-                        ),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = DrawingScreenColor.PaletteBackgroundColor
-                    ),
-                    contentPadding = PaddingValues(4.dp),
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Color",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                viewModel = viewModel
+            )
         },
 
         bottomBar = {
             Column {
                 Slider(
-                    value = uiState.canvasScale,
-                    onValueChange = { viewModel.setCanvasScale(it) },
-                    valueRange = 0.5f..10f,
+                    value = canvasZoomState.scale,
+                    onValueChange = {
+                        coroutineScope.launch {
+                            canvasZoomState.changeScale(
+                                targetScale = it,
+                                position = Offset(
+                                    x = layoutSize.value.width / 2f,
+                                    y = layoutSize.value.height / 2f
+                                )
+                            )
+                        }
+                    },
+                    valueRange = 1f..maxScale,
                     colors = SliderDefaults.colors(
                         thumbColor = Color.White,
                         activeTrackColor = DrawingScreenColor.SelectedToolColor,
@@ -137,30 +122,27 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(DrawingScreenColor.BackgroundColor)
-                .graphicsLayer(
-                    scaleX = uiState.canvasScale,
-                    scaleY = uiState.canvasScale,
+                .zoomable(
+                    zoomState = canvasZoomState,
+                    enableOneFingerZoom = false,
+                    onTap = null,
+                    onDoubleTap = null,
+                    onLongPress = null
                 )
-                .pointerInput(uiState.selectedTool) {
-                    detectTransformGestures(
-                        onGesture = { _, pan, zoom, _ ->
-                            viewModel.setCanvasScale(uiState.canvasScale * zoom)
-                            viewModel.setCanvasOffset(uiState.canvasOffset + pan)
-                        }
-                    )
+                .onSizeChanged {
+                    layoutSize.value = it
                 }
         ) {
-                // Canvas section
-                PixelCanvas(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .offset {
-                            IntOffset(uiState.canvasOffset.x.roundToInt(), uiState.canvasOffset.y.roundToInt())
-                        }
-                        .fillMaxSize()
-                        .fillMaxHeight(0.7f),
-                    viewModel = viewModel
-                )
+
+            // Canvas section
+            PixelCanvas(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(10.dp)
+                    .fillMaxSize()
+                    .fillMaxHeight(0.7f),
+                viewModel = viewModel
+            )
         }
     }
 }

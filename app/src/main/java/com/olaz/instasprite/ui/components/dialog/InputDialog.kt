@@ -1,13 +1,12 @@
 package com.olaz.instasprite.ui.components.dialog
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -35,7 +34,12 @@ fun InputDialog(
     extraBottomContent: @Composable () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val inputStates = remember { fields.map { mutableStateOf("") } }
+
+    val inputStates = remember {
+        fields.map { field ->
+            mutableStateOf(field.defaultValue)
+        }
+    }
 
     CustomDialog(
         title = title,
@@ -47,7 +51,6 @@ fun InputDialog(
 
             if (allValid) {
                 onConfirm(inputStates.map { it.value })
-                onDismiss()
             } else {
                 Toast.makeText(context, "Input errors", Toast.LENGTH_SHORT).show()
             }
@@ -55,6 +58,7 @@ fun InputDialog(
         confirmButtonText = confirmButtonText,
         dismissButtonText = dismissButtonText,
         content = {
+            Spacer(modifier = Modifier.height(12.dp))
             Column {
                 extraTopContent()
 
@@ -69,7 +73,11 @@ fun InputDialog(
                         },
                         trailingIcon = {
                             field.suffix?.let {
-                                Text(it, color = Color.White)
+                                Text(
+                                    it,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 14.dp)
+                                )
                             }
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = field.keyboardType),
@@ -86,6 +94,13 @@ fun InputDialog(
                             cursorColor = Color.White,
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.Gray,
+
+                            errorTextColor = Color.Red,
+                            errorBorderColor = Color.Red,
+                            errorLabelColor = Color.Red,
+                            errorCursorColor = Color.Red,
+                            errorTrailingIconColor = Color.Red,
+                            errorSupportingTextColor = Color.Red
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )

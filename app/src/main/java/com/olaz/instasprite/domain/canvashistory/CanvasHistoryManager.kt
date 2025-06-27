@@ -5,10 +5,14 @@ import java.util.ArrayDeque
 class CanvasHistoryManager<T> {
     private val undoStack: ArrayDeque<T> = ArrayDeque()
     private val redoStack: ArrayDeque<T> = ArrayDeque()
+    private var currentState: T? = null
 
     fun saveState(state: T) {
-        undoStack.addLast(state)
-        redoStack.clear()
+        if (currentState == null || currentState != state) {
+            currentState = state
+            undoStack.addLast(state)
+            redoStack.clear()
+        }
     }
 
     fun undo(): T? {
@@ -27,5 +31,18 @@ class CanvasHistoryManager<T> {
             return redoState
         }
         return null
+    }
+
+    fun getUndoStack(): ArrayDeque<T> {
+        return undoStack
+    }
+
+    fun getRedoStack(): ArrayDeque<T> {
+        return redoStack
+    }
+
+    fun reset() {
+        undoStack.clear()
+        redoStack.clear()
     }
 }

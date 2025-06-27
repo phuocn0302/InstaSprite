@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.0.21"
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
 }
 
 android {
@@ -26,6 +28,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            isDebuggable = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -44,6 +49,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     // --- Jetpack Compose UI ---
     implementation(platform(libs.androidx.compose.bom))
@@ -57,9 +63,15 @@ dependencies {
     implementation(libs.core.splashscreen)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.zoomable)
+
+    // --- Persistence / Storage ---
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.annotations) // Javax Annotations (used by Room, etc.)
 
     // --- Testing ---
-    // Unit Testing
     testImplementation(libs.junit)
 
     // Android Instrumentation Tests

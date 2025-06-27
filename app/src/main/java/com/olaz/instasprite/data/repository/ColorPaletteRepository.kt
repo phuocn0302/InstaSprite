@@ -8,15 +8,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
-import java.util.Locale
-import androidx.core.graphics.toColorInt
 import com.olaz.instasprite.utils.convertHexToColor
 
-class ColorPaletteRepository {
+class ColorPaletteRepository(private val colorPaletteModel: ColorPaletteModel) {
 
-
-
-    suspend fun fetchPaletteFromUrl(url: String): Result<List<Color>> = withContext(Dispatchers.IO) {
+    suspend fun fetchPaletteFromUrl(url: String): Result<ColorPaletteModel> = withContext(Dispatchers.IO) {
         try {
 
             val paletteName = when {
@@ -44,14 +40,23 @@ class ColorPaletteRepository {
             val colors = List(colorsArray.length()) { 
                 convertHexToColor(colorsArray.getString(it))
             }
+
+            val paletteNameFromJson = jsonObject.optString("name", paletteName)
+            val author = jsonObject.optString("author", "Unknown")
             
-            Result.success(colors)
+            val updatedPalette = colorPaletteModel.copy(
+                name = paletteNameFromJson,
+                author = author,
+                colors = colors
+            )
+            
+            Result.success(updatedPalette)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun importPaletteFromFile(context: Context, uri: Uri): Result<List<Color>> = withContext(Dispatchers.IO) {
+    suspend fun importPaletteFromFile(context: Context, uri: Uri): Result<ColorPaletteModel> = withContext(Dispatchers.IO) {
         try {
             val colors = mutableListOf<Color>()
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -80,10 +85,33 @@ class ColorPaletteRepository {
             if (colors.isEmpty()) {
                 Result.failure(Exception("No valid colors found in file"))
             } else {
-                Result.success(colors)
+                val updatedPalette = colorPaletteModel.copy(
+                    name = "Imported Palette",
+                    author = "File Import",
+                    colors = colors
+                )
+                Result.success(updatedPalette)
             }
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    fun addColorToPalette(color: Color): ColorPaletteModel {
+        val updatedColors = listOf(color) + colorPaletteModel.colors
+        return colorPaletteModel.copy(colors = updatedColors)
+    }
+
+    fun removeColorFromPalette(color: Color): ColorPaletteModel {
+        val updatedColors = colorPaletteModel.colors.filter { it != color }
+        return colorPaletteModel.copy(colors = updatedColors)
+    }
+
+    fun clearPalette(): ColorPaletteModel {
+        return colorPaletteModel.copy(colors = emptyList())
+    }
+
+    fun getCurrentPalette(): ColorPaletteModel {
+        return colorPaletteModel
     }
 } 

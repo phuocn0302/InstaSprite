@@ -140,6 +140,33 @@ fun ToolSelector(
             }
         )
 
+        ToolItem(
+            iconResourceId = R.drawable.ic_move_tool,
+            contentDescription = "Rotate canvas",
+            selected = false,
+            onClick = {
+                viewModel.rotate()
+            }
+        )
+
+        ToolItem(
+            iconResourceId = R.drawable.ic_move_tool,
+            contentDescription = "HFlip canvas",
+            selected = false,
+            onClick = {
+                viewModel.hFlip()
+            }
+        )
+
+        ToolItem(
+            iconResourceId = R.drawable.ic_move_tool,
+            contentDescription = "VFlip canvas",
+            selected = false,
+            onClick = {
+                viewModel.vFlip()
+            }
+        )
+
         Box {
             ToolItem(
                 iconResourceId = R.drawable.ic_menu,

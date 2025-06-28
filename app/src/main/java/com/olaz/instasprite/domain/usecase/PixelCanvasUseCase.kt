@@ -43,5 +43,58 @@ class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
         return repo.getISpriteData()
     }
 
+    fun rotateCanvas(pixels: List<Color>) {
+        val width = repo.width
+        val height = repo.height
+        val rotatedPixels = mutableListOf<Color>()
+
+        for (row in 0 until height) {
+            for (col in 0 until width) {
+                val newRow = height - 1 - col
+                val newCol = row
+
+                if (newRow >= 0 && newRow < height && newCol < width) {
+                    val Index = newRow * width + newCol
+                    if (Index < pixels.size) {
+                        rotatedPixels.add(pixels[Index])
+                    } else {
+                        rotatedPixels.add(Color.Transparent)
+                    }
+                } else {
+                    rotatedPixels.add(Color.Transparent)
+                }
+            }
+        }
+
+        return setAllPixels(rotatedPixels)
+    }
+
+    fun hFlipCanvas(pixels: List<Color>) {
+        val width = repo.width
+        val height = repo.height
+        val flippedPixels = mutableListOf<Color>()
+
+        for (row in 0 until height) {
+            for (col in width - 1 downTo 0) {
+                flippedPixels.add(pixels[row * width + col])
+            }
+        }
+        return setAllPixels(flippedPixels)
+    }
+
+    fun vFlipCanvas(pixels: List<Color>) {
+        val width = repo.width
+        val height = repo.height
+        val flippedPixels = mutableListOf<Color>()
+
+        for (row in height - 1 downTo 0) {
+            for (col in 0 until width) {
+                flippedPixels.add(pixels[row * width + col])
+            }
+        }
+
+        return setAllPixels(flippedPixels)
+    }
+
     val pixelChanged = repo.pixelChanged
 }

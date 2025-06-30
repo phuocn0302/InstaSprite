@@ -100,6 +100,53 @@ fun ToolSelector(
                 containerColor = DrawingScreenColor.PaletteBarColor,
                 onDismissRequest = { toolListVisible = false }
             ) {
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_redo),
+                            contentDescription = "Rotate canvas",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    text = { Text("Rotate canvas", color = Color.White) },
+                    onClick = {
+                        viewModel.rotate()
+                        toolListVisible = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_hflip),
+                            contentDescription = "Flip canvas horizontal",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    text = { Text("HFlip", color = Color.White) },
+                    onClick = {
+                        viewModel.hFlip()
+                        toolListVisible = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_vflip),
+                            contentDescription = "Flip canvas vertical",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    text = { Text("VFlip", color = Color.White) },
+                    onClick = {
+                        viewModel.vFlip()
+                        toolListVisible = false
+                    }
+                )
 
                 tools.reversed().forEach { tool ->
                     DropdownMenuItem(
@@ -137,33 +184,6 @@ fun ToolSelector(
             selected = false,
             onClick = {
                 viewModel.redo()
-            }
-        )
-
-        ToolItem(
-            iconResourceId = R.drawable.ic_move_tool,
-            contentDescription = "Rotate canvas",
-            selected = false,
-            onClick = {
-                viewModel.rotate()
-            }
-        )
-
-        ToolItem(
-            iconResourceId = R.drawable.ic_move_tool,
-            contentDescription = "HFlip canvas",
-            selected = false,
-            onClick = {
-                viewModel.hFlip()
-            }
-        )
-
-        ToolItem(
-            iconResourceId = R.drawable.ic_move_tool,
-            contentDescription = "VFlip canvas",
-            selected = false,
-            onClick = {
-                viewModel.vFlip()
             }
         )
 

@@ -9,11 +9,9 @@ object EyedropperTool : Tool {
     override val name: String = "Eyedropper"
     override val description: String = "Select a pixel color"
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
-        val selectedColor = canvas.getPixel(row, col)
-        if (selectedColor != Color.Transparent) {
-            selectedColor
-        } else {
-            color
-        }
+    }
+
+    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int): Color {
+        return canvas.getPixel(row, col)
     }
 }

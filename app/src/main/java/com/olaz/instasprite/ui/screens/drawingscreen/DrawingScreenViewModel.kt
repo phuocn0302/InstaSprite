@@ -69,6 +69,9 @@ class DrawingScreenViewModel(
     }
 
     fun selectColor(color: Color) {
+        if (color == Color.Transparent) {
+            return
+        }
         _uiState.value = _uiState.value.copy(selectedColor = color)
 
         val currentState = _uiState.value
@@ -98,7 +101,8 @@ class DrawingScreenViewModel(
         tool.apply(pixelCanvasUseCase, row, col, color)
 
         if (tool is EyedropperTool) {
-            selectColor(color)
+            val activeColor = tool.apply(pixelCanvasUseCase, row, col)
+            selectColor(activeColor)
         }
     }
 

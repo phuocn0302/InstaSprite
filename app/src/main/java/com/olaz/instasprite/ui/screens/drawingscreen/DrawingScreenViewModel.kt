@@ -8,12 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
-import com.olaz.instasprite.data.repository.ColorPaletteRepository.Companion.createDefaultPalette
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
-import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
@@ -25,8 +24,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class DrawingScreenState(
-    val colorPalette: List<Color>,
-    val selectedColor: Color,
     val selectedTool: Tool,
 
     val canvasWidth: Int,
@@ -39,18 +36,18 @@ class DrawingScreenViewModel(
     private val pixelCanvasRepository: PixelCanvasRepository,
     private val spriteDataRepository: ISpriteDatabaseRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
-    context: Context
+    private val lospecColorPaletteRepository: LospecColorPaletteRepository,
 ) : ViewModel() {
     private val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
     private val saveFileUseCase = SaveFileUseCase()
     private val loadFileUseCase = LoadFileUseCase()
-    private val pixelCanvasUseCase = PixelCanvasUseCase(repo = pixelCanvasRepository)
+    private val pixelCanvasUseCase = PixelCanvasUseCase(
+        pixelCanvasRepository = pixelCanvasRepository,
+        colorPaletteRepository =  colorPaletteRepository
+    )
 
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
-            colorPalette = createDefaultPalette(context).colors,
-            selectedColor = createDefaultPalette(context).activeColor,
-
             selectedTool = PencilTool,
 
             canvasWidth = pixelCanvasUseCase.getCanvasWidth(),
@@ -63,20 +60,17 @@ class DrawingScreenViewModel(
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
 
+    var colorPalette = colorPaletteRepository.colors
+    var activeColor = colorPaletteRepository.activeColor
+
     fun setCanvasSize(width: Int, height: Int) {
         pixelCanvasUseCase.setCanvas(width, height)
         _uiState.value = _uiState.value.copy(canvasWidth = width, canvasHeight = height)
     }
 
     fun selectColor(color: Color) {
-        _uiState.value = _uiState.value.copy(selectedColor = color)
-
-        val currentState = _uiState.value
-        if (!currentState.colorPalette.contains(color)) {
-            _uiState.value = currentState.copy(
-                colorPalette = listOf(color) + currentState.colorPalette
-            )
-        }
+        colorPaletteRepository.addColorToPalette(color)
+        colorPaletteRepository.setActiveColor(color)
     }
 
     fun selectTool(tool: Tool) {
@@ -88,18 +82,14 @@ class DrawingScreenViewModel(
         col: Int,
     ) {
         val tool = _uiState.value.selectedTool
-        val color = _uiState.value.selectedColor
+        val color = activeColor.value
 
         Log.d(
             "DrawingScreenViewModel",
-            "Applying tool: ${tool.name} at row=$row, col=$col with color=$color"
+            "Applying tool: ${tool.name} at row=$row, col=$col with color=${color.value}"
         )
 
         tool.apply(pixelCanvasUseCase, row, col, color)
-
-        if (tool is EyedropperTool) {
-            selectColor(color)
-        }
     }
 
     fun getPixelData(row: Int, col: Int): Color {
@@ -220,24 +210,22 @@ class DrawingScreenViewModel(
         }
     }
 
-    suspend fun importFromFile(context: Context, uri: Uri): List<Color> {
-        return colorPaletteRepository.importPaletteFromFile(context, uri)
+    suspend fun importColorsFromFile(uri: Uri): List<Color> {
+        return lospecColorPaletteRepository.importPaletteFromFile(uri)
             .map { it.colors }
             .getOrElse { emptyList() }
     }
 
-    suspend fun importFromUrl(url: String): List<Color> {
-        return colorPaletteRepository.fetchPaletteFromUrl(url)
+    suspend fun importColorsFromLospecUrl(url: String): List<Color> {
+        return lospecColorPaletteRepository.fetchPaletteFromUrl(url)
             .map { it.colors }
             .getOrElse { emptyList() }
     }
 
     fun updateColorPalette(colors: List<Color>) {
         if (colors.isNotEmpty()) {
-            _uiState.value = _uiState.value.copy(
-                colorPalette = colors,
-                selectedColor = colors.first()
-            )
+            colorPaletteRepository.updatePalette(colors)
+            colorPaletteRepository.setActiveColor(colors.first())
         }
     }
 }

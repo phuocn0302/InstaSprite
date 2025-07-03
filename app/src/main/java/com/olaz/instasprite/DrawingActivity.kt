@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
+import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
@@ -48,8 +49,8 @@ class DrawingActivity : ComponentActivity() {
         val database = AppDatabase.getInstance(applicationContext)
         val spriteDataRepository = ISpriteDatabaseRepository(database.spriteDataDao(), database.spriteMetaDataDao())
 
-        val defaultPalette = ColorPaletteRepository.createDefaultPalette(applicationContext)
-        val colorPaletteRepository = ColorPaletteRepository(defaultPalette)
+        val colorPaletteRepository = ColorPaletteRepository(applicationContext)
+        val lospecColorPaletteRepository = LospecColorPaletteRepository(applicationContext)
 
         viewModel = DrawingScreenViewModel(
             spriteId = spriteId!!,
@@ -57,7 +58,7 @@ class DrawingActivity : ComponentActivity() {
             pixelCanvasRepository = pixelCanvasRepository,
             spriteDataRepository = spriteDataRepository,
             colorPaletteRepository = colorPaletteRepository,
-            context = applicationContext
+            lospecColorPaletteRepository = lospecColorPaletteRepository,
         )
 
         lifecycleScope.launch {

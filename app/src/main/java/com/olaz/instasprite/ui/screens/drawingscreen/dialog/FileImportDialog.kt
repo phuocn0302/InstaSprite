@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.components
+package com.olaz.instasprite.ui.screens.drawingscreen.dialog
 
 import android.content.Intent
 import android.provider.OpenableColumns
@@ -56,9 +56,9 @@ fun FileImportDialog(
 
                 scope.launch {
                     try {
-                        val colors = viewModel.importFromFile(context, it)
+                        val colors = viewModel.importColorsFromFile(it)
                         if (colors.isEmpty()) {
-                                Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT).show()
                             previewColors = null
                         } else {
                             previewColors = colors

@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.components
+package com.olaz.instasprite.ui.screens.drawingscreen.dialog
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -121,7 +121,7 @@ fun LospecImportDialog(
                             }
 
                             try {
-                                val colors = viewModel.importFromUrl(trimmedUrl)
+                                val colors = viewModel.importColorsFromLospecUrl(trimmedUrl)
                                 if (colors.isEmpty()) {
                                     Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT).show()
                                     previewColors = null

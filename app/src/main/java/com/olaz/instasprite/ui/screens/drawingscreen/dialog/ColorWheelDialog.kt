@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.screens.drawingscreen
+package com.olaz.instasprite.ui.screens.drawingscreen.dialog
 
 
 import android.graphics.Bitmap
@@ -23,14 +23,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -39,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,18 +54,16 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toRect
+import com.olaz.instasprite.ui.components.dialog.CustomDialog
+import com.olaz.instasprite.ui.screens.drawingscreen.ColorPaletteContent
+import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
+import com.olaz.instasprite.ui.theme.HomeScreenColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import android.graphics.Color as AndroidColor
-import androidx.core.graphics.createBitmap
-import com.olaz.instasprite.ui.theme.HomeScreenColor
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -79,8 +74,7 @@ fun ColorWheelDialog(
     onColorSelected: (Color) -> Unit,
     viewModel: DrawingScreenViewModel
 ) {
-    var showImportDialog by remember { mutableStateOf(false) }
-    val colorPaletteState by viewModel.uiState.collectAsState()
+    val colorPaletteState by viewModel.colorPalette.collectAsState()
     
     val hsv = remember {
         val hsvArray = floatArrayOf(0f, 0f, 0f)
@@ -124,7 +118,7 @@ fun ColorWheelDialog(
             val hsvArray = floatArrayOf(0f, 0f, 0f)
             AndroidColor.colorToHSV(color.toArgb(), hsvArray)
             hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -138,9 +132,11 @@ fun ColorWheelDialog(
                 AndroidColor.colorToHSV(color.toArgb(), hsvArray)
                 hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
+
+    var showImportDialog by remember { mutableStateOf(false) }
 
     if (showImportDialog) {
         ImportColorPalettesDialog(
@@ -161,27 +157,20 @@ fun ColorWheelDialog(
         )
     }
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .width(380.dp)
-                .background(
-                    color = HomeScreenColor.BackgroundColor,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .padding(20.dp)
-        ) {
+    CustomDialog(
+        title = "Color Wheel",
+        onDismiss = onDismiss,
+        confirmButtonText = "Select Color",
+        onConfirm = {
+            onColorSelected(selectedColor.value)
+            onDismiss()
+        },
+        content = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-
-
                 SatValPanel(
                     hue = hsv.value.first,
                     saturation = hsv.value.second,
@@ -193,16 +182,18 @@ fun ColorWheelDialog(
 
                 Row {
                     HueBar(
-                        hue = hsv.value.first
+                        hue = hsv.value.first,
+                        modifier = Modifier
+                            .height(40.dp)
+                            .weight(0.7f)
                     ) { hue ->
                         hsv.value = Triple(hue, hsv.value.second, hsv.value.third)
                         updateInputFields()
                     }
 
-                    Spacer(modifier = Modifier.width(20.dp))
-
                     Box(
                         modifier = Modifier
+                            .padding(start = 8.dp)
                             .size(40.dp)
                             .border(
                                 width = 2.dp,
@@ -213,174 +204,96 @@ fun ColorWheelDialog(
                                 color = selectedColor.value,
                                 shape = RoundedCornerShape(10.dp)
                             )
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(10.dp))
                     )
                 }
 
-                LazyRow(
+                ColorPaletteContent(
+                    colors = colorPaletteState,
+                    onColorSelected = { color ->
+                        val hsvArray = floatArrayOf(0f, 0f, 0f)
+                        AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                        hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                        updateInputFields()
+                    },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(colorPaletteState.colorPalette) { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.White.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .background(
-                                    color = color,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .clickable {
-                                    val hsvArray = floatArrayOf(0f, 0f, 0f)
-                                    AndroidColor.colorToHSV(color.toArgb(), hsvArray)
-                                    hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-                                    updateInputFields()
-                                }
+                        .fillMaxWidth(),
+                    colorItemModifier = Modifier
+                        .size(40.dp)
+                        .border(
+                            width = 2.dp,
+                            color = Color.White,
+                            shape = RoundedCornerShape(10.dp)
                         )
-                    }
-                }
+                        .clip(RoundedCornerShape(10.dp)),
+                    isInteractive = true
+                )
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
+                Column {
+                    ColorInputTextField(
                         value = hexValue.value,
                         onValueChange = { newText ->
                             val filtered = newText.uppercase().filter { it in "0123456789ABCDEF" }
                             hexValue.value = filtered.take(6)
                             updateColorFromHex()
                         },
-                        label = { Text("Hex") },
-                        placeholder = {
-                            Text(
-                                text = "FFFFFF",
-                                color = Color.White
-                            )
-                        },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.White,
-                        ),
-                        modifier = Modifier.weight(.4f)
+                        label = "Hex",
+                        placeholder = "FFFFFF",
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    OutlinedTextField(
-                        value = redValue.value,
-                        onValueChange = { newText ->
-                            val filtered = newText.filter { it in "0123456789" }
-                            if (filtered.isEmpty()) {
-                                redValue.value = ""
-                            } else {
-                                val number = filtered.take(3).toInt()
-                                redValue.value = when {
-                                    number <= 255 -> filtered
-                                    else -> "255"
-                                }
-                            }
-                            updateColorFromRGB()
-                        },
-                        label = { Text("R") },
-                        placeholder = {
-                            Text(
-                                text = "0",
-                                color = Color.White
-                            )
-                        },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.White,
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(.2f)
-                    )
-                    OutlinedTextField(
-                        value = greenValue.value,
-                        onValueChange = { newText ->
-                            val filtered = newText.filter { it in "0123456789" }
-                            if (filtered.isEmpty()) {
-                                greenValue.value = ""
-                            } else {
-                                val number = filtered.take(3).toInt()
-                                greenValue.value = when {
-                                    number <= 255 -> filtered
-                                    else -> "255"
-                                }
-                            }
-                            updateColorFromRGB()
-                        },
-                        label = { Text("G") },
-                        placeholder = {
-                            Text(
-                                text = "0",
-                                color = Color.White
-                            )
-                        },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.White,
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(.2f)
-                    )
-                    OutlinedTextField(
-                        value = blueValue.value,
-                        onValueChange = { newText ->
-                            val filtered = newText.filter { it in "0123456789" }
-                            if (filtered.isEmpty()) {
-                                blueValue.value = ""
-                            } else {
-                                val number = filtered.take(3).toInt()
-                                blueValue.value = when {
-                                    number <= 255 -> filtered
-                                    else -> "255"
-                                }
-                            }
-                            updateColorFromRGB()
-                        },
-                        label = { Text("B") },
-                        placeholder = {
-                            Text(
-                                text = "0",
-                            )
-                        },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.White,
-                            unfocusedLabelColor = Color.White,
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(.2f)
-                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        ColorInputTextField(
+                            value = redValue.value,
+                            onValueChange = { newText ->
+                                val filtered = newText.filter { it in "0123456789" }
+                                redValue.value = if (filtered.isEmpty()) "" else minOf(
+                                    filtered.take(3).toInt(),
+                                    255
+                                ).toString()
+                                updateColorFromRGB()
+                            },
+                            label = "R",
+                            placeholder = "0",
+                            modifier = Modifier.weight(0.2f),
+                            keyboardType = KeyboardType.Number
+                        )
+
+                        ColorInputTextField(
+                            value = greenValue.value,
+                            onValueChange = { newText ->
+                                val filtered = newText.filter { it in "0123456789" }
+                                greenValue.value = if (filtered.isEmpty()) "" else minOf(
+                                    filtered.take(3).toInt(),
+                                    255
+                                ).toString()
+                                updateColorFromRGB()
+                            },
+                            label = "G",
+                            placeholder = "0",
+                            modifier = Modifier.weight(0.2f),
+                            keyboardType = KeyboardType.Number
+                        )
+
+                        ColorInputTextField(
+                            value = blueValue.value,
+                            onValueChange = { newText ->
+                                val filtered = newText.filter { it in "0123456789" }
+                                blueValue.value = if (filtered.isEmpty()) "" else minOf(
+                                    filtered.take(3).toInt(),
+                                    255
+                                ).toString()
+                                updateColorFromRGB()
+                            },
+                            label = "B",
+                            placeholder = "0",
+                            modifier = Modifier.weight(0.2f),
+                            keyboardType = KeyboardType.Number
+                        )
+                    }
                 }
 
                 Button(
@@ -392,50 +305,45 @@ fun ColorWheelDialog(
                 ) {
                     Text("Import Color Palettes")
                 }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            onColorSelected(selectedColor.value)
-                            onDismiss()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = HomeScreenColor.ButtonColor
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier
-                            .height(50.dp)
-                            .weight(1f)
-                    ) {
-                        Text("Select")
-                    }
-
-                    Button(
-                        onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = HomeScreenColor.ButtonColor
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier
-                            .height(50.dp)
-                            .weight(1f)
-                    ) {
-                        Text("Cancel")
-                    }
-                }
             }
         }
-    }
+    )
 }
 
 
+@Composable
+private fun ColorInputTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        placeholder = { Text(placeholder, color = Color.White) },
+        singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            cursorColor = Color.White,
+            focusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.Gray,
+            focusedLabelColor = Color.White,
+            unfocusedLabelColor = Color.White,
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        modifier = modifier
+    )
+}
 
 @Composable
-fun HueBar(
+private fun HueBar(
     hue: Float,
+    modifier: Modifier = Modifier,
     setColor: (Float) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -447,15 +355,13 @@ fun HueBar(
     }
 
     Canvas(
-        modifier = Modifier
-            .height(40.dp)
-            .width(280.dp)
+        modifier = modifier
             .border(
                 width = 2.dp,
                 color = Color.White,
-                shape = RoundedCornerShape(50)
+                shape = RoundedCornerShape(10.dp)
             )
-            .clip(RoundedCornerShape(50))
+            .clip(RoundedCornerShape(10.dp))
             .emitDragGesture(interactionSource)
     ) {
         val drawScopeSize = size
@@ -520,7 +426,7 @@ fun HueBar(
 }
 
 @Composable
-fun SatValPanel(
+private fun SatValPanel(
     hue: Float,
     saturation: Float,
     value: Float,
@@ -652,7 +558,7 @@ fun SatValPanel(
 }
 
 
-fun CoroutineScope.collectForPress(
+private fun CoroutineScope.collectForPress(
     interactionSource: InteractionSource,
     setOffset: (Offset) -> Unit
 ) {

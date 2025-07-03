@@ -3,27 +3,31 @@ package com.olaz.instasprite.domain.usecase
 import androidx.compose.ui.graphics.Color
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
+import com.olaz.instasprite.data.repository.ColorPaletteRepository
 
-class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
+class PixelCanvasUseCase(
+    private val pixelCanvasRepository: PixelCanvasRepository,
+    private val colorPaletteRepository: ColorPaletteRepository,
+) {
 
     fun getCanvasWidth(): Int {
-        return repo.width
+        return pixelCanvasRepository.width
     }
 
     fun getCanvasHeight(): Int {
-        return repo.height
+        return pixelCanvasRepository.height
     }
 
     fun setPixel(row: Int, col: Int, color: Color) {
-        repo.setPixel(row, col, color)
+        pixelCanvasRepository.setPixel(row, col, color)
     }
 
     fun getPixel(row: Int, col: Int): Color {
-        return repo.getPixel(row, col)
+        return pixelCanvasRepository.getPixel(row, col)
     }
 
     fun setCanvas(width: Int, height: Int, pixels: List<Color>? = null) {
-        repo.setCanvas(width, height, pixels)
+        pixelCanvasRepository.setCanvas(width, height, pixels)
     }
 
     fun setCanvas(spriteData: ISpriteData) {
@@ -32,20 +36,24 @@ class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
     }
 
     fun setAllPixels(pixels: List<Color>) {
-        repo.setAllPixels(pixels)
+        pixelCanvasRepository.setAllPixels(pixels)
     }
 
     fun getAllPixels(): List<Color> {
-        return repo.getAllPixels()
+        return pixelCanvasRepository.getAllPixels()
     }
 
     fun getISpriteData(): ISpriteData {
-        return repo.getISpriteData()
+        return pixelCanvasRepository.getISpriteData()
+    }
+
+    fun selectColor(color: Color) {
+        colorPaletteRepository.setActiveColor(color)
     }
 
     fun rotateCanvas(pixels: List<Color>) {
-        val width = repo.width
-        val height = repo.height
+        val width = pixelCanvasRepository.width
+        val height = pixelCanvasRepository.height
         val rotatedPixels = mutableListOf<Color>()
 
         for (row in 0 until height) {
@@ -54,9 +62,9 @@ class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
                 val newCol = row
 
                 if (newRow >= 0 && newRow < height && newCol < width) {
-                    val Index = newRow * width + newCol
-                    if (Index < pixels.size) {
-                        rotatedPixels.add(pixels[Index])
+                    val index = newRow * width + newCol
+                    if (index < pixels.size) {
+                        rotatedPixels.add(pixels[index])
                     } else {
                         rotatedPixels.add(Color.Transparent)
                     }
@@ -70,8 +78,8 @@ class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
     }
 
     fun hFlipCanvas(pixels: List<Color>) {
-        val width = repo.width
-        val height = repo.height
+        val width = pixelCanvasRepository.width
+        val height = pixelCanvasRepository.height
         val flippedPixels = mutableListOf<Color>()
 
         for (row in 0 until height) {
@@ -83,8 +91,8 @@ class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
     }
 
     fun vFlipCanvas(pixels: List<Color>) {
-        val width = repo.width
-        val height = repo.height
+        val width = pixelCanvasRepository.width
+        val height = pixelCanvasRepository.height
         val flippedPixels = mutableListOf<Color>()
 
         for (row in height - 1 downTo 0) {
@@ -96,5 +104,5 @@ class PixelCanvasUseCase(private val repo: PixelCanvasRepository) {
         return setAllPixels(flippedPixels)
     }
 
-    val pixelChanged = repo.pixelChanged
+    val pixelChanged = pixelCanvasRepository.pixelChanged
 }

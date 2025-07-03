@@ -1,10 +1,8 @@
-package com.olaz.instasprite.ui.screens.drawingscreen
+package com.olaz.instasprite.ui.screens.drawingscreen.dialog
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import com.olaz.instasprite.ui.components.FileImportDialog
-import com.olaz.instasprite.ui.components.ImportOptionsDialog
-import com.olaz.instasprite.ui.components.LospecImportDialog
+import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
 
 @Composable
 fun ImportColorPalettesDialog(

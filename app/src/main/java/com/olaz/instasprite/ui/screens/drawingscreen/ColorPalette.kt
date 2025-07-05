@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -22,20 +24,26 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.ColorWheelDialog
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.toHexString
+import kotlinx.coroutines.launch
 
 @Composable
 fun ColorPalette(
@@ -45,7 +53,27 @@ fun ColorPalette(
 
     val colorPalette by viewModel.colorPalette.collectAsState()
     val activeColor by viewModel.activeColor.collectAsState()
+    val lazyListState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
+    LaunchedEffect(activeColor) {
+        if (activeColor in colorPalette) {
+            val index = colorPalette.indexOf(activeColor)
+            val visibleIndices = lazyListState.layoutInfo.visibleItemsInfo.map { it.index }
+
+            if (index !in visibleIndices) {
+                coroutineScope.launch {
+                    lazyListState.scrollItemToCenter(
+                        index = index,
+                        itemSizeDp = 40.dp,
+                        itemSpacingDp = 6.dp,
+                        density = density
+                    )
+                }
+            }
+        }
+    }
 
     var showColorWheel by remember { mutableStateOf(false) }
     if (showColorWheel) {
@@ -64,6 +92,7 @@ fun ColorPalette(
         modifier = modifier,
     ) {
         ColorPaletteContent(
+            lazyListState = lazyListState,
             colors = colorPalette,
             activeColor = activeColor,
             onColorSelected = viewModel::selectColor,
@@ -80,7 +109,19 @@ fun ColorPalette(
         ) {
             ActiveColor(
                 activeColor = activeColor,
-                onClick = {},
+                onClick = {
+                    if (activeColor in colorPalette) {
+                        val index = colorPalette.indexOf(activeColor)
+                        coroutineScope.launch {
+                            lazyListState.scrollItemToCenter(
+                                index = index,
+                                itemSizeDp = 40.dp,
+                                itemSpacingDp = 6.dp,
+                                density = density
+                            )
+                        }
+                    }
+                },
                 modifier = Modifier
                     .height(40.dp)
                     .width(86.dp) // Equal two color item in palette + spacing
@@ -133,6 +174,7 @@ private fun ActiveColor(
 @Composable
 fun ColorPaletteContent(
     colors: List<Color>,
+    lazyListState: LazyListState = LazyListState(),
     activeColor: Color? = null,
     onColorSelected: ((Color) -> Unit)? = null,
     modifier: Modifier = Modifier,
@@ -155,6 +197,7 @@ fun ColorPaletteContent(
         }
 
         LazyRow(
+            state = lazyListState,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             items(colors) { color ->
@@ -198,4 +241,17 @@ fun ColorItem(
                 }
             )
     )
+}
+
+private suspend fun LazyListState.scrollItemToCenter(
+    index: Int,
+    itemSizeDp: Dp,
+    itemSpacingDp: Dp,
+    density: Density
+) {
+    val itemSizeWithSpacing = itemSizeDp + itemSpacingDp
+    val itemSizePx = with(density) { itemSizeWithSpacing.toPx().toInt() }
+
+    val centerOffset = -((layoutInfo.viewportEndOffset - itemSizePx) / 2)
+    animateScrollToItem(index, centerOffset)
 }

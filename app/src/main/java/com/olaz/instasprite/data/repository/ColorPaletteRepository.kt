@@ -1,6 +1,7 @@
 package com.olaz.instasprite.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.olaz.instasprite.R
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import kotlin.collections.ArrayDeque
 
 class ColorPaletteRepository(private val context: Context) {
 
@@ -20,13 +22,18 @@ class ColorPaletteRepository(private val context: Context) {
     private val _activeColor = MutableStateFlow(_colors.value.firstOrNull() ?: Color.Unspecified)
     val activeColor: StateFlow<Color> = _activeColor.asStateFlow()
 
+    private val _recentColors = MutableStateFlow(ArrayDeque<Color> ())
+    val recentColors: StateFlow<ArrayDeque<Color>> = _recentColors.asStateFlow()
+
     fun addColorToPalette(color: Color) {
         if (color !in _colors.value) {
-            _colors.value = (listOf(color) + _colors.value) as MutableList<Color>
+            _colors.value = mutableListOf(color).apply { addAll(_colors.value) }
         }
     }
 
     fun setActiveColor(color: Color) {
+        addColorToRecent(_activeColor.value)
+
         if (color !in _colors.value) {
             addColorToPalette(color)
         }
@@ -37,6 +44,15 @@ class ColorPaletteRepository(private val context: Context) {
         if (colors.isNotEmpty()) {
             _colors.value = colors.toMutableList()
             setActiveColor(colors.first())
+        }
+    }
+
+    private fun addColorToRecent(color: Color) {
+        _recentColors.value.remove(color)
+        _recentColors.value.addFirst(color)
+
+        if (_recentColors.value.size > 100) {
+            _recentColors.value.removeLast()
         }
     }
 }

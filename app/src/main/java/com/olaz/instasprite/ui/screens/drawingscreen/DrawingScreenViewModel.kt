@@ -62,6 +62,7 @@ class DrawingScreenViewModel(
 
     var colorPalette = colorPaletteRepository.colors
     var activeColor = colorPaletteRepository.activeColor
+    var recentColors = colorPaletteRepository.recentColors
 
     fun setCanvasSize(width: Int, height: Int) {
         pixelCanvasUseCase.setCanvas(width, height)
@@ -69,7 +70,6 @@ class DrawingScreenViewModel(
     }
 
     fun selectColor(color: Color) {
-        colorPaletteRepository.addColorToPalette(color)
         colorPaletteRepository.setActiveColor(color)
     }
 

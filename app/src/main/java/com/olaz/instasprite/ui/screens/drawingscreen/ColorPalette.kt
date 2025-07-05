@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,18 +54,22 @@ fun ColorPalette(
 
     val colorPalette by viewModel.colorPalette.collectAsState()
     val activeColor by viewModel.activeColor.collectAsState()
-    val lazyListState = rememberLazyListState()
+    val recentColors by viewModel.recentColors.collectAsState()
+
+    val colorPaletteListState = rememberLazyListState()
+    val recentColorsListState = rememberLazyListState()
+
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
     LaunchedEffect(activeColor) {
         if (activeColor in colorPalette) {
             val index = colorPalette.indexOf(activeColor)
-            val visibleIndices = lazyListState.layoutInfo.visibleItemsInfo.map { it.index }
+            val visibleIndices = colorPaletteListState.layoutInfo.visibleItemsInfo.map { it.index }
 
             if (index !in visibleIndices) {
                 coroutineScope.launch {
-                    lazyListState.scrollItemToCenter(
+                    colorPaletteListState.scrollItemToCenter(
                         index = index,
                         itemSizeDp = 40.dp,
                         itemSpacingDp = 6.dp,
@@ -72,6 +77,12 @@ fun ColorPalette(
                     )
                 }
             }
+        }
+    }
+
+    LaunchedEffect(recentColors.firstOrNull()) {
+        coroutineScope.launch {
+            recentColorsListState.animateScrollToItem(0)
         }
     }
 
@@ -92,7 +103,7 @@ fun ColorPalette(
         modifier = modifier,
     ) {
         ColorPaletteContent(
-            lazyListState = lazyListState,
+            lazyListState = colorPaletteListState,
             colors = colorPalette,
             activeColor = activeColor,
             onColorSelected = viewModel::selectColor,
@@ -113,7 +124,7 @@ fun ColorPalette(
                     if (activeColor in colorPalette) {
                         val index = colorPalette.indexOf(activeColor)
                         coroutineScope.launch {
-                            lazyListState.scrollItemToCenter(
+                            colorPaletteListState.scrollItemToCenter(
                                 index = index,
                                 itemSizeDp = 40.dp,
                                 itemSpacingDp = 6.dp,
@@ -128,7 +139,10 @@ fun ColorPalette(
             )
 
             IconButton(
-                onClick = { showColorWheel = true }
+                onClick = { showColorWheel = true },
+                modifier = Modifier
+                    .size(45.dp)
+                    .padding(horizontal = 2.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -137,9 +151,41 @@ fun ColorPalette(
                     modifier = Modifier.size(32.dp)
                 )
             }
+
+            // Recent Colors section
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(40.dp)
+                    .background(DrawingScreenColor.BackgroundColor),
+                contentAlignment = Alignment.Center
+            ) {
+                ColorPaletteContent(
+                    lazyListState = recentColorsListState,
+                    colors = recentColors.toList(),
+                    onColorSelected = viewModel::selectColor,
+                    colorItemModifier = Modifier.size(30.dp),
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    itemSpacingDp = 0.dp,
+                    isInteractive = true
+                )
+            }
+
+            // Opt button: show a TODO: dialog with canvas option
+            IconButton(
+                onClick = { },
+                modifier = Modifier
+                    .size(45.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Show opts",
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
         }
     }
-
 }
 
 @Composable
@@ -174,11 +220,12 @@ private fun ActiveColor(
 @Composable
 fun ColorPaletteContent(
     colors: List<Color>,
-    lazyListState: LazyListState = LazyListState(),
+    lazyListState: LazyListState = rememberLazyListState(),
     activeColor: Color? = null,
     onColorSelected: ((Color) -> Unit)? = null,
     modifier: Modifier = Modifier,
     colorItemModifier: Modifier? = null,
+    itemSpacingDp: Dp = 6.dp,
     isInteractive: Boolean = false,
     showPreviewLabel: Boolean = false
 ) {
@@ -198,7 +245,7 @@ fun ColorPaletteContent(
 
         LazyRow(
             state = lazyListState,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(itemSpacingDp),
         ) {
             items(colors) { color ->
                 val borderColor = if (isInteractive && color == activeColor) {

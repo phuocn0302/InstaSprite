@@ -174,7 +174,7 @@ private fun ActiveColor(
 @Composable
 fun ColorPaletteContent(
     colors: List<Color>,
-    lazyListState: LazyListState = LazyListState(),
+    lazyListState: LazyListState =  rememberLazyListState(),
     activeColor: Color? = null,
     onColorSelected: ((Color) -> Unit)? = null,
     modifier: Modifier = Modifier,

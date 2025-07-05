@@ -128,7 +128,10 @@ fun ColorPalette(
             )
 
             IconButton(
-                onClick = { showColorWheel = true }
+                onClick = { showColorWheel = true },
+                modifier = Modifier
+                    .size(45.dp)
+                    .padding(horizontal = 2.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

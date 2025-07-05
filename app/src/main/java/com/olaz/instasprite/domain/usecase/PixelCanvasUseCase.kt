@@ -52,29 +52,23 @@ class PixelCanvasUseCase(
     }
 
     fun rotateCanvas(pixels: List<Color>) {
-        val width = pixelCanvasRepository.width
-        val height = pixelCanvasRepository.height
-        val rotatedPixels = mutableListOf<Color>()
+        val oldWidth = pixelCanvasRepository.width
+        val oldHeight = pixelCanvasRepository.height
+        val rotatedPixels = MutableList(pixels.size) { Color.Transparent }
 
-        for (row in 0 until height) {
-            for (col in 0 until width) {
-                val newRow = height - 1 - col
-                val newCol = row
-
-                if (newRow >= 0 && newRow < height && newCol < width) {
-                    val index = newRow * width + newCol
-                    if (index < pixels.size) {
-                        rotatedPixels.add(pixels[index])
-                    } else {
-                        rotatedPixels.add(Color.Transparent)
-                    }
-                } else {
-                    rotatedPixels.add(Color.Transparent)
+        for (row in 0 until oldHeight) {
+            for (col in 0 until oldWidth) {
+                val oldIndex = row * oldWidth + col
+                val newRow = col
+                val newCol = oldHeight - 1 - row
+                val newIndex = newRow * oldHeight + newCol
+                if (newIndex in rotatedPixels.indices && oldIndex in pixels.indices) {
+                    rotatedPixels[newIndex] = pixels[oldIndex]
                 }
             }
         }
 
-        return setAllPixels(rotatedPixels)
+        return pixelCanvasRepository.setCanvas(oldHeight, oldWidth, rotatedPixels)
     }
 
     fun hFlipCanvas(pixels: List<Color>) {

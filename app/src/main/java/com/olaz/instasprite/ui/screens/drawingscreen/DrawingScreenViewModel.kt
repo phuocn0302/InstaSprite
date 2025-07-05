@@ -114,6 +114,12 @@ class DrawingScreenViewModel(
 
     fun rotate() {
         pixelCanvasUseCase.rotateCanvas(pixelCanvasUseCase.getAllPixels())
+
+        _uiState.value = _uiState.value.copy(
+            canvasWidth = pixelCanvasUseCase.getCanvasWidth(),
+            canvasHeight = pixelCanvasUseCase.getCanvasHeight()
+        )
+
         saveState()
     }
 

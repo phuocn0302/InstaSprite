@@ -158,7 +158,6 @@ fun ColorWheelDialog(
     }
 
     CustomDialog(
-        title = "Color Wheel",
         onDismiss = onDismiss,
         confirmButtonText = "Select Color",
         onConfirm = {

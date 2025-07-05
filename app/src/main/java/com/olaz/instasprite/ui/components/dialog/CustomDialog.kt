@@ -1,14 +1,18 @@
 package com.olaz.instasprite.ui.components.dialog
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,7 +20,7 @@ import com.olaz.instasprite.ui.theme.DrawingScreenColor
 
 @Composable
 fun CustomDialog(
-    title: String,
+    title: String? = null,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     confirmButtonText: String = "OK",
@@ -27,7 +31,19 @@ fun CustomDialog(
         onDismissRequest = onDismiss,
         containerColor = DrawingScreenColor.PaletteBarColor,
         title = {
-            Text(title, color = Color.White)
+            if (title != null)
+            {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = title,
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
         },
         text = {
             Column(

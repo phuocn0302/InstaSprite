@@ -114,14 +114,17 @@ class DrawingScreenViewModel(
 
     fun rotate() {
         pixelCanvasUseCase.rotateCanvas(pixelCanvasUseCase.getAllPixels())
+        saveState()
     }
 
     fun hFlip() {
         pixelCanvasUseCase.hFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        saveState()
     }
 
     fun vFlip() {
         pixelCanvasUseCase.vFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        saveState()
     }
 
     suspend fun getLastSavedLocation(): Uri? {

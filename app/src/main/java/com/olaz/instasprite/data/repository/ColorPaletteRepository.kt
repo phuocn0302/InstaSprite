@@ -22,7 +22,7 @@ class ColorPaletteRepository(private val context: Context) {
     private val _activeColor = MutableStateFlow(_colors.value.firstOrNull() ?: Color.Unspecified)
     val activeColor: StateFlow<Color> = _activeColor.asStateFlow()
 
-    private val _recentColors = MutableStateFlow(ArrayDeque<Color> ())
+    private val _recentColors = MutableStateFlow(ArrayDeque<Color>())
     val recentColors: StateFlow<ArrayDeque<Color>> = _recentColors.asStateFlow()
 
     fun addColorToPalette(color: Color) {
@@ -31,8 +31,10 @@ class ColorPaletteRepository(private val context: Context) {
         }
     }
 
-    fun setActiveColor(color: Color) {
-        addColorToRecent(_activeColor.value)
+    fun setActiveColor(color: Color, addColorToRecent: Boolean = true) {
+        if (addColorToRecent) {
+            addColorToRecent(_activeColor.value)
+        }
 
         if (color !in _colors.value) {
             addColorToPalette(color)
@@ -43,7 +45,7 @@ class ColorPaletteRepository(private val context: Context) {
     fun updatePalette(colors: List<Color>) {
         if (colors.isNotEmpty()) {
             _colors.value = colors.toMutableList()
-            setActiveColor(colors.first())
+            setActiveColor(colors.first(), addColorToRecent = false)
         }
     }
 

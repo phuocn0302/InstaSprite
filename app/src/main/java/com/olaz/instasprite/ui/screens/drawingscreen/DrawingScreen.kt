@@ -60,7 +60,7 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
             ColorPalette(
                 modifier = Modifier
                     .background(DrawingScreenColor.PaletteBarColor)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
                 viewModel = viewModel
             )
         },

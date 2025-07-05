@@ -20,8 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.ui.components.composable.ColorPaletteList
+import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
-import com.olaz.instasprite.ui.screens.drawingscreen.ColorPaletteContent
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import kotlinx.coroutines.launch
@@ -90,9 +91,11 @@ fun LospecImportDialog(
                 )
 
                 if (previewColors != null) {
-                    ColorPaletteContent(
-                        colors = previewColors!!,
-                        showPreviewLabel = true
+                    ColorPaletteList(
+                        colorPaletteListOptions = ColorPaletteListOptions(
+                            colors = previewColors!!,
+                            isInteractive = false
+                        )
                     )
                 }
 

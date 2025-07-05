@@ -57,8 +57,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toRect
+import com.olaz.instasprite.ui.components.composable.ColorPaletteList
+import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
-import com.olaz.instasprite.ui.screens.drawingscreen.ColorPaletteContent
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
 import com.olaz.instasprite.ui.theme.HomeScreenColor
 import kotlinx.coroutines.CoroutineScope
@@ -207,25 +208,16 @@ fun ColorWheelDialog(
                     )
                 }
 
-                ColorPaletteContent(
-                    colors = colorPaletteState,
-                    onColorSelected = { color ->
-                        val hsvArray = floatArrayOf(0f, 0f, 0f)
-                        AndroidColor.colorToHSV(color.toArgb(), hsvArray)
-                        hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-                        updateInputFields()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colorItemModifier = Modifier
-                        .size(40.dp)
-                        .border(
-                            width = 2.dp,
-                            color = Color.White,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .clip(RoundedCornerShape(10.dp)),
-                    isInteractive = true
+                ColorPaletteList(
+                    colorPaletteListOptions = ColorPaletteListOptions(
+                        colors = colorPaletteState,
+                        onColorSelected = { color ->
+                            val hsvArray = floatArrayOf(0f, 0f, 0f)
+                            AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                            hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                            updateInputFields()
+                        },
+                    )
                 )
 
                 Column {

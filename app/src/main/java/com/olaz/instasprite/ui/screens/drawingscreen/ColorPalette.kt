@@ -3,19 +3,15 @@ package com.olaz.instasprite.ui.screens.drawingscreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -40,7 +36,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.olaz.instasprite.ui.components.composable.ColorPaletteList
+import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.ColorWheelDialog
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.toHexString
@@ -102,12 +99,13 @@ fun ColorPalette(
     Column(
         modifier = modifier,
     ) {
-        ColorPaletteContent(
+        ColorPaletteList(
+            colorPaletteListOptions = ColorPaletteListOptions(
+                colors = colorPalette,
+                activeColor = activeColor,
+                onColorSelected = viewModel::selectColor,
+            ),
             lazyListState = colorPaletteListState,
-            colors = colorPalette,
-            activeColor = activeColor,
-            onColorSelected = viewModel::selectColor,
-            isInteractive = true
         )
 
         // ColorPaletteContent already has 4.dp padding; add 2.dp for consistency
@@ -126,8 +124,8 @@ fun ColorPalette(
                         coroutineScope.launch {
                             colorPaletteListState.scrollItemToCenter(
                                 index = index,
-                                itemSizeDp = 40.dp,
-                                itemSpacingDp = 6.dp,
+                                itemSizeDp = 30.dp,
+                                itemSpacingDp = 0.dp,
                                 density = density
                             )
                         }
@@ -135,7 +133,7 @@ fun ColorPalette(
                 },
                 modifier = Modifier
                     .height(40.dp)
-                    .width(86.dp) // Equal two color item in palette + spacing
+                    .width(86.dp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
             )
 
             IconButton(
@@ -153,23 +151,16 @@ fun ColorPalette(
             }
 
             // Recent Colors section
-            Box(
+            ColorPaletteList(
+                colorPaletteListOptions = ColorPaletteListOptions(
+                    colors = recentColors.toList(),
+                    listHeight = 40.dp,
+                    onColorSelected = viewModel::selectColor,
+                ),
+                lazyListState = recentColorsListState,
                 modifier = Modifier
                     .weight(1f)
-                    .height(40.dp)
-                    .background(DrawingScreenColor.BackgroundColor),
-                contentAlignment = Alignment.Center
-            ) {
-                ColorPaletteContent(
-                    lazyListState = recentColorsListState,
-                    colors = recentColors.toList(),
-                    onColorSelected = viewModel::selectColor,
-                    colorItemModifier = Modifier.size(30.dp),
-                    modifier = Modifier.padding(horizontal = 5.dp),
-                    itemSpacingDp = 0.dp,
-                    isInteractive = true
-                )
-            }
+            )
 
             // Opt button: show a TODO: dialog with canvas option
             IconButton(
@@ -214,80 +205,6 @@ private fun ActiveColor(
             style = MaterialTheme.typography.bodyLarge
         )
     }
-}
-
-
-@Composable
-fun ColorPaletteContent(
-    colors: List<Color>,
-    lazyListState: LazyListState = rememberLazyListState(),
-    activeColor: Color? = null,
-    onColorSelected: ((Color) -> Unit)? = null,
-    modifier: Modifier = Modifier,
-    colorItemModifier: Modifier? = null,
-    itemSpacingDp: Dp = 6.dp,
-    isInteractive: Boolean = false,
-    showPreviewLabel: Boolean = false
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(if (showPreviewLabel) 16.dp else 0.dp)
-    ) {
-        if (showPreviewLabel) {
-            Text(
-                text = "Preview",
-                color = Color.White,
-                fontSize = 14.sp
-            )
-        }
-
-        LazyRow(
-            state = lazyListState,
-            horizontalArrangement = Arrangement.spacedBy(itemSpacingDp),
-        ) {
-            items(colors) { color ->
-                val borderColor = if (isInteractive && color == activeColor) {
-                    Color.White
-                } else {
-                    DrawingScreenColor.BackgroundColor
-                }
-
-                val modifier = colorItemModifier ?: Modifier
-                    .size(40.dp)
-                    .border(
-                        width = 5.dp,
-                        color = borderColor
-                    )
-
-                ColorItem(
-                    color = color,
-                    onColorSelected = if (isInteractive) onColorSelected else null,
-                    modifier = modifier
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ColorItem(
-    color: Color,
-    onColorSelected: ((Color) -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .background(color)
-            .then(
-                if (onColorSelected != null) {
-                    Modifier.clickable { onColorSelected(color) }
-                } else {
-                    Modifier
-                }
-            )
-    )
 }
 
 private suspend fun LazyListState.scrollItemToCenter(

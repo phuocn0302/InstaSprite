@@ -23,8 +23,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.olaz.instasprite.ui.components.composable.ColorPaletteList
+import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.InputDialog
-import com.olaz.instasprite.ui.screens.drawingscreen.ColorPaletteContent
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
 import kotlinx.coroutines.launch
 
@@ -122,9 +123,11 @@ fun FileImportDialog(
         },
         extraBottomContent = {
             if (previewColors != null) {
-                ColorPaletteContent(
-                    colors = previewColors!!,
-                    showPreviewLabel = true
+                ColorPaletteList(
+                    colorPaletteListOptions = ColorPaletteListOptions(
+                        colors = previewColors!!,
+                        isInteractive = false
+                    )
                 )
             }
         }

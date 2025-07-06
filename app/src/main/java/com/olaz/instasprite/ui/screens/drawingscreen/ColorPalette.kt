@@ -43,6 +43,7 @@ import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.ColorWheelDialog
+import com.olaz.instasprite.ui.screens.drawingscreen.dialog.ResizeCanvasDialog
 import com.olaz.instasprite.ui.theme.DrawingScreenColor
 import com.olaz.instasprite.utils.toHexString
 import kotlinx.coroutines.launch
@@ -50,7 +51,8 @@ import kotlinx.coroutines.launch
 private data class CanvasMenuCallback(
     val onRotateRequest: () -> Unit = {},
     val onHFlipRequest: () -> Unit = {},
-    val onVFlipRequest: () -> Unit = {}
+    val onVFlipRequest: () -> Unit = {},
+    val onResizeRequest: () -> Unit = {},
 )
 
 @Composable
@@ -102,6 +104,14 @@ fun ColorPalette(
                 viewModel.selectColor(color)
                 showColorWheel = false
             },
+            viewModel = viewModel
+        )
+    }
+
+    var showResizeCanvasDialog by remember { mutableStateOf(false) }
+    if (showResizeCanvasDialog) {
+        ResizeCanvasDialog(
+            onDismiss = { showResizeCanvasDialog = false },
             viewModel = viewModel
         )
     }
@@ -195,7 +205,10 @@ fun ColorPalette(
                     menuCallback = CanvasMenuCallback(
                         onRotateRequest = viewModel::rotate,
                         onHFlipRequest = viewModel::hFlip,
-                        onVFlipRequest = viewModel::vFlip
+                        onVFlipRequest = viewModel::vFlip,
+                        onResizeRequest = {
+                            showResizeCanvasDialog = true
+                        }
                     )
                 )
             }
@@ -294,6 +307,23 @@ private fun CanvasMenuDropdownMenu(
                     )
                 },
                 onClick = onVFlipRequest
+            )
+
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "Resize", color = Color.White
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_resize),
+                        contentDescription = "Resize canvas",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(32.dp)
+                    )
+                },
+                onClick = onResizeRequest
             )
         }
     }

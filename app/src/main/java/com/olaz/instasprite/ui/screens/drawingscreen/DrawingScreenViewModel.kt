@@ -46,7 +46,7 @@ class DrawingScreenViewModel(
     private val loadFileUseCase = LoadFileUseCase()
     private val pixelCanvasUseCase = PixelCanvasUseCase(
         pixelCanvasRepository = pixelCanvasRepository,
-        colorPaletteRepository =  colorPaletteRepository
+        colorPaletteRepository = colorPaletteRepository
     )
 
     private val _uiState = MutableStateFlow(
@@ -154,6 +154,15 @@ class DrawingScreenViewModel(
 
     fun vFlip() {
         pixelCanvasUseCase.vFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        saveState()
+    }
+
+    fun resizeCanvas(width: Int, height: Int) {
+        pixelCanvasUseCase.resizeCanvas(width, height)
+        _canvasState.value = _canvasState.value.copy(
+            width = width,
+            height = height
+        )
         saveState()
     }
 

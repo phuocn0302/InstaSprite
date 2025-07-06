@@ -98,5 +98,27 @@ class PixelCanvasUseCase(
         return setAllPixels(flippedPixels)
     }
 
+    fun resizeCanvas(newWidth: Int, newHeight: Int) {
+        val oldWidth = pixelCanvasRepository.width
+        val oldHeight = pixelCanvasRepository.height
+        val oldPixels = pixelCanvasRepository.getAllPixels()
+
+        val newPixels = MutableList(newWidth * newHeight) { Color.Transparent }
+
+        val copyWidth = minOf(oldWidth, newWidth)
+        val copyHeight = minOf(oldHeight, newHeight)
+
+        for (row in 0 until copyHeight) {
+            for (col in 0 until copyWidth) {
+                val oldIndex = row * oldWidth + col
+                val newIndex = row * newWidth + col
+                newPixels[newIndex] = oldPixels[oldIndex]
+            }
+        }
+
+        pixelCanvasRepository.setCanvas(newWidth, newHeight, newPixels)
+    }
+
+
     val pixelChanged = pixelCanvasRepository.pixelChanged
 }

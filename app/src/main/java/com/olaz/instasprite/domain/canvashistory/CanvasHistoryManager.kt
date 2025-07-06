@@ -9,26 +9,27 @@ class CanvasHistoryManager<T> {
 
     fun saveState(state: T) {
         if (currentState == null || currentState != state) {
+            currentState?.let { undoStack.addLast(it) }
             currentState = state
-            undoStack.addLast(state)
             redoStack.clear()
         }
     }
 
+
     fun undo(): T? {
-        if (undoStack.size > 1) {
-            val current = undoStack.removeLast()
-            redoStack.addLast(current)
-            return undoStack.last()
+        if (undoStack.isNotEmpty()) {
+            currentState?.let { redoStack.addLast(it) }
+            currentState = undoStack.removeLast()
+            return currentState
         }
         return null
     }
 
     fun redo(): T? {
         if (redoStack.isNotEmpty()) {
-            val redoState = redoStack.removeLast()
-            undoStack.addLast(redoState)
-            return redoState
+            currentState?.let { undoStack.addLast(it) }
+            currentState = redoStack.removeLast()
+            return currentState
         }
         return null
     }

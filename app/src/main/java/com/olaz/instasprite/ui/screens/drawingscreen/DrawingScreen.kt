@@ -38,11 +38,11 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
     UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
 
     val viewModel = viewModel
-    val uiState by viewModel.uiState.collectAsState()
+    val canvasState by viewModel.canvasState.collectAsState()
 
-    val maxScale by remember(uiState.canvasWidth, uiState.canvasHeight) {
+    val maxScale by remember(canvasState.width, canvasState.height) {
         derivedStateOf {
-            val canvasSize = maxOf(uiState.canvasWidth, uiState.canvasHeight).toFloat()
+            val canvasSize = maxOf(canvasState.width, canvasState.height).toFloat()
             canvasSize.div(8f).coerceAtLeast(2f).coerceAtMost(100f)
         }
     }

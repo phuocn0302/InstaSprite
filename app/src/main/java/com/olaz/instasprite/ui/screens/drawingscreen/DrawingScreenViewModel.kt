@@ -23,11 +23,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+data class CanvasState(
+    val width: Int,
+    val height: Int,
+    val pixels: List<Color>
+)
+
 data class DrawingScreenState(
     val selectedTool: Tool,
-
-    val canvasWidth: Int,
-    val canvasHeight: Int,
 )
 
 class DrawingScreenViewModel(
@@ -38,23 +41,30 @@ class DrawingScreenViewModel(
     private val colorPaletteRepository: ColorPaletteRepository,
     private val lospecColorPaletteRepository: LospecColorPaletteRepository,
 ) : ViewModel() {
-    private val canvasHistoryManager = CanvasHistoryManager<List<Color>>()
+    private val canvasHistoryManager = CanvasHistoryManager<CanvasState>()
     private val saveFileUseCase = SaveFileUseCase()
     private val loadFileUseCase = LoadFileUseCase()
     private val pixelCanvasUseCase = PixelCanvasUseCase(
         pixelCanvasRepository = pixelCanvasRepository,
-        colorPaletteRepository =  colorPaletteRepository
+        colorPaletteRepository = colorPaletteRepository
     )
 
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
             selectedTool = PencilTool,
-
-            canvasWidth = pixelCanvasUseCase.getCanvasWidth(),
-            canvasHeight = pixelCanvasUseCase.getCanvasHeight(),
         )
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
+
+    private val _canvasState = MutableStateFlow(
+        CanvasState(
+            width = pixelCanvasUseCase.getCanvasWidth(),
+            height = pixelCanvasUseCase.getCanvasHeight(),
+            pixels = pixelCanvasUseCase.getAllPixels()
+        )
+    )
+    val canvasState: StateFlow<CanvasState> = _canvasState.asStateFlow()
+
     val pixelChangeTrigger = pixelCanvasUseCase.pixelChanged
 
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
@@ -66,7 +76,7 @@ class DrawingScreenViewModel(
 
     fun setCanvasSize(width: Int, height: Int) {
         pixelCanvasUseCase.setCanvas(width, height)
-        _uiState.value = _uiState.value.copy(canvasWidth = width, canvasHeight = height)
+        _canvasState.value = _canvasState.value.copy(width = width, height = height)
     }
 
     fun selectColor(color: Color) {
@@ -97,31 +107,63 @@ class DrawingScreenViewModel(
     }
 
     fun saveState() {
-        canvasHistoryManager.saveState(pixelCanvasUseCase.getAllPixels())
+        canvasHistoryManager.saveState(
+            CanvasState(
+                width = pixelCanvasUseCase.getCanvasWidth(),
+                height = pixelCanvasUseCase.getCanvasHeight(),
+                pixels = pixelCanvasUseCase.getAllPixels()
+            )
+        )
     }
 
     fun undo() {
         canvasHistoryManager.undo()?.let {
-            pixelCanvasUseCase.setAllPixels(it)
+            pixelCanvasUseCase.setCanvas(it.width, it.height, it.pixels)
+            _canvasState.value = _canvasState.value.copy(
+                width = it.width,
+                height = it.height,
+            )
         }
     }
 
     fun redo() {
         canvasHistoryManager.redo()?.let {
-            pixelCanvasUseCase.setAllPixels(it)
+            pixelCanvasUseCase.setCanvas(it.width, it.height, it.pixels)
+            _canvasState.value = _canvasState.value.copy(
+                width = it.width,
+                height = it.height,
+            )
         }
     }
 
     fun rotate() {
         pixelCanvasUseCase.rotateCanvas(pixelCanvasUseCase.getAllPixels())
+
+        _canvasState.value = _canvasState.value.copy(
+            width = pixelCanvasUseCase.getCanvasWidth(),
+            height = pixelCanvasUseCase.getCanvasHeight()
+        )
+
+        saveState()
     }
 
     fun hFlip() {
         pixelCanvasUseCase.hFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        saveState()
     }
 
     fun vFlip() {
         pixelCanvasUseCase.vFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        saveState()
+    }
+
+    fun resizeCanvas(width: Int, height: Int) {
+        pixelCanvasUseCase.resizeCanvas(width, height)
+        _canvasState.value = _canvasState.value.copy(
+            width = width,
+            height = height
+        )
+        saveState()
     }
 
     suspend fun getLastSavedLocation(): Uri? {

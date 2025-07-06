@@ -47,13 +47,13 @@ fun PixelCanvas(
     modifier: Modifier = Modifier,
     viewModel: DrawingScreenViewModel
 ) {
-    var canvasWidth by remember { mutableIntStateOf(viewModel.uiState.value.canvasWidth) }
-    var canvasHeight by remember { mutableIntStateOf(viewModel.uiState.value.canvasHeight) }
+    var canvasWidth by remember { mutableIntStateOf(viewModel.canvasState.value.width) }
+    var canvasHeight by remember { mutableIntStateOf(viewModel.canvasState.value.height) }
 
     LaunchedEffect(Unit) {
-        viewModel.uiState.collect { state ->
-            canvasWidth = state.canvasWidth
-            canvasHeight = state.canvasHeight
+        viewModel.canvasState.collect { state ->
+            canvasWidth = state.width
+            canvasHeight = state.height
         }
     }
 

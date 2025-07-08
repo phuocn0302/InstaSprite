@@ -1,6 +1,7 @@
 package com.olaz.instasprite.domain.usecase
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
@@ -44,7 +45,8 @@ class PixelCanvasUseCase(
     }
 
     fun getISpriteData(): ISpriteData {
-        return pixelCanvasRepository.getISpriteData()
+        val colorPalette = colorPaletteRepository.colors.value.map { it.toArgb() }
+        return pixelCanvasRepository.getISpriteData().copy(colorPalette = colorPalette)
     }
 
     fun selectColor(color: Color) {

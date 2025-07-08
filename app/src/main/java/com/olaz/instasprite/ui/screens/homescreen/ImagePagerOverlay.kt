@@ -19,6 +19,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
@@ -55,6 +56,7 @@ import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
 import com.olaz.instasprite.ui.screens.homescreen.dialog.DeleteSpriteConfirmDialog
+import com.olaz.instasprite.ui.screens.homescreen.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toDateString
 import kotlinx.coroutines.delay
@@ -85,6 +87,7 @@ fun ImagePagerOverlay(
     var zoomedPageIndex by remember { mutableStateOf<Int?>(null) }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showSaveImageDialog by remember { mutableStateOf(false) }
 
     if (showDeleteDialog) {
         DeleteSpriteConfirmDialog(
@@ -94,6 +97,14 @@ fun ImagePagerOverlay(
                 showDeleteDialog = false
             },
             onDismiss = { showDeleteDialog = false }
+        )
+    }
+
+    if (showSaveImageDialog) {
+        SaveImageDialog(
+            iSpriteData = currentSprite!!.sprite,
+            viewModel = viewModel,
+            onDismiss = { showSaveImageDialog = false }
         )
     }
 
@@ -123,6 +134,7 @@ fun ImagePagerOverlay(
                         }
                         viewModel.openDrawingActivity(context, currentSprite!!.sprite)
                     },
+                    onSaveImageTap = { showSaveImageDialog = true },
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
                         .height(180.dp)
@@ -205,6 +217,7 @@ fun ImagePagerOverlay(
 @Composable
 private fun BottomBar(
     spriteWithMetaData: ISpriteWithMetaData?,
+    onSaveImageTap: () -> Unit,
     onEditButtonTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -236,33 +249,60 @@ private fun BottomBar(
             Text(text = "Last modified: $dateModified")
 
             Text(text = "Dimensions: $spriteWidth x $spriteHeight")
-        }
 
-        Button(
-            onClick = onEditButtonTap,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = CatppuccinUI.AccentButtonColor
-            ),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
+            Spacer(modifier = Modifier.height(12.dp))
 
-        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxSize()
             ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit sprite",
-                    tint = CatppuccinUI.TextColorDark,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Edit",
-                    color = CatppuccinUI.TextColorDark
-                )
+                Button(
+                    onClick = onSaveImageTap,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CatppuccinUI.SelectedColor
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Save as image",
+                            tint = CatppuccinUI.TextColorDark,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Save as Image",
+                            color = CatppuccinUI.TextColorDark
+                        )
+                    }
+                }
+
+                Button(
+                    onClick = onEditButtonTap,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CatppuccinUI.AccentButtonColor
+                    ),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit sprite",
+                            tint = CatppuccinUI.TextColorDark,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Edit",
+                            color = CatppuccinUI.TextColorDark
+                        )
+                    }
+                }
             }
         }
     }

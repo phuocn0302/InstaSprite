@@ -39,7 +39,7 @@ import com.olaz.instasprite.domain.draw.DrawUtils
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.PencilTool
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -67,8 +67,8 @@ fun PixelCanvas(
         updateBitmapPixels(
             bitmap = bitmap,
             viewModel = viewModel,
-            checkerColor1 = DrawingScreenColor.CheckerColor1.toArgb(),
-            checkerColor2 = DrawingScreenColor.CheckerColor2.toArgb()
+            checkerColor1 = CatppuccinUI.CanvasChecker1Color.toArgb(),
+            checkerColor2 = CatppuccinUI.CanvasChecker2Color.toArgb()
         )
         bitmap.asImageBitmap()
     }
@@ -87,7 +87,7 @@ fun PixelCanvas(
 
         Box(
             modifier = Modifier
-                .border(borderSize, DrawingScreenColor.CanvasBorderColor)
+                .border(borderSize, CatppuccinUI.BackgroundColor)
                 .padding(borderSize)
         ) {
             Box(
@@ -107,9 +107,9 @@ fun PixelCanvas(
                         filterQuality = FilterQuality.None
                     )
 
-                    if (canvasWidth < 32 && canvasHeight < 32) {
-                        drawGridOverlay(canvasWidth, canvasHeight, gridColor, gridStroke)
-                    }
+//                    if (canvasWidth < 32 && canvasHeight < 32) {
+//                        drawGridOverlay(canvasWidth, canvasHeight, gridColor, gridStroke)
+//                    }
                 }
             }
         }

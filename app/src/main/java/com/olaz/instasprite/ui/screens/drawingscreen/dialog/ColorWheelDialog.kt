@@ -11,7 +11,6 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -19,7 +18,6 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -27,12 +25,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,6 +43,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -57,11 +54,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toRect
+import com.olaz.instasprite.ui.components.composable.ColorItem
 import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import android.graphics.Color as AndroidColor
@@ -168,7 +166,7 @@ fun ColorWheelDialog(
         content = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 SatValPanel(
@@ -191,20 +189,12 @@ fun ColorWheelDialog(
                         updateInputFields()
                     }
 
-                    Box(
+                    ColorItem(
+                        color = selectedColor.value,
                         modifier = Modifier
                             .padding(start = 8.dp)
                             .size(40.dp)
-                            .border(
-                                width = 2.dp,
-                                color = Color.White,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .background(
-                                color = selectedColor.value,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .clip(RoundedCornerShape(10.dp))
+                            .border(width = 5.dp, color = CatppuccinUI.BackgroundColorDarker)
                     )
                 }
 
@@ -229,6 +219,7 @@ fun ColorWheelDialog(
                             updateColorFromHex()
                         },
                         label = "Hex",
+                        labelColor = CatppuccinUI.SelectedColor,
                         placeholder = "FFFFFF",
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -248,6 +239,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "R",
+                            labelColor = CatppuccinUI.CurrentPalette.Red,
                             placeholder = "0",
                             modifier = Modifier.weight(0.2f),
                             keyboardType = KeyboardType.Number
@@ -264,6 +256,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "G",
+                            labelColor = CatppuccinUI.CurrentPalette.Green,
                             placeholder = "0",
                             modifier = Modifier.weight(0.2f),
                             keyboardType = KeyboardType.Number
@@ -280,6 +273,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "B",
+                            labelColor = CatppuccinUI.CurrentPalette.Blue,
                             placeholder = "0",
                             modifier = Modifier.weight(0.2f),
                             keyboardType = KeyboardType.Number
@@ -290,11 +284,11 @@ fun ColorWheelDialog(
                 Button(
                     onClick = { showImportDialog = true },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = HomeScreenColor.ButtonColor
+                        containerColor = CatppuccinUI.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Import Color Palettes")
+                    Text(text = "Import Color Palettes", color = CatppuccinUI.TextColorDark)
                 }
             }
         }
@@ -307,6 +301,7 @@ private fun ColorInputTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    labelColor: Color = Color.Unspecified,
     placeholder: String,
     modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
@@ -314,18 +309,10 @@ private fun ColorInputTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { Text(label, color = labelColor) },
         placeholder = { Text(placeholder, color = Color.White) },
         singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            cursorColor = Color.White,
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.Gray,
-            focusedLabelColor = Color.White,
-            unfocusedLabelColor = Color.White,
-        ),
+        colors = CatppuccinUI.OutlineTextFieldColors.colors(),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         modifier = modifier
     )
@@ -348,11 +335,10 @@ private fun HueBar(
     Canvas(
         modifier = modifier
             .border(
-                width = 2.dp,
-                color = Color.White,
-                shape = RoundedCornerShape(10.dp)
+                width = 5.dp,
+                color = CatppuccinUI.BackgroundColorDarker
             )
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
         val drawScopeSize = size
@@ -407,7 +393,7 @@ private fun HueBar(
 
         drawCircle(
             Color.White,
-            radius = 38.dp.toPx() / 2,
+            radius = 5.dp.toPx(),
             center = pressOffset.value,
             style = Stroke(
                 width = 2.dp.toPx()
@@ -439,12 +425,12 @@ private fun SatValPanel(
             .fillMaxWidth()
             .height(200.dp)
             .border(
-                width = 2.dp,
-                color = Color.White,
-                shape = RoundedCornerShape(10.dp)
+                width = 5.dp,
+                color = CatppuccinUI.BackgroundColorDarker,
+                shape = RectangleShape
             )
             .emitDragGesture(interactionSource)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RectangleShape)
     ) {
         val cornerRadius = 12.dp.toPx()
         val satValSize = size

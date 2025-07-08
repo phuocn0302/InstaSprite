@@ -3,7 +3,11 @@ package com.olaz.instasprite.ui.screens.homescreen.dialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
 fun DeleteSpriteConfirmDialog(
@@ -19,8 +23,13 @@ fun DeleteSpriteConfirmDialog(
         dismissButtonText = "Cancel",
         content = {
             Text(
-                text = "Are you sure you want to delete $spriteName?",
-                color = Color.White
+                buildAnnotatedString {
+                    append("Are you sure you want to delete ")
+                    withStyle(style = SpanStyle(color = CatppuccinUI.DismissButtonColor)) {
+                        append(spriteName)
+                    }
+                    append("?")
+                }
             )
         }
     )

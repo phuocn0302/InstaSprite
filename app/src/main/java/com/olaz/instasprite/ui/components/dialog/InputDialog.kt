@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.InputField
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
 @Composable
@@ -66,16 +66,16 @@ fun InputDialog(
                     OutlinedTextField(
                         value = inputStates[index].value,
                         onValueChange = { inputStates[index].value = it },
-                        label = { Text(field.label, color = Color.White) },
+                        label = { Text(field.label, color = CatppuccinUI.SelectedColor) },
                         placeholder = {
                             if (field.placeholder.isNotBlank())
-                                Text(field.placeholder, color = Color.Gray)
+                                Text(field.placeholder, color = CatppuccinUI.Subtext1Color)
                         },
                         trailingIcon = {
                             field.suffix?.let {
                                 Text(
                                     it,
-                                    color = Color.White,
+                                    color = CatppuccinUI.CurrentPalette.Blue,
                                     modifier = Modifier.padding(horizontal = 14.dp)
                                 )
                             }
@@ -85,23 +85,10 @@ fun InputDialog(
                         isError = !field.validator(inputStates[index].value),
                         supportingText = {
                             if (!field.validator(inputStates[index].value)) {
-                                Text(field.errorMessage, color = Color.Red)
+                                Text(field.errorMessage, color = CatppuccinUI.CurrentPalette.Red)
                             }
                         },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.Gray,
-
-                            errorTextColor = Color.Red,
-                            errorBorderColor = Color.Red,
-                            errorLabelColor = Color.Red,
-                            errorCursorColor = Color.Red,
-                            errorTrailingIconColor = Color.Red,
-                            errorSupportingTextColor = Color.Red
-                        ),
+                        colors = CatppuccinUI.OutlineTextFieldColors.colors(),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

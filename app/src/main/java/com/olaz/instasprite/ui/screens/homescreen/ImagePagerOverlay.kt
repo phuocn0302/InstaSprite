@@ -55,7 +55,7 @@ import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
 import com.olaz.instasprite.ui.screens.homescreen.dialog.DeleteSpriteConfirmDialog
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toDateString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -126,7 +126,7 @@ fun ImagePagerOverlay(
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
                         .height(180.dp)
-                        .background(HomeScreenColor.BottombarColor)
+                        .background(CatppuccinUI.BackgroundColor)
                 )
             }
         ) { innerPadding ->
@@ -135,7 +135,7 @@ fun ImagePagerOverlay(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(HomeScreenColor.BackgroundColor)
+                    .background(CatppuccinUI.BackgroundColorDarker)
             ) { page ->
                 val sprite = sprites[page]
                 val bitmapImage = remember(sprite) {
@@ -229,31 +229,19 @@ private fun BottomBar(
                 .align(Alignment.TopStart)
                 .padding(12.dp)
         ) {
-            Text(
-                text = "Name: $spriteName",
-                color = Color.White
-            )
+            Text(text = "Name: $spriteName")
 
-            Text(
-                text = "Date created: $dateCreated",
-                color = Color.White,
-            )
+            Text(text = "Date created: $dateCreated")
 
-            Text(
-                text = "Last modified: $dateModified",
-                color = Color.White,
-            )
+            Text(text = "Last modified: $dateModified")
 
-            Text(
-                text = "Dimensions: $spriteWidth x $spriteHeight",
-                color = Color.White,
-            )
+            Text(text = "Dimensions: $spriteWidth x $spriteHeight")
         }
 
         Button(
             onClick = onEditButtonTap,
             colors = ButtonDefaults.buttonColors(
-                containerColor = HomeScreenColor.ButtonColor
+                containerColor = CatppuccinUI.AccentButtonColor
             ),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -267,13 +255,13 @@ private fun BottomBar(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit sprite",
-                    tint = Color.White,
+                    tint = CatppuccinUI.TextColorDark,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = "Edit",
-                    color = Color.White
+                    color = CatppuccinUI.TextColorDark
                 )
             }
         }
@@ -291,7 +279,7 @@ private fun TopBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .background(HomeScreenColor.TopbarColor)
+            .background(CatppuccinUI.BackgroundColor)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -306,7 +294,7 @@ private fun TopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
                     contentDescription = "Dismiss",
-                    tint = Color.White,
+                    tint = CatppuccinUI.DismissButtonColor,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -318,7 +306,7 @@ private fun TopBar(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More",
-                        tint = Color.White,
+                        tint = CatppuccinUI.TextColorLight,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -344,17 +332,17 @@ private fun PagerDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        containerColor = HomeScreenColor.TopbarColor
+        containerColor = CatppuccinUI.DropDownMenuColor
     ) {
         DropdownMenuItem(
             text = {
-                Text(text = "Delete", color = Color.White)
+                Text(text = "Delete")
             },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete sprite",
-                    tint = Color.White
+                    tint = CatppuccinUI.TextColorLight
                 )
             },
             onClick = {

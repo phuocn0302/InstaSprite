@@ -3,16 +3,12 @@ package com.olaz.instasprite
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreen
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreenViewModel
-import com.olaz.instasprite.ui.theme.Typography
+import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,16 +35,8 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            MaterialTheme(
-                typography = Typography
-            ) {
-                Surface(
-
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    HomeScreen(viewModel)
-                }
+            InstaSpriteTheme {
+                HomeScreen(viewModel)
             }
         }
     }

@@ -37,6 +37,7 @@ import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
 import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.getFileName
 
 @Composable
@@ -81,22 +82,17 @@ fun LoadISpriteDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text("File", color = Color.White) },
+                    label = { Text("File", color = CatppuccinUI.SelectedColor) },
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Menu,
                             contentDescription = "Choose File",
-                            tint = Color.White
+                            tint = CatppuccinUI.TextColorLight
                         )
                     },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = Color.White,
-                        disabledBorderColor = Color.Gray,
-                        disabledLabelColor = Color.White,
-                        disabledTrailingIconColor = Color.White
-                    ),
+                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -107,8 +103,8 @@ fun LoadISpriteDialog(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Width: $spriteWidth", color = Color.White)
-                Text("Height: $spriteHeight", color = Color.White)
+                Text("Width: $spriteWidth")
+                Text("Height: $spriteHeight")
             }
 
             spriteData?.let {

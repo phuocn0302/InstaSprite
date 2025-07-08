@@ -35,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.rememberBottomBarVisibleState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +53,7 @@ fun HomeBottomBar(
     ) {
 
         BottomAppBar(
-            containerColor = HomeScreenColor.BottombarColor,
+            containerColor = CatppuccinUI.BottomBarColor,
             modifier = modifier
                 .clip(
                     BottomNavShape(
@@ -71,7 +71,7 @@ fun HomeBottomBar(
                     onClick = {
                         // TODO
                     },
-                    iconTint = Color.White
+                    iconTint = CatppuccinUI.TextColorLight
                 )
             }
 
@@ -89,14 +89,14 @@ fun HomeBottomBar(
                     onClick = {
                         viewModel.toggleSearchBar()
                     },
-                    iconTint = Color.White
+                    iconTint = CatppuccinUI.TextColorLight
                 )
                 BottomBarItem(
                     iconResourceId = R.drawable.ic_sort,
                     onClick = {
                         viewModel.toggleSelectSortOptionDialog()
                     },
-                    iconTint = Color.White
+                    iconTint = CatppuccinUI.TextColorLight
                 )
             }
         }
@@ -159,13 +159,13 @@ fun HomeFab(
         FloatingActionButton(
             onClick = onClick,
             shape = CircleShape,
-            containerColor = HomeScreenColor.SelectedColor,
-            contentColor = Color.White,
+            containerColor = CatppuccinUI.SelectedColor,
             modifier = Modifier.size(70.dp)
         ) {
             Icon(
                 Icons.Filled.Add,
                 contentDescription = "Floating action button",
+                tint = CatppuccinUI.TextColorDark,
                 modifier = Modifier.size(30.dp)
             )
         }

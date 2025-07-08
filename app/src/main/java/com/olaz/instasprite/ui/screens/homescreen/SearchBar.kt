@@ -20,10 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
 fun SearchBar(
@@ -63,7 +62,7 @@ fun SearchBar(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = Color.White,
+                    tint = CatppuccinUI.DismissButtonColor,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -75,16 +74,16 @@ fun SearchBar(
                 isFocused = it.isFocused
             },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = HomeScreenColor.TopbarColor,
-            disabledContainerColor = HomeScreenColor.TopbarColor,
-            unfocusedContainerColor = HomeScreenColor.TopbarColor,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            cursorColor = Color.White,
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.White,
-            unfocusedPlaceholderColor = Color.White,
-            focusedPlaceholderColor = Color.White
+            focusedContainerColor = CatppuccinUI.BackgroundColor,
+            disabledContainerColor = CatppuccinUI.BackgroundColor,
+            unfocusedContainerColor = CatppuccinUI.BackgroundColor,
+            focusedTextColor = CatppuccinUI.TextColorLight,
+            unfocusedTextColor = CatppuccinUI.TextColorLight,
+            cursorColor = CatppuccinUI.TextColorLight,
+            focusedBorderColor = CatppuccinUI.CurrentPalette.Peach,
+            unfocusedBorderColor = CatppuccinUI.CurrentPalette.Peach,
+            unfocusedPlaceholderColor = CatppuccinUI.CurrentPalette.Peach,
+            focusedPlaceholderColor = CatppuccinUI.Subtext0Color
         ),
     )
 

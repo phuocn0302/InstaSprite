@@ -15,11 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,7 +44,7 @@ fun JumpToTopButton(
         },
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = HomeScreenColor.SelectedColor
+            containerColor = CatppuccinUI.CurrentPalette.Peach
         ),
         contentPadding = PaddingValues(0.dp),
         modifier = modifier.size(48.dp)
@@ -53,7 +52,7 @@ fun JumpToTopButton(
         Icon(
             painter = painterResource(R.drawable.ic_arrowup),
             contentDescription = "Jump to top",
-            tint = Color.White,
+            tint = CatppuccinUI.TextColorDark,
             modifier = Modifier
                 .size(24.dp)
                 .rotate(rotation.value)

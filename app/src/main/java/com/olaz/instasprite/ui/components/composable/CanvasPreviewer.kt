@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.domain.export.ImageExporter
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
 fun CanvasPreviewer(
@@ -46,7 +46,7 @@ fun CanvasPreviewer(
     var modifier = modifier
 
     if (showBorder) {
-        modifier = modifier.border(5.dp, DrawingScreenColor.PaletteBackgroundColor)
+        modifier = modifier.border(5.dp, CatppuccinUI.BackgroundColorDarker)
     }
 
     Image(

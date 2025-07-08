@@ -51,7 +51,7 @@ import com.olaz.instasprite.data.model.SpriteMetaData
 import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
 import com.olaz.instasprite.ui.screens.homescreen.dialog.DeleteSpriteConfirmDialog
 import com.olaz.instasprite.ui.screens.homescreen.dialog.RenameDialog
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.launch
 
 
@@ -189,8 +189,7 @@ fun SpriteCard(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = HomeScreenColor.TopbarColor,
-                contentColor = Color.White
+                containerColor = CatppuccinUI.BackgroundColor,
             ),
             modifier = Modifier
                 .padding(vertical = 8.dp)
@@ -271,38 +270,38 @@ fun SpriteDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        containerColor = HomeScreenColor.TopbarColor,
+        containerColor = CatppuccinUI.DropDownMenuColor,
         modifier = modifier
     ) {
         DropdownMenuItem(
-            text = { Text("Rename", color = Color.White) },
+            text = { Text("Rename") },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = "Rename",
-                    tint = Color.White
+                    tint = CatppuccinUI.TextColorLight
                 )
             },
             onClick = onRename,
         )
         DropdownMenuItem(
-            text = { Text("Edit", color = Color.White) },
+            text = { Text("Edit") },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit",
-                    tint = Color.White
+                    tint = CatppuccinUI.TextColorLight
                 )
             },
             onClick = onEdit,
         )
         DropdownMenuItem(
-            text = { Text("Delete", color = Color.White) },
+            text = { Text("Delete") },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = Color.White
+                    tint = CatppuccinUI.TextColorLight
                 )
             },
             onClick = onDelete,

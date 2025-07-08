@@ -22,12 +22,12 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 data class ColorPaletteListOptions(
     val colors: List<Color>,
     val activeColor: Color? = null,
-    val backgroundColor: Color = DrawingScreenColor.BackgroundColor,
+    val backgroundColor: Color = CatppuccinUI.BackgroundColorDarker,
     val itemSpacing: Dp = 0.dp,
     val listHeight: Dp = 40.dp,
     val colorItemSize: Dp = 30.dp,

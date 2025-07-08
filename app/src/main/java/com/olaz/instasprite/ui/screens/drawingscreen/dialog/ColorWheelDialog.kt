@@ -211,7 +211,7 @@ fun ColorWheelDialog(
                     )
                 )
 
-                Column {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ColorInputTextField(
                         value = hexValue.value,
                         onValueChange = { newText ->

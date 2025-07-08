@@ -41,12 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
@@ -61,7 +59,6 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toDateString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
 
 @Composable
 fun ImagePagerOverlay(
@@ -173,34 +170,6 @@ fun ImagePagerOverlay(
                                 indication = null,
                                 onClick = { zoomedPageIndex = page }
                             )
-                            .graphicsLayer {
-                                val pageOffset = (
-                                        (pagerState.currentPage - page) + pagerState
-                                            .currentPageOffsetFraction
-                                        )
-
-                                alpha = lerp(
-                                    start = 0.4f,
-                                    stop = 1f,
-                                    fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f),
-                                )
-
-                                cameraDistance = 8 * density
-                                rotationY = lerp(
-                                    start = 0f,
-                                    stop = 40f,
-                                    fraction = pageOffset.coerceIn(-1f, 1f),
-                                )
-
-                                lerp(
-                                    start = 0.5f,
-                                    stop = 1f,
-                                    fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f),
-                                ).also { scale ->
-                                    scaleX = scale
-                                    scaleY = scale
-                                }
-                            }
                     )
 
                     if (zoomedPageIndex == page) {

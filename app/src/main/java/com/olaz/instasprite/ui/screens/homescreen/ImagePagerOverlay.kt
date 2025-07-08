@@ -102,7 +102,8 @@ fun ImagePagerOverlay(
 
     if (showSaveImageDialog) {
         SaveImageDialog(
-            iSpriteData = currentSprite!!.sprite,
+            spriteName = currentSprite!!.meta!!.spriteName,
+            iSpriteData = currentSprite.sprite,
             viewModel = viewModel,
             onDismiss = { showSaveImageDialog = false }
         )

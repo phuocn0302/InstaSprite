@@ -17,12 +17,13 @@ import com.olaz.instasprite.ui.screens.homescreen.HomeScreenViewModel
 
 @Composable
 fun SaveImageDialog(
+    spriteName: String,
     iSpriteData: ISpriteData,
     viewModel: HomeScreenViewModel,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
-    var fileName by remember { mutableStateOf("Sprite") }
+    var fileName by remember { mutableStateOf(spriteName) }
     var scalePercent by remember { mutableStateOf("100") }
     var folderUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -40,7 +41,7 @@ fun SaveImageDialog(
                 suffix = ".png",
                 validator = { it.isNotBlank() },
                 errorMessage = "Name cannot be blank",
-                defaultValue = "Sprite"
+                defaultValue = spriteName
             ),
             InputField(
                 label = "Scale",

@@ -48,8 +48,8 @@ fun SaveImageDialog(
                 placeholder = "100",
                 keyboardType = KeyboardType.Number,
                 suffix = "%",
-                validator = { it.toIntOrNull() != null && it.toInt() in 25..2000 },
-                errorMessage = "Must be a number between 25 and 2000",
+                validator = { it.toIntOrNull() != null && it.toInt() in 25..20000 },
+                errorMessage = "Must be a number between 25 and 20000",
                 defaultValue = "100"
             )
         ),
@@ -60,7 +60,7 @@ fun SaveImageDialog(
         },
         onSave = {
             folderUri?.let { uri ->
-                val scale = scalePercent.toIntOrNull()?.coerceIn(25, 2000) ?: 100
+                val scale = scalePercent.toIntOrNull()?.coerceIn(25, 20000) ?: 100
                 val success = viewModel.saveImage(context, iSpriteData, uri, "$fileName.png", scale)
                 Toast.makeText(
                     context,

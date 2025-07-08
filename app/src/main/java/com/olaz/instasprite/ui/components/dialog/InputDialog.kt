@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.InputField
+import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
@@ -69,7 +70,10 @@ fun InputDialog(
                         label = { Text(field.label, color = CatppuccinUI.SelectedColor) },
                         placeholder = {
                             if (field.placeholder.isNotBlank())
-                                Text(field.placeholder, color = CatppuccinUI.Subtext1Color)
+                                Text(
+                                    field.placeholder, color = CatppuccinUI.Subtext0Color,
+                                    style = CatppuccinTypography.bodyMedium
+                                )
                         },
                         trailingIcon = {
                             field.suffix?.let {
@@ -89,7 +93,8 @@ fun InputDialog(
                             }
                         },
                         colors = CatppuccinUI.OutlineTextFieldColors.colors(),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = CatppuccinTypography.bodyMedium
                     )
                 }
 

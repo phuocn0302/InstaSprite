@@ -48,7 +48,7 @@ fun SearchBar(
     TextField(
         value = viewModel.searchQuery,
         onValueChange = viewModel::updateSearchQuery,
-        placeholder = { Text("Search sprites") },
+        placeholder = { Text(text = "Search sprites", color = CatppuccinUI.Subtext0Color) },
         singleLine = true,
         trailingIcon = {
             IconButton(

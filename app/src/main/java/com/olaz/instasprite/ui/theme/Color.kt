@@ -175,8 +175,8 @@ object CatppuccinUI {
     val SelectedColor = CurrentPalette.Mauve
 
     val TextColorLight = CurrentPalette.Text
-    val Subtext0Color = CurrentPalette.Subtext0
-    val Subtext1Color = CurrentPalette.Subtext1
+    val Subtext0Color = CurrentPalette.Overlay1
+    val Subtext1Color = CurrentPalette.Overlay2
     val TextColorDark = CurrentPalette.Mantle
 
     val AccentButtonColor = CurrentPalette.Green

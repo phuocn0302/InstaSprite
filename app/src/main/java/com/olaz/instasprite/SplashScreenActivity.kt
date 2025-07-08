@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -46,8 +46,8 @@ class SplashScreenActivity : ComponentActivity() {
 @Composable
 @Preview
 fun SplashScreen() {
-    UiUtils.SetStatusBarColor(HomeScreenColor.BackgroundColor)
-    UiUtils.SetNavigationBarColor(HomeScreenColor.BackgroundColor)
+    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
+    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)
     Box(
         modifier = Modifier
             .fillMaxSize()

@@ -24,7 +24,7 @@ import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
-import com.olaz.instasprite.ui.theme.HomeScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,23 +70,15 @@ fun LospecImportDialog(
                     onValueChange = { newUrl ->
                         paletteUrl = newUrl
                     },
-                    label = { Text("Lospec URL", color = Color.White) },
+                    label = { Text("Lospec URL", color = CatppuccinUI.SelectedColor) },
                     placeholder = {
                         Text(
                             "https://lospec.com/palette-list/example",
-                            color = Color.Gray
+                             color = CatppuccinUI.Subtext1Color
                         )
                     },
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color.White,
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = Color.White,
-                        unfocusedLabelColor = Color.White,
-                    ),
+                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -139,11 +131,11 @@ fun LospecImportDialog(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = HomeScreenColor.ButtonColor
+                        containerColor = CatppuccinUI.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Fetch Palette")
+                    Text(text = "Fetch Palette", color = CatppuccinUI.TextColorDark)
                 }
             }
         }

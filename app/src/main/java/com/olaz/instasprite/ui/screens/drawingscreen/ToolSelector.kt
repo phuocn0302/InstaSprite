@@ -33,7 +33,7 @@ import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.LoadISpriteDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.SaveISpriteDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.SaveImageDialog
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
 fun ToolSelector(
@@ -97,7 +97,7 @@ fun ToolSelector(
 
             DropdownMenu(
                 expanded = toolListVisible,
-                containerColor = DrawingScreenColor.PaletteBarColor,
+                containerColor = CatppuccinUI.DropDownMenuColor,
                 onDismissRequest = { toolListVisible = false }
             ) {
                 tools.reversed().forEach { tool ->
@@ -110,7 +110,7 @@ fun ToolSelector(
                                 modifier = Modifier.size(32.dp)
                             )
                         },
-                        text = { Text(tool.name, color = Color.White) },
+                        text = { Text(tool.name) },
                         onClick = {
                             viewModel.selectTool(tool)
                             toolListVisible = false
@@ -151,32 +151,32 @@ fun ToolSelector(
 
             DropdownMenu(
                 expanded = menuListVisible,
-                containerColor = DrawingScreenColor.PaletteBarColor,
+                containerColor = CatppuccinUI.DropDownMenuColor,
                 onDismissRequest = { menuListVisible = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text(text = "Save", color = Color.White) },
+                    text = { Text(text = "Save") },
                     onClick = {
                         saveISpriteDialogVisible = true
                     }
                 )
 
                 DropdownMenuItem(
-                    text = { Text(text = "Load", color = Color.White) },
+                    text = { Text(text = "Load") },
                     onClick = {
                         loadISpriteDialogVisible = true
                     }
                 )
 
                 DropdownMenuItem(
-                    text = { Text(text = "Export image", color = Color.White) },
+                    text = { Text(text = "Export image") },
                     onClick = {
                         saveImageDialogVisible = true
                     }
                 )
 
                 DropdownMenuItem(
-                    text = { Text(text = "Settings", color = Color.White) },
+                    text = { Text(text = "Settings") },
                     onClick = {
                         // TODO: Handle settings
                     }
@@ -197,7 +197,7 @@ fun ToolItem(
 ) {
     Button(
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) DrawingScreenColor.SelectedToolColor else Color.Transparent
+            containerColor = if (selected) CatppuccinUI.Foreground0Color else Color.Transparent
         ),
         shape = CircleShape,
         contentPadding = PaddingValues(0.dp),

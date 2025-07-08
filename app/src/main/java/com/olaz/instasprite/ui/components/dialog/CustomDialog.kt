@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -14,9 +15,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
 fun CustomDialog(
@@ -29,7 +30,8 @@ fun CustomDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DrawingScreenColor.PaletteBarColor,
+        containerColor = CatppuccinUI.DialogColor,
+        shape = RoundedCornerShape(10.dp),
         title = {
             if (title != null)
             {
@@ -39,7 +41,7 @@ fun CustomDialog(
                 ) {
                     Text(
                         text = title,
-                        color = Color.White,
+                        color = CatppuccinUI.TextColorLight,
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -56,14 +58,14 @@ fun CustomDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(containerColor = DrawingScreenColor.ButtonColor)
+                colors = ButtonDefaults.buttonColors(containerColor = CatppuccinUI.AccentButtonColor,)
             ) {
-                Text(confirmButtonText, color = Color.White)
+                Text(confirmButtonText, color = CatppuccinUI.TextColorDark)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(dismissButtonText, color = Color.White)
+                Text(dismissButtonText, color = CatppuccinUI.TextColorLight)
             }
         }
     )

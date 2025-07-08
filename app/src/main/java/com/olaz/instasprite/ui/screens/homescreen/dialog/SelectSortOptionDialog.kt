@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.screens.homescreen.dialog
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -25,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreenViewModel
 import com.olaz.instasprite.ui.screens.homescreen.SpriteListOrder
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,9 +49,18 @@ fun SelectSortOptionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DrawingScreenColor.PaletteBarColor,
+        containerColor = CatppuccinUI.DialogColor,
         title = {
-            Text(text = "Sort By", color = Color.White)
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Sort by",
+                    color = CatppuccinUI.TextColorLight,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         },
         text = {
             Column(
@@ -78,14 +89,13 @@ fun SelectSortOptionDialog(
                         RadioButton(
                             selected = (sortOrder == selectedOption.value),
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = Color.White,
-                                unselectedColor = Color.Gray
+                                selectedColor = CatppuccinUI.SelectedColor,
+                                unselectedColor = CatppuccinUI.Foreground2Color
                             ),
                             onClick = null
                         )
                         Text(
                             text = label,
-                            color = Color.White,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }

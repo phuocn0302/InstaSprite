@@ -44,7 +44,7 @@ import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.ColorWheelDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.dialog.ResizeCanvasDialog
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toHexString
 import kotlinx.coroutines.launch
 
@@ -231,7 +231,7 @@ private fun ActiveColor(
             .background(activeColor)
             .border(
                 width = 5.dp,
-                color = DrawingScreenColor.BackgroundColor
+                color = CatppuccinUI.BackgroundColorDarker
             )
             .clickable(
                 onClick = onClick
@@ -256,13 +256,11 @@ private fun CanvasMenuDropdownMenu(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismiss,
-            modifier = modifier.background(DrawingScreenColor.PaletteBarColor)
+            modifier = modifier.background(CatppuccinUI.DropDownMenuColor)
         ) {
             DropdownMenuItem(
                 text = {
-                    Text(
-                        text = "Rotate Canvas", color = Color.White
-                    )
+                    Text(text = "Rotate Canvas")
                 },
                 leadingIcon = {
                     Icon(
@@ -277,9 +275,7 @@ private fun CanvasMenuDropdownMenu(
 
             DropdownMenuItem(
                 text = {
-                    Text(
-                        text = "Horizontal Flip", color = Color.White
-                    )
+                    Text(text = "Horizontal Flip")
                 },
                 leadingIcon = {
                     Icon(
@@ -294,9 +290,7 @@ private fun CanvasMenuDropdownMenu(
 
             DropdownMenuItem(
                 text = {
-                    Text(
-                        text = "Vertical Flip", color = Color.White
-                    )
+                    Text(text = "Vertical Flip")
                 },
                 leadingIcon = {
                     Icon(
@@ -311,9 +305,7 @@ private fun CanvasMenuDropdownMenu(
 
             DropdownMenuItem(
                 text = {
-                    Text(
-                        text = "Resize", color = Color.White
-                    )
+                    Text(text = "Resize")
                 },
                 leadingIcon = {
                     Icon(

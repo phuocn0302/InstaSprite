@@ -1,6 +1,7 @@
 package com.olaz.instasprite.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -75,3 +76,31 @@ val Typography = Typography(
         fontSize = 11.sp
     )
 )
+
+val CatppuccinTypography: Typography = Typography().run {
+    copy(
+        displayLarge = displayLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        displayMedium = displayMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        displaySmall = displaySmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+
+        headlineLarge = headlineLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        headlineMedium = headlineMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        headlineSmall = headlineSmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+
+        titleLarge = titleLarge.withFontAndColor(RetronFont, CatppuccinUI.Subtext1Color),
+        titleMedium = titleMedium.withFontAndColor(RetronFont, CatppuccinUI.Subtext1Color),
+        titleSmall = titleSmall.withFontAndColor(RetronFont, CatppuccinUI.Subtext1Color),
+
+        bodyLarge = bodyLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        bodyMedium = bodyMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        bodySmall = bodySmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+
+        labelLarge = labelLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        labelMedium = labelMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        labelSmall = labelSmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+    )
+}
+
+private fun TextStyle.withFontAndColor(font: FontFamily, color: Color): TextStyle {
+    return this.copy(fontFamily = font, color = color)
+}

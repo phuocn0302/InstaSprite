@@ -26,6 +26,7 @@ fun ResizeCanvasDialog(
             InputField(
                 label = "Width",
                 placeholder = "Width",
+                suffix = "px",
                 defaultValue = canvasWidth.toString(),
                 keyboardType = KeyboardType.Number,
                 validator = { it.toIntOrNull() != null && it.toInt() > 0 },
@@ -34,6 +35,7 @@ fun ResizeCanvasDialog(
             InputField(
                 label = "Height",
                 placeholder = "Height",
+                suffix = "px",
                 defaultValue = canvasHeight.toString(),
                 keyboardType = KeyboardType.Number,
                 validator = { it.toIntOrNull() != null && it.toInt() > 0 },

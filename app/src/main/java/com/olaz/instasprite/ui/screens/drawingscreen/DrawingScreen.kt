@@ -21,11 +21,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.DrawingScreenColor
+import com.olaz.instasprite.data.database.AppDatabase
+import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.data.repository.ColorPaletteRepository
+import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
+import com.olaz.instasprite.data.repository.PixelCanvasRepository
+import com.olaz.instasprite.data.repository.StorageLocationRepository
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ZoomState
@@ -34,8 +42,8 @@ import net.engawapg.lib.zoomable.zoomable
 @SuppressLint("DefaultLocale", "ConfigurationScreenWidthHeight")
 @Composable
 fun DrawingScreen(viewModel: DrawingScreenViewModel) {
-    UiUtils.SetStatusBarColor(DrawingScreenColor.PaletteBarColor)
-    UiUtils.SetNavigationBarColor(DrawingScreenColor.PaletteBarColor)
+    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
+    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)
 
     val viewModel = viewModel
     val canvasState by viewModel.canvasState.collectAsState()
@@ -59,7 +67,7 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
         topBar = {
             ColorPalette(
                 modifier = Modifier
-                    .background(DrawingScreenColor.PaletteBarColor)
+                    .background(CatppuccinUI.BackgroundColor)
                     .padding(horizontal = 8.dp, vertical = 2.dp),
                 viewModel = viewModel
             )
@@ -82,20 +90,20 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
                     },
                     valueRange = 1f..maxScale,
                     colors = SliderDefaults.colors(
-                        thumbColor = Color.White,
-                        activeTrackColor = DrawingScreenColor.SelectedToolColor,
-                        inactiveTrackColor = DrawingScreenColor.SelectedToolColor
+                        thumbColor = CatppuccinUI.SelectedColor,
+                        activeTrackColor = CatppuccinUI.Foreground0Color,
+                        inactiveTrackColor = CatppuccinUI.Foreground0Color
 
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(DrawingScreenColor.PaletteBarColor)
+                        .background(CatppuccinUI.BackgroundColor)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
                 ToolSelector(
                     modifier = Modifier
-                        .background(DrawingScreenColor.PaletteBarColor)
+                        .background(CatppuccinUI.BackgroundColor)
                         .padding(horizontal = 5.dp, vertical = 8.dp),
                     viewModel = viewModel
                 )
@@ -106,7 +114,7 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(DrawingScreenColor.BackgroundColor)
+                .background(CatppuccinUI.BackgroundColorDarker)
                 .zoomable(
                     zoomState = canvasZoomState,
                     enableOneFingerZoom = false,
@@ -130,4 +138,33 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun DrawingScreenPreview() {
+
+    val context = LocalContext.current
+
+    val storageLocationRepository = StorageLocationRepository(context)
+    val pixelCanvasRepository = PixelCanvasRepository(PixelCanvasModel(16, 16))
+
+    val database = AppDatabase.getInstance(context)
+    val spriteDataRepository = ISpriteDatabaseRepository(database.spriteDataDao(), database.spriteMetaDataDao())
+
+    val colorPaletteRepository = ColorPaletteRepository(context)
+    val lospecColorPaletteRepository = LospecColorPaletteRepository(context)
+
+    val viewModel = DrawingScreenViewModel(
+        spriteId = "dummy",
+        storageLocationRepository = storageLocationRepository,
+        pixelCanvasRepository = pixelCanvasRepository,
+        spriteDataRepository = spriteDataRepository,
+        colorPaletteRepository = colorPaletteRepository,
+        lospecColorPaletteRepository = lospecColorPaletteRepository,
+    )
+
+    DrawingScreen(
+        viewModel = viewModel
+    )
 }

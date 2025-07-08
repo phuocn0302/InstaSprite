@@ -3,21 +3,17 @@ package com.olaz.instasprite
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.model.PixelCanvasModel
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
-import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreen
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
-import com.olaz.instasprite.ui.theme.Typography
+import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import kotlinx.coroutines.launch
 
 class DrawingActivity : ComponentActivity() {
@@ -67,13 +63,8 @@ class DrawingActivity : ComponentActivity() {
         }
 
         setContent {
-            MaterialTheme(typography = Typography) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    DrawingScreen(viewModel)
-                }
+            InstaSpriteTheme {
+                DrawingScreen(viewModel)
             }
         }
     }

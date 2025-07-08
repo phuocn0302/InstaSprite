@@ -201,7 +201,7 @@ fun ToolItem(
         ),
         shape = CircleShape,
         contentPadding = PaddingValues(0.dp),
-        modifier = modifier.size(64.dp),
+        modifier = modifier.size(56.dp),
         onClick = onClick,
     ) {
         Icon(

@@ -2,6 +2,7 @@ package com.olaz.instasprite.ui.screens.homescreen
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -14,6 +15,8 @@ import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
+import com.olaz.instasprite.data.repository.StorageLocationRepository
+import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,8 +44,10 @@ data class HomeScreenState(
 
 class HomeScreenViewModel(
     private val spriteDatabaseRepository: ISpriteDatabaseRepository,
-    private val sortSettingRepository: SortSettingRepository
+    private val sortSettingRepository: SortSettingRepository,
+    private val storageLocationRepository: StorageLocationRepository,
 ) : ViewModel() {
+    private val saveFileUseCase = SaveFileUseCase()
 
     private val _uiState = MutableStateFlow(
         HomeScreenState()
@@ -59,6 +64,8 @@ class HomeScreenViewModel(
 
     var searchQuery by mutableStateOf("")
         private set
+
+    private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
 
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var spriteListOrder by mutableStateOf(SpriteListOrder.LastModifiedDesc)
@@ -97,6 +104,42 @@ class HomeScreenViewModel(
             showImagePager = !_uiState.value.showImagePager
         )
         currentSelectedSpriteIndex = spriteList.map { it.sprite }.indexOf(selectedSprite)
+    }
+
+    suspend fun getLastSavedLocation(): Uri? {
+        _lastSavedLocation.value = storageLocationRepository.getLastSavedLocation()
+        return _lastSavedLocation.value
+    }
+
+    fun setLastSavedLocation(uri: Uri) {
+        _lastSavedLocation.value = uri
+        viewModelScope.launch {
+            storageLocationRepository.setLastSavedLocation(uri)
+        }
+    }
+
+    fun saveImage(
+        context: Context,
+        ispriteData: ISpriteData,
+        folderUri: Uri,
+        fileName: String,
+        scalePercent: Int = 100
+    ): Boolean {
+        val result = saveFileUseCase.saveImageFile(
+            context,
+            ispriteData,
+            scalePercent,
+            folderUri,
+            fileName
+        )
+
+        result.fold(
+            onSuccess = { return true },
+            onFailure = { exception ->
+                Log.e("SaveFile", "Failed to save file", exception)
+                return false
+            }
+        )
     }
 
     fun deleteSpriteById(spriteId: String) {

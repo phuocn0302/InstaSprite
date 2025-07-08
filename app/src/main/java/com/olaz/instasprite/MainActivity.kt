@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
+import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreen
 import com.olaz.instasprite.ui.screens.homescreen.HomeScreenViewModel
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
@@ -28,10 +29,12 @@ class MainActivity : ComponentActivity() {
         val spriteDataRepository =
             ISpriteDatabaseRepository(database.spriteDataDao(), database.spriteMetaDataDao())
         val sortSettingRepository = SortSettingRepository(applicationContext)
+        val storageLocationRepository = StorageLocationRepository(applicationContext)
 
         val viewModel = HomeScreenViewModel(
             spriteDatabaseRepository = spriteDataRepository,
-            sortSettingRepository = sortSettingRepository
+            sortSettingRepository = sortSettingRepository,
+            storageLocationRepository = storageLocationRepository
         )
 
         setContent {

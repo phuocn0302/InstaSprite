@@ -229,6 +229,9 @@ class DrawingScreenViewModel(
     fun loadISprite(spriteData: ISpriteData) {
         setCanvasSize(spriteData.width, spriteData.height)
         pixelCanvasUseCase.setCanvas(spriteData)
+        spriteData.colorPalette?.let {
+            colorPaletteRepository.updatePalette(spriteData.colorPalette.map { Color(it) })
+        }
         canvasHistoryManager.reset()
         saveState()
     }

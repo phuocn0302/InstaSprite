@@ -24,6 +24,7 @@ import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
+import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.launch
 
@@ -74,9 +75,11 @@ fun LospecImportDialog(
                     placeholder = {
                         Text(
                             "https://lospec.com/palette-list/example",
-                             color = CatppuccinUI.Subtext1Color
+                             color = CatppuccinUI.Subtext0Color,
+                            style = CatppuccinTypography.bodyMedium
                         )
                     },
+                    textStyle = CatppuccinTypography.bodyMedium,
                     singleLine = true,
                     colors = CatppuccinUI.OutlineTextFieldColors.colors(),
                     modifier = Modifier.fillMaxWidth()

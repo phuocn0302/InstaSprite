@@ -59,6 +59,7 @@ import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.screens.drawingscreen.DrawingScreenViewModel
+import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -74,7 +75,7 @@ fun ColorWheelDialog(
     viewModel: DrawingScreenViewModel
 ) {
     val colorPaletteState by viewModel.colorPalette.collectAsState()
-    
+
     val hsv = remember {
         val hsvArray = floatArrayOf(0f, 0f, 0f)
         AndroidColor.colorToHSV(initialColor.toArgb(), hsvArray)
@@ -210,7 +211,7 @@ fun ColorWheelDialog(
                     )
                 )
 
-                Column {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ColorInputTextField(
                         value = hexValue.value,
                         onValueChange = { newText ->
@@ -310,7 +311,14 @@ private fun ColorInputTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, color = labelColor) },
-        placeholder = { Text(placeholder, color = Color.White) },
+        textStyle = CatppuccinTypography.bodyLarge,
+        placeholder = {
+            Text(
+                placeholder,
+                color = CatppuccinUI.Subtext0Color,
+                style = CatppuccinTypography.bodyLarge
+            )
+        },
         singleLine = true,
         colors = CatppuccinUI.OutlineTextFieldColors.colors(),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

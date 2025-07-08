@@ -282,6 +282,7 @@ private fun TopBar(
             .background(CatppuccinUI.BackgroundColor)
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()

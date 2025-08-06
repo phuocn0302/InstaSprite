@@ -31,6 +31,7 @@ data class CanvasState(
 
 data class DrawingScreenState(
     val selectedTool: Tool,
+    val toolSize: Int,
 )
 
 class DrawingScreenViewModel(
@@ -52,6 +53,7 @@ class DrawingScreenViewModel(
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
             selectedTool = PencilTool,
+            toolSize = 1,
         )
     )
     val uiState: StateFlow<DrawingScreenState> = _uiState.asStateFlow()
@@ -87,19 +89,24 @@ class DrawingScreenViewModel(
         _uiState.value = _uiState.value.copy(selectedTool = tool)
     }
 
+    fun setToolSize(size: Int) {
+        _uiState.value = _uiState.value.copy(toolSize = size)
+    }
+
     fun applyTool(
         row: Int,
         col: Int,
     ) {
         val tool = _uiState.value.selectedTool
         val color = activeColor.value
+        val size = _uiState.value.toolSize
 
         Log.d(
             "DrawingScreenViewModel",
             "Applying tool: ${tool.name} at row=$row, col=$col with color=${color.value}"
         )
 
-        tool.apply(pixelCanvasUseCase, row, col, color)
+        tool.apply(pixelCanvasUseCase, row, col, color, size)
     }
 
     fun getPixelData(row: Int, col: Int): Color {

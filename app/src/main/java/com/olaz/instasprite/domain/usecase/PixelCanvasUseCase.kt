@@ -22,6 +22,10 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setPixel(row, col, color)
     }
 
+    fun setPixel(row: Int, col: Int, color: Color, scale: Int) {
+        pixelCanvasRepository.setPixel(row, col, color, scale)
+    }
+
     fun getPixel(row: Int, col: Int): Color {
         return pixelCanvasRepository.getPixel(row, col)
     }

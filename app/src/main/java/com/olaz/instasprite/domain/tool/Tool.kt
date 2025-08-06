@@ -7,5 +7,10 @@ interface Tool {
     val icon: Int
     val name: String
     val description: String
-    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) : Unit
+
+    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color): Unit
+
+    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int): Unit {
+        apply(canvas, row, col, color)
+    }
 }

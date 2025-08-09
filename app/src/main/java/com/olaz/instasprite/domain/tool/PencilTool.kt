@@ -12,4 +12,8 @@ object PencilTool : Tool {
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
     }
+
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
+        canvas.setPixel(row, col, color, size)
+    }
 }

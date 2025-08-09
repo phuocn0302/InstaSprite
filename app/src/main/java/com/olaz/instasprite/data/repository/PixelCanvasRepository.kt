@@ -28,6 +28,38 @@ class PixelCanvasRepository(var model: PixelCanvasModel) {
         }
     }
 
+    fun setPixel(row: Int, col: Int, color: Color, scale: Int) {
+        var xStart = row
+        var xEnd = row
+        var yStart = col
+        var yEnd = col
+
+        for (s in 2..scale) {
+            if (s % 2 == 0) {
+                // Even scale → expand top-left
+                xStart -= 1
+                yStart -= 1
+            } else {
+                // Odd scale → expand bottom-right
+                xEnd += 1
+                yEnd += 1
+            }
+        }
+
+        // Clamp bounds to stay within matrix limits
+        xStart = xStart.coerceAtLeast(0)
+        yStart = yStart.coerceAtLeast(0)
+        xEnd = xEnd.coerceAtMost(height - 1)
+        yEnd = yEnd.coerceAtMost(width - 1)
+
+        // Fill all pixels in the region
+        for (row in xStart..xEnd) {
+            for (col in yStart..yEnd) {
+                setPixel(row, col, color)
+            }
+        }
+    }
+
     fun getPixel(row: Int, col: Int): Color {
         return if (row in 0 until height && col in 0 until width) {
             pixels[row * width + col]

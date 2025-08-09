@@ -4,24 +4,31 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +41,8 @@ import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
+import com.olaz.instasprite.domain.tool.EraserTool
+import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
@@ -49,6 +58,7 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
 
     val viewModel = viewModel
     val canvasState by viewModel.canvasState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     val maxScale by remember(canvasState.width, canvasState.height) {
         derivedStateOf {
@@ -65,14 +75,59 @@ fun DrawingScreen(viewModel: DrawingScreenViewModel) {
 
     val coroutineScope = rememberCoroutineScope()
 
+    var toolSizeValue by remember { mutableFloatStateOf(1f) } // Default brush size
+
     Scaffold(
         topBar = {
-            ColorPalette(
-                modifier = Modifier
-                    .background(CatppuccinUI.BackgroundColor)
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-                viewModel = viewModel
-            )
+            Column {
+                Box() {
+                    ColorPalette(
+                        modifier = Modifier
+                            .background(CatppuccinUI.BackgroundColor)
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        viewModel = viewModel
+                    )
+                }
+                Row() {
+                    if (uiState.selectedTool in listOf(PencilTool, EraserTool)) {
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(35.dp)
+                                .background(
+                                    color = CatppuccinUI.BackgroundColor,
+                                )
+
+                        ) {
+                            Text(
+                                text = "${toolSizeValue.toInt()}px",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier
+                                    .width(86.dp)
+                                    .padding(start = 32.dp)
+                                    .align(alignment = Alignment.Top)
+                            )
+
+                            Slider(
+                                value = toolSizeValue,
+                                onValueChange = {
+                                    toolSizeValue = it
+                                    viewModel.setToolSize(toolSizeValue.toInt())
+                                },
+                                valueRange = 1f..10f,
+                                steps = 8,
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .align(alignment = Alignment.CenterVertically)
+                                    .padding(start = 10.dp, end = 32.dp)
+                            )
+                        }
+                    }
+                }
+            }
         },
 
         bottomBar = {

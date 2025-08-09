@@ -12,4 +12,8 @@ object EraserTool : Tool {
     override fun apply(canvas: PixelCanvasUseCase, x: Int, y: Int, color: Color) {
         canvas.setPixel(x, y, Color.Transparent)
     }
+
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
+        canvas.setPixel(row, col, Color.Transparent, size)
+    }
 }
